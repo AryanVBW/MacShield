@@ -6,6 +6,26 @@
         <description>Most recent updates to MakLock</description>
         <language>en</language>
         <item>
+            <title>MakLock 1.0.1</title>
+            <pubDate>Mon, 17 Mar 2026 20:00:00 +0000</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>MakLock 1.0.1 — Bug Fix</h2>
+                <ul>
+                    <li>Fixed Apple Watch BLE reconnection and proximity reliability</li>
+                    <li>Improved Watch connectivity after sleep/wake cycles</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/dutkiewiczmaciej/MakLock/releases/download/v1.0.1/MakLock-1.0.1.dmg"
+                type="application/octet-stream"
+                sparkle:edSignature="LH5t9nTkuqpv87lTv+9ACLCNFtKFnmAzkOm/02wkX8vdJu+17SOex9pi1j2X1Yzg4De5nII8Kqe1M7iBfNgQDQ=="
+                length="2472865"
+            />
+        </item>
+        <item>
             <title>MakLock 1.0.0</title>
             <pubDate>Mon, 24 Feb 2026 03:00:00 +0000</pubDate>
             <sparkle:version>1</sparkle:version>
