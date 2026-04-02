@@ -1,51 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<rss version="2.0" xmlns:sparkle="http://www.sparkle-project.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
-        <title>MakLock Updates</title>
-        <link>https://dutkiewiczmaciej.github.io/MakLock/</link>
-        <description>Most recent updates to MakLock</description>
+        <title>MacShield Updates</title>
+        <link>https://AryanVBW.github.io/MacShield/appcast.xml</link>
+        <description>Most recent updates to MacShield</description>
         <language>en</language>
         <item>
-            <title>MakLock 1.0.1</title>
-            <pubDate>Mon, 17 Mar 2026 20:00:00 +0000</pubDate>
+            <title>Version 1.0.1</title>
             <sparkle:version>2</sparkle:version>
             <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <pubDate>Wed, 01 Apr 2026 12:00:00 +0000</pubDate>
             <description><![CDATA[
-                <h2>MakLock 1.0.1 — Bug Fix</h2>
+                <h2>MacShield 1.0.1</h2>
                 <ul>
-                    <li>Fixed Apple Watch BLE reconnection and proximity reliability</li>
-                    <li>Improved Watch connectivity after sleep/wake cycles</li>
+                    <li>Fix Apple Watch BLE reconnection and proximity reliability</li>
+                    <li>Bug fixes and stability improvements</li>
                 </ul>
             ]]></description>
             <enclosure
-                url="https://github.com/dutkiewiczmaciej/MakLock/releases/download/v1.0.1/MakLock-1.0.1.dmg"
+                url="https://github.com/AryanVBW/MacShield/releases/download/v1.0.1/MacShield.dmg"
                 type="application/octet-stream"
-                sparkle:edSignature="LH5t9nTkuqpv87lTv+9ACLCNFtKFnmAzkOm/02wkX8vdJu+17SOex9pi1j2X1Yzg4De5nII8Kqe1M7iBfNgQDQ=="
-                length="2472865"
-            />
-        </item>
-        <item>
-            <title>MakLock 1.0.0</title>
-            <pubDate>Mon, 24 Feb 2026 03:00:00 +0000</pubDate>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[
-                <h2>MakLock 1.0.0 — First Public Release</h2>
-                <ul>
-                    <li>Lock any macOS app with Touch ID or Apple Watch</li>
-                    <li>Full-screen blur overlay on all monitors</li>
-                    <li>Auto-lock on idle, sleep, or Watch out of range</li>
-                    <li>Auto-close inactive protected apps</li>
-                    <li>Menu bar app with Touch ID/Watch protection</li>
-                </ul>
-            ]]></description>
-            <enclosure
-                url="https://github.com/dutkiewiczmaciej/MakLock/releases/download/v1.0.0/MakLock-1.0.0.dmg"
-                type="application/octet-stream"
-                sparkle:edSignature="QB7mKQWucOWvtUOFR2DkpcYYNQNpJzzNl4333Mk9Np6AAxtWcmy3xZ8tV1SDPCsa6AhlofJji6yerPdMc68QAg=="
-                length="2463525"
+                sparkle:edSignature=""
+                length="0"
             />
         </item>
     </channel>

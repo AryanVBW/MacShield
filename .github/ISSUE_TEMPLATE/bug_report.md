@@ -27,7 +27,7 @@ What actually happened.
 ## Environment
 
 - macOS version:
-- MakLock version:
+- MacShield version:
 - Mac model:
 - Touch ID available: Yes / No
 

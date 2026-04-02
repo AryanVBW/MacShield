@@ -1,0 +1,151 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Release archive
+        run: |
+          xcodebuild archive \
+            -project MacShield.xcodeproj \
+            -scheme MacShield \
+            -configuration Release \
+            -archivePath build/MacShield.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true
+
+      - name: Export app from archive
+        run: |
+          mkdir -p build/export
+          cp -R build/MacShield.xcarchive/Products/Applications/MacShield.app build/export/
+
+      - name: Create DMG
+        run: |
+          mkdir -p build/dmg-stage
+          cp -R build/export/MacShield.app build/dmg-stage/
+          ln -s /Applications build/dmg-stage/Applications
+          hdiutil create -volname "MacShield" \
+            -srcfolder build/dmg-stage \
+            -ov -format UDZO \
+            build/MacShield.dmg
+
+      - name: Sign DMG with Sparkle EdDSA
+        if: env.SPARKLE_KEY != ''
+        env:
+          SPARKLE_KEY: ${{ secrets.SPARKLE_KEY }}
+        run: |
+          # Resolve Sparkle package path from SPM
+          SPARKLE_PATH=$(find ~/Library/Developer/Xcode/DerivedData \
+            -path "*/SourcePackages/artifacts/sparkle/Sparkle/bin" \
+            -type d 2>/dev/null | head -1)
+
+          if [ -z "$SPARKLE_PATH" ]; then
+            # Build to fetch SPM dependencies and try again
+            xcodebuild build \
+              -project MacShield.xcodeproj \
+              -scheme MacShield \
+              -destination 'platform=macOS' \
+              -configuration Release \
+              CODE_SIGNING_ALLOWED=NO 2>/dev/null || true
+            SPARKLE_PATH=$(find ~/Library/Developer/Xcode/DerivedData \
+              -path "*/SourcePackages/artifacts/sparkle/Sparkle/bin" \
+              -type d 2>/dev/null | head -1)
+          fi
+
+          if [ -n "$SPARKLE_PATH" ] && [ -f "$SPARKLE_PATH/sign_update" ]; then
+            SIGNATURE=$("$SPARKLE_PATH/sign_update" build/MacShield.dmg --ed-key-file <(echo "$SPARKLE_KEY") 2>&1 | grep 'sparkle:edSignature=' | sed 's/.*sparkle:edSignature="\([^"]*\)".*/\1/')
+            echo "ED_SIGNATURE=$SIGNATURE" >> "$GITHUB_ENV"
+            echo "Sparkle EdDSA signature generated."
+          else
+            echo "::warning::Sparkle sign_update not found. Generating signature with openssl."
+            # Fallback: generate EdDSA signature using Swift
+            SIGNATURE=$(swift -e '
+              import CryptoKit; import Foundation
+              let keyData = Data(base64Encoded: ProcessInfo.processInfo.environment["SPARKLE_KEY"]!)!
+              let privateKey = try! Curve25519.Signing.PrivateKey(rawRepresentation: keyData.prefix(32))
+              let fileData = try! Data(contentsOf: URL(fileURLWithPath: "build/MacShield.dmg"))
+              let sig = try! privateKey.signature(for: fileData)
+              print(sig.base64EncodedString())
+            ')
+            echo "ED_SIGNATURE=$SIGNATURE" >> "$GITHUB_ENV"
+          fi
+
+      - name: Get DMG size
+        run: |
+          DMG_SIZE=$(stat -f%z build/MacShield.dmg)
+          echo "DMG_SIZE=$DMG_SIZE" >> "$GITHUB_ENV"
+
+      - name: Update appcast.xml
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          PUB_DATE=$(date -u '+%a, %d %b %Y %H:%M:%S +0000')
+          cat > docs/appcast.xml << APPCAST_EOF
+          <?xml version="1.0" encoding="utf-8"?>
+          <rss version="2.0" xmlns:sparkle="http://www.sparkle-project.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+              <channel>
+                  <title>MacShield Updates</title>
+                  <link>https://AryanVBW.github.io/MacShield/appcast.xml</link>
+                  <description>Most recent updates to MacShield</description>
+                  <language>en</language>
+                  <item>
+                      <title>Version ${VERSION}</title>
+                      <sparkle:version>${VERSION}</sparkle:version>
+                      <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
+                      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+                      <pubDate>${PUB_DATE}</pubDate>
+                      <enclosure
+                          url="https://github.com/AryanVBW/MacShield/releases/download/v${VERSION}/MacShield.dmg"
+                          type="application/octet-stream"
+                          sparkle:edSignature="${ED_SIGNATURE:-}"
+                          length="${DMG_SIZE}"
+                      />
+                  </item>
+              </channel>
+          </rss>
+          APPCAST_EOF
+
+      - name: Commit updated appcast.xml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+          git add docs/appcast.xml
+          git diff --cached --quiet && echo "No appcast changes" || \
+            git commit -m "Update appcast.xml for v${{ steps.version.outputs.VERSION }}" && \
+            git push origin main
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MacShield v${{ steps.version.outputs.VERSION }}
+          body: |
+            ## MacShield v${{ steps.version.outputs.VERSION }}
+
+            ### Installation
+            1. Download `MacShield.dmg` below
+            2. Open the DMG and drag MacShield to Applications
+            3. Launch MacShield from Applications
+
+            **Requires macOS 13.0+**
+          files: build/MacShield.dmg
+          draft: false
+          prerelease: false
