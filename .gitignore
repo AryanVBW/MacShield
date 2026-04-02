@@ -3,6 +3,7 @@ build/
 DerivedData/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
+*.xcuserstate
 *.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 
 # Swift Package Manager
@@ -23,6 +24,12 @@ CLAUDE.md
 icon-proposals.html
 icon-render.html
 .playwright-mcp/
+
+# Secrets — NEVER commit
+.secrets/
+*.pem
+*.p12
+sparkle_private_key*
 
 # Archives and distribution
 *.dmg

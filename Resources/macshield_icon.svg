@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1C1C1E"/>
+      <stop offset="100%" stop-color="#0A0A0A"/>
+    </linearGradient>
+    <!-- Shield gradient -->
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD213"/>
+      <stop offset="100%" stop-color="#E6B800"/>
+    </linearGradient>
+    <!-- Inner shield gradient -->
+    <linearGradient id="innerGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A1A1C"/>
+      <stop offset="100%" stop-color="#111113"/>
+    </linearGradient>
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Subtle shadow -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="1024" height="1024" rx="228" ry="228" fill="url(#bgGrad)"/>
+
+  <!-- Outer shield shape (gold border) -->
+  <path d="M512 130
+           C512 130 280 190 200 240
+           C200 240 170 600 512 890
+           C854 600 824 240 824 240
+           C744 190 512 130 512 130Z"
+        fill="url(#shieldGrad)" filter="url(#shadow)"/>
+
+  <!-- Inner shield (dark fill) -->
+  <path d="M512 175
+           C512 175 300 228 230 272
+           C230 272 204 580 512 842
+           C820 580 794 272 794 272
+           C724 228 512 175 512 175Z"
+        fill="url(#innerGrad)"/>
+
+  <!-- Eye shape (gold) -->
+  <g filter="url(#glow)">
+    <!-- Eye outline -->
+    <path d="M310 500
+             C370 400 440 360 512 360
+             C584 360 654 400 714 500
+             C654 600 584 640 512 640
+             C440 640 370 600 310 500Z"
+          fill="none" stroke="#FFD213" stroke-width="16" stroke-linejoin="round"/>
+
+    <!-- Iris circle -->
+    <circle cx="512" cy="500" r="62" fill="none" stroke="#FFD213" stroke-width="14"/>
+
+    <!-- Pupil dot -->
+    <circle cx="512" cy="500" r="24" fill="#FFD213"/>
+
+    <!-- Slash line (privacy / hidden) -->
+    <line x1="340" y1="620" x2="684" y2="380"
+          stroke="#FFD213" stroke-width="20" stroke-linecap="round"/>
+
+    <!-- Second slash line (background dark to create "cut" effect) -->
+    <line x1="340" y1="620" x2="684" y2="380"
+          stroke="#131315" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Small lock at bottom of shield -->
+  <g transform="translate(512, 740)" filter="url(#glow)">
+    <!-- Lock body -->
+    <rect x="-22" y="-6" width="44" height="32" rx="6" fill="#FFD213"/>
+    <!-- Lock shackle -->
+    <path d="M-12 -6 L-12 -20 A12 12 0 0 1 12 -20 L12 -6"
+          fill="none" stroke="#FFD213" stroke-width="6" stroke-linecap="round"/>
+    <!-- Keyhole -->
+    <circle cx="0" cy="8" r="6" fill="#131315"/>
+    <rect x="-3" y="8" width="6" height="10" rx="2" fill="#131315"/>
+  </g>
+</svg>
