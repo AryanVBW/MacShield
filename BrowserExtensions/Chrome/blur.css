@@ -1,0 +1,146 @@
+/* MacShield Web — Chat Blur CSS */
+/* Blur rules per chat platform. Messages are blurred by default, revealed on hover. */
+
+:root {
+  --gv-blur: 8px;
+  --gv-transition: 0.2s ease;
+}
+
+/* ===== WhatsApp Web ===== */
+.web.whatsapp.com .message-in .copyable-text,
+.web.whatsapp.com .message-out .copyable-text,
+[data-testid="msg-container"] .selectable-text {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+[data-testid="msg-container"]:hover .selectable-text {
+  filter: blur(0);
+}
+
+/* WhatsApp — chat list preview */
+[data-testid="cell-frame-container"] [data-testid="last-msg-status"] {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+[data-testid="cell-frame-container"]:hover [data-testid="last-msg-status"] {
+  filter: blur(0);
+}
+
+/* ===== Instagram DMs ===== */
+/* Message bubbles */
+div[role="listbox"] div[role="row"] span,
+div[role="listbox"] div[role="row"] p {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+div[role="listbox"] div[role="row"]:hover span,
+div[role="listbox"] div[role="row"]:hover p {
+  filter: blur(0);
+}
+
+/* ===== Telegram Web ===== */
+.message .text-content,
+.message .media-container {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+.message:hover .text-content,
+.message:hover .media-container {
+  filter: blur(0);
+}
+
+/* ===== Discord ===== */
+[class*="messageContent-"],
+[class*="embedDescription-"],
+[class*="markup-"] {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+[class*="message-"]:hover [class*="messageContent-"],
+[class*="message-"]:hover [class*="embedDescription-"],
+[class*="message-"]:hover [class*="markup-"] {
+  filter: blur(0);
+}
+
+/* ===== Slack ===== */
+.c-message__body,
+.c-message_kit__text {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+.c-message:hover .c-message__body,
+.c-message_kit__message:hover .c-message_kit__text {
+  filter: blur(0);
+}
+
+/* ===== X / Twitter DMs ===== */
+[data-testid="messageEntry"] [data-testid="tweetText"],
+[data-testid="DmActivityViewRenderer"] [dir="auto"] {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+[data-testid="messageEntry"]:hover [data-testid="tweetText"],
+[data-testid="DmActivityViewRenderer"]:hover [dir="auto"] {
+  filter: blur(0);
+}
+
+/* ===== LinkedIn Messages ===== */
+.msg-s-event-listitem__body,
+.msg-s-message-group__msg {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+.msg-s-event-listitem:hover .msg-s-event-listitem__body,
+.msg-s-message-group:hover .msg-s-message-group__msg {
+  filter: blur(0);
+}
+
+/* ===== Gmail ===== */
+.a3s.aiL, /* Email body */
+.y2 /* Snippet in list */ {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+tr:hover .y2 {
+  filter: blur(0);
+}
+.a3s.aiL:hover {
+  filter: blur(0);
+}
+
+/* ===== Microsoft Teams ===== */
+[data-tid="messageBodyContent"],
+.cke_contents {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+[data-tid="messageBodyContent"]:hover,
+.cke_contents:hover {
+  filter: blur(0);
+}
+
+/* ===== Facebook Messenger ===== */
+[data-scope="messages_table"] [dir="auto"],
+.__fb-light-mode [role="row"] [dir="auto"] {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+[data-scope="messages_table"] [role="row"]:hover [dir="auto"],
+.__fb-light-mode [role="row"]:hover [dir="auto"] {
+  filter: blur(0);
+}
+
+/* ===== Google Messages ===== */
+.text-msg-content,
+mws-relative-timestamp + div {
+  filter: blur(var(--gv-blur));
+  transition: filter var(--gv-transition);
+}
+mws-message-wrapper:hover .text-msg-content {
+  filter: blur(0);
+}
+
+/* ===== Global disabled state ===== */
+body.macshield-disabled * {
+  filter: none !important;
+}

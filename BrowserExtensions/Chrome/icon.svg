@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD213"/>
+      <stop offset="100%" stop-color="#E6B800"/>
+    </linearGradient>
+    <linearGradient id="innerGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A1A1C"/>
+      <stop offset="100%" stop-color="#111113"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield (gold border) -->
+  <path d="M64 8
+           C64 8 30 18 18 24
+           C18 24 14 72 64 110
+           C114 72 110 24 110 24
+           C98 18 64 8 64 8Z"
+        fill="url(#shieldGrad)"/>
+
+  <!-- Inner shield -->
+  <path d="M64 14
+           C64 14 34 23 24 28
+           C24 28 20 70 64 104
+           C108 70 104 28 104 28
+           C94 23 64 14 64 14Z"
+        fill="url(#innerGrad)"/>
+
+  <!-- Eye -->
+  <path d="M34 60
+           C42 48 52 42 64 42
+           C76 42 86 48 94 60
+           C86 72 76 78 64 78
+           C52 78 42 72 34 60Z"
+        fill="none" stroke="#FFD213" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="64" cy="60" r="9" fill="none" stroke="#FFD213" stroke-width="2"/>
+  <circle cx="64" cy="60" r="3.5" fill="#FFD213"/>
+
+  <!-- Slash -->
+  <line x1="38" y1="74" x2="90" y2="46" stroke="#FFD213" stroke-width="3" stroke-linecap="round"/>
+  <line x1="38" y1="74" x2="90" y2="46" stroke="#131315" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Lock -->
+  <g transform="translate(64, 90)">
+    <rect x="-5" y="-1" width="10" height="7" rx="1.5" fill="#FFD213"/>
+    <path d="M-3 -1 L-3 -5 A3 3 0 0 1 3 -5 L3 -1" fill="none" stroke="#FFD213" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="0" cy="2" r="1.3" fill="#131315"/>
+  </g>
+</svg>

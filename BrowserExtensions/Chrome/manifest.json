@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "MacShield Web — Chat Blur",
+  "version": "1.0.0",
+  "description": "Blur chat messages on web apps for privacy. Reveal on hover.",
+  "permissions": ["storage", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://web.whatsapp.com/*",
+        "*://www.instagram.com/*",
+        "*://web.telegram.org/*",
+        "*://discord.com/*",
+        "*://app.slack.com/*",
+        "*://x.com/*",
+        "*://twitter.com/*",
+        "*://www.linkedin.com/*",
+        "*://mail.google.com/*",
+        "*://teams.microsoft.com/*",
+        "*://www.messenger.com/*",
+        "*://www.facebook.com/messages/*",
+        "*://messages.google.com/*"
+      ],
+      "css": ["blur.css"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
