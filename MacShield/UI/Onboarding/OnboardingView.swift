@@ -1,0 +1,373 @@
+import SwiftUI
+import ServiceManagement
+
+/// First-launch onboarding view with welcome, safety tutorial, password setup, and finish.
+struct OnboardingView: View {
+    @State private var currentStep = 0
+    let onComplete: () -> Void
+
+    private let totalSteps = 5
+
+    private let infoSteps: [Int: OnboardingInfoStep] = [
+        0: OnboardingInfoStep(
+            icon: "lock.shield.fill",
+            title: "Welcome to MacShield",
+            description: "Lock any macOS app with Touch ID or password.\nYour apps, your privacy."
+        ),
+        // Step 1 = Panic Key (custom view with visual keycaps)
+        // Step 2 = Password Setup (custom view)
+        3: OnboardingInfoStep(
+            icon: "plus.app.fill",
+            title: "Add Apps to Protect",
+            description: "Open Settings → Apps to choose which applications require authentication.\n\nStart with a test app like Chess."
+        )
+        // Step 4 = Final Step (custom view with Launch at Login toggle)
+    ]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Group {
+                switch currentStep {
+                case 1:
+                    PanicKeyStep()
+                case 2:
+                    PasswordSetupStep(onContinue: { advanceStep() })
+                case 4:
+                    FinalStep()
+                default:
+                    if let info = infoSteps[currentStep] {
+                        InfoStepView(step: info)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .animation(MacShieldAnimations.standard, value: currentStep)
+
+            // Navigation
+            HStack {
+                HStack(spacing: 8) {
+                    ForEach(0..<totalSteps, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentStep ? MacShieldColors.gold : Color.gray.opacity(0.3))
+                            .frame(width: 8, height: 8)
+                    }
+                }
+
+                Spacer()
+
+                // Password step handles its own button
+                if currentStep != 2 {
+                    if currentStep < totalSteps - 1 {
+                        PrimaryButton("Continue") {
+                            advanceStep()
+                        }
+                    } else {
+                        PrimaryButton("Get Started") {
+                            onComplete()
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 32)
+            .padding(.bottom, 24)
+        }
+        .frame(width: 480, height: 440)
+        .background(MacShieldColors.background)
+    }
+
+    private func advanceStep() {
+        withAnimation(MacShieldAnimations.standard) {
+            currentStep += 1
+        }
+    }
+}
+
+// MARK: - Info Step
+
+private struct InfoStepView: View {
+    let step: OnboardingInfoStep
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Image(systemName: step.icon)
+                .font(.system(size: 48))
+                .foregroundColor(MacShieldColors.gold)
+                .frame(height: 60)
+
+            Text(step.title)
+                .font(MacShieldTypography.largeTitle)
+                .foregroundColor(MacShieldColors.textPrimary)
+                .multilineTextAlignment(.center)
+
+            Text(step.description)
+                .font(MacShieldTypography.body)
+                .foregroundColor(MacShieldColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 340)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Panic Key Step
+
+private struct PanicKeyStep: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(MacShieldColors.gold)
+                .frame(height: 60)
+
+            Text("Emergency Panic Key")
+                .font(MacShieldTypography.largeTitle)
+                .foregroundColor(MacShieldColors.textPrimary)
+
+            Text("If you ever get locked out, this shortcut\ninstantly dismisses all overlays:")
+                .font(MacShieldTypography.body)
+                .foregroundColor(MacShieldColors.textSecondary)
+                .multilineTextAlignment(.center)
+
+            // Visual keyboard shortcut
+            HStack(spacing: 6) {
+                KeyCap("⌘", label: "Command")
+                Text("+").foregroundColor(MacShieldColors.textSecondary)
+                KeyCap("⌥", label: "Option")
+                Text("+").foregroundColor(MacShieldColors.textSecondary)
+                KeyCap("⇧", label: "Shift")
+                Text("+").foregroundColor(MacShieldColors.textSecondary)
+                KeyCap("⌃", label: "Control")
+                Text("+").foregroundColor(MacShieldColors.textSecondary)
+                KeyCap("U", label: nil)
+            }
+            .padding(.vertical, 8)
+
+            Text("Try it now — it always works, even in full screen.")
+                .font(MacShieldTypography.caption)
+                .foregroundColor(MacShieldColors.textSecondary)
+                .multilineTextAlignment(.center)
+
+            Spacer()
+        }
+    }
+}
+
+/// A visual keyboard key cap.
+private struct KeyCap: View {
+    let symbol: String
+    let label: String?
+
+    init(_ symbol: String, label: String?) {
+        self.symbol = symbol
+        self.label = label
+    }
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(symbol)
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundColor(MacShieldColors.textPrimary)
+                .frame(width: 36, height: 36)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(MacShieldColors.cardDark)
+                        .shadow(color: .black.opacity(0.4), radius: 1, y: 2)
+                )
+
+            Text(label ?? " ")
+                .font(.system(size: 8))
+                .foregroundColor(label != nil ? MacShieldColors.textSecondary : .clear)
+        }
+    }
+}
+
+// MARK: - Password Setup Step
+
+private struct PasswordSetupStep: View {
+    let onContinue: () -> Void
+
+    @State private var password = ""
+    @State private var confirmPassword = ""
+    @State private var errorMessage: String?
+    @State private var isSaved = false
+    @State private var showPassword = false
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Spacer()
+
+            Image(systemName: "key.fill")
+                .font(.system(size: 48))
+                .foregroundColor(MacShieldColors.gold)
+                .frame(height: 60)
+
+            Text("Set Backup Password")
+                .font(MacShieldTypography.largeTitle)
+                .foregroundColor(MacShieldColors.textPrimary)
+
+            Text("Required as fallback when Touch ID is unavailable.\nYou can change it later in Settings.")
+                .font(MacShieldTypography.body)
+                .foregroundColor(MacShieldColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 340)
+
+            if isSaved {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(MacShieldColors.success)
+                    Text("Password saved!")
+                        .font(MacShieldTypography.body)
+                        .foregroundColor(MacShieldColors.success)
+                }
+                .padding(.top, 8)
+
+                PrimaryButton("Continue") {
+                    onContinue()
+                }
+            } else {
+                VStack(spacing: 10) {
+                    passwordField("Password (4+ characters)", text: $password)
+                    passwordField("Confirm Password", text: $confirmPassword)
+                        .onSubmit { savePassword() }
+                }
+
+                // Show/hide toggle
+                Button(action: { showPassword.toggle() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: showPassword ? "eye.slash" : "eye")
+                            .font(.system(size: 11))
+                        Text(showPassword ? "Hide password" : "Show password")
+                            .font(MacShieldTypography.caption)
+                    }
+                    .foregroundColor(MacShieldColors.textSecondary)
+                }
+                .buttonStyle(.plain)
+
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(MacShieldTypography.caption)
+                        .foregroundColor(MacShieldColors.error)
+                }
+
+                PrimaryButton("Save Password") {
+                    savePassword()
+                }
+            }
+
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private func passwordField(_ placeholder: String, text: Binding<String>) -> some View {
+        Group {
+            if showPassword {
+                TextField(placeholder, text: text)
+            } else {
+                SecureField(placeholder, text: text)
+            }
+        }
+        .textFieldStyle(.roundedBorder)
+        .frame(width: 260)
+    }
+
+    private func savePassword() {
+        guard !password.isEmpty else {
+            errorMessage = "Password cannot be empty."
+            return
+        }
+        guard password.count >= 4 else {
+            errorMessage = "Password must be at least 4 characters."
+            return
+        }
+        guard password == confirmPassword else {
+            errorMessage = "Passwords do not match."
+            return
+        }
+
+        let saved = KeychainManager.shared.savePassword(password)
+        if saved {
+            Defaults.shared.isBackupPasswordSet = true
+            withAnimation(MacShieldAnimations.standard) {
+                isSaved = true
+            }
+        } else {
+            errorMessage = "Failed to save. Please try again."
+        }
+    }
+}
+
+// MARK: - Final Step
+
+private struct FinalStep: View {
+    @State private var launchAtLogin = true
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Image(systemName: "touchid")
+                .font(.system(size: 48))
+                .foregroundColor(MacShieldColors.gold)
+                .frame(height: 60)
+
+            Text("You're All Set")
+                .font(MacShieldTypography.largeTitle)
+                .foregroundColor(MacShieldColors.textPrimary)
+                .multilineTextAlignment(.center)
+
+            Text("MacShield runs in your menu bar.\nProtected apps will require Touch ID — just put your finger on the sensor.")
+                .font(MacShieldTypography.body)
+                .foregroundColor(MacShieldColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 340)
+
+            VStack(spacing: 12) {
+                Toggle("Launch MacShield at login", isOn: $launchAtLogin)
+                    .toggleStyle(.goldSwitch)
+
+                Text("You can also configure idle auto-lock\nand other options in Settings.")
+                    .font(MacShieldTypography.caption)
+                    .foregroundColor(MacShieldColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 40)
+            .padding(.top, 8)
+
+            Spacer()
+        }
+        .onDisappear {
+            saveLaunchAtLogin()
+        }
+    }
+
+    private func saveLaunchAtLogin() {
+        var settings = Defaults.shared.appSettings
+        settings.launchAtLogin = launchAtLogin
+        Defaults.shared.appSettings = settings
+
+        do {
+            if launchAtLogin {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            NSLog("[MacShield] Failed to set login item: %@", error.localizedDescription)
+        }
+    }
+}
+
+// MARK: - Models
+
+private struct OnboardingInfoStep {
+    let icon: String
+    let title: String
+    let description: String
+}
