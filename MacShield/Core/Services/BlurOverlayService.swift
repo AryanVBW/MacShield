@@ -113,11 +113,6 @@ final class BlurOverlayService: ObservableObject {
         guard !isMonitoring else { return }
         isMonitoring = true
 
-        // Prompt for Screen Recording permission if not yet granted
-        if !CGPreflightScreenCaptureAccess() {
-            CGRequestScreenCaptureAccess()
-        }
-
         let workspace = NSWorkspace.shared
 
         // Monitor app activations — show blur when a blurred app comes to foreground

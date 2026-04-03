@@ -2,7 +2,8 @@ import AppKit
 
 /// Manages blur overlay windows — one per blurred app window.
 /// Each overlay is a borderless, transparent NSPanel positioned
-/// exactly over the target app's window.
+/// exactly over the target app's window. Click-through so users
+/// can interact with the app normally while the blur is active.
 final class BlurWindowManager {
     static let shared = BlurWindowManager()
 
@@ -12,8 +13,11 @@ final class BlurWindowManager {
     /// Active blur content views keyed by target app PID.
     private(set) var blurViews: [pid_t: BlurContentView] = [:]
 
-    /// Refresh timer for continuous blur updates.
+    /// Refresh timer for continuous reveal-zone updates.
     private var refreshTimer: Timer?
+
+    /// Global mouse-event monitor (for reveal zone tracking).
+    private var mouseMonitor: Any?
 
     private init() {}
 
@@ -47,21 +51,19 @@ final class BlurWindowManager {
         panel.backgroundColor = .clear
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.ignoresMouseEvents = false
         panel.hasShadow = false
         panel.isReleasedWhenClosed = false
         panel.animationBehavior = .none
         panel.hidesOnDeactivate = false
         panel.becomesKeyOnlyIfNeeded = true
 
-        // Find the CGWindowID for the target app
-        let targetWindowID = findWindowID(for: app)
+        // CRITICAL: click-through so the user can interact with the app beneath
+        panel.ignoresMouseEvents = true
 
         let blurView = BlurContentView(frame: NSRect(origin: .zero, size: appKitFrame.size))
         blurView.blurRadius = CGFloat(settings.blurIntensity)
         blurView.revealRadius = CGFloat(settings.revealRadius)
         blurView.revealOnHover = settings.revealOnHover
-        blurView.targetWindowID = targetWindowID
         blurView.autoresizingMask = [.width, .height]
 
         panel.contentView = blurView
@@ -75,7 +77,8 @@ final class BlurWindowManager {
             self?.repositionOverlay(pid: pid, to: newFrame)
         }
 
-        // Start refresh timer if not already running
+        // Start mouse tracking and refresh timer if not already running
+        startMouseMonitoring()
         startRefreshTimer()
 
         NSLog("[MacShield] Blur overlay created for %@ (pid %d)", app.localizedName ?? "unknown", pid)
@@ -88,7 +91,6 @@ final class BlurWindowManager {
             blurView.blurRadius = CGFloat(settings.blurIntensity)
             blurView.revealRadius = CGFloat(settings.revealRadius)
             blurView.revealOnHover = settings.revealOnHover
-            blurView.needsDisplay = true
         }
     }
 
@@ -109,6 +111,7 @@ final class BlurWindowManager {
 
         if overlayWindows.isEmpty {
             stopRefreshTimer()
+            stopMouseMonitoring()
         }
     }
 
@@ -120,6 +123,7 @@ final class BlurWindowManager {
         }
         WindowTracker.shared.stopAll()
         stopRefreshTimer()
+        stopMouseMonitoring()
         NSLog("[MacShield] All blur overlays removed")
     }
 
@@ -144,32 +148,46 @@ final class BlurWindowManager {
         return NSRect(x: rect.origin.x, y: flippedY, width: rect.size.width, height: rect.size.height)
     }
 
-    /// Find the CGWindowID for the frontmost window of the given app.
-    private func findWindowID(for app: NSRunningApplication) -> CGWindowID {
-        let pid = app.processIdentifier
-        guard let windowList = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] else {
-            return 0
-        }
+    // MARK: - Mouse Tracking
 
-        for info in windowList {
-            guard let windowPID = info[kCGWindowOwnerPID as String] as? Int32,
-                  let windowID = info[kCGWindowNumber as String] as? CGWindowID,
-                  let windowLayer = info[kCGWindowLayer as String] as? Int else {
-                continue
-            }
-            // Layer 0 = normal windows
-            if windowPID == pid && windowLayer == 0 {
-                return windowID
-            }
+    /// Install a global mouse-moved monitor to track the cursor
+    /// and update reveal zones on all active blur views.
+    private func startMouseMonitoring() {
+        guard mouseMonitor == nil else { return }
+
+        // Use addGlobalMonitorForEvents to track mouse even when our overlay
+        // doesn't receive events (ignoresMouseEvents = true).
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.mouseMoved, .leftMouseDragged, .rightMouseDragged]
+        ) { [weak self] _ in
+            self?.updateRevealPositions()
         }
-        return 0
     }
 
-    /// Refresh timer to keep blur content up-to-date.
+    private func stopMouseMonitoring() {
+        if let monitor = mouseMonitor {
+            NSEvent.removeMonitor(monitor)
+            mouseMonitor = nil
+        }
+    }
+
+    /// Push current mouse location into every active blur view.
+    private func updateRevealPositions() {
+        let mouseLocation = NSEvent.mouseLocation  // screen coordinates
+        for (_, blurView) in blurViews {
+            if blurView.revealOnHover {
+                blurView.updateRevealFromScreenPoint(mouseLocation)
+            }
+        }
+    }
+
+    // MARK: - Refresh Timer
+
+    /// Refresh timer to keep overlay positions and reveal zones up-to-date.
     private func startRefreshTimer() {
         guard refreshTimer == nil else { return }
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 10.0, repeats: true) { [weak self] _ in
-            self?.refreshOverlays()
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            self?.updateRevealPositions()
         }
         RunLoop.main.add(refreshTimer!, forMode: .common)
     }
@@ -177,11 +195,5 @@ final class BlurWindowManager {
     private func stopRefreshTimer() {
         refreshTimer?.invalidate()
         refreshTimer = nil
-    }
-
-    private func refreshOverlays() {
-        for (_, blurView) in blurViews {
-            blurView.needsDisplay = true
-        }
     }
 }

@@ -13,16 +13,43 @@ final class WindowTracker {
 
     // MARK: - Window Frame
 
-    /// Get the frame of the frontmost window for the given app.
+    /// Get the frame of the main (largest) window for the given app.
+    /// Falls back to the first window if only one exists.
+    /// This avoids picking small utility/toolbar windows that some apps
+    /// (like WhatsApp) create alongside the main window.
     func getWindowFrame(for app: NSRunningApplication) -> CGRect? {
         let appElement = AXUIElementCreateApplication(app.processIdentifier)
         var windowsRef: AnyObject?
         let result = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &windowsRef)
         guard result == .success,
               let windows = windowsRef as? [AXUIElement],
-              let window = windows.first else { return nil }
+              !windows.isEmpty else { return nil }
 
-        return frameForElement(window)
+        // Try to find the AXMain window first
+        for window in windows {
+            var mainRef: AnyObject?
+            AXUIElementCopyAttributeValue(window, kAXMainAttribute as CFString, &mainRef)
+            if let isMain = mainRef as? Bool, isMain {
+                return frameForElement(window)
+            }
+        }
+
+        // Fall back to the largest window by area
+        var bestFrame: CGRect? = nil
+        var bestArea: CGFloat = 0
+        for window in windows {
+            guard let frame = frameForElement(window) else { continue }
+            // Skip tiny windows (toolbars, popovers, etc.)
+            if frame.width < 100 || frame.height < 100 { continue }
+            let area = frame.width * frame.height
+            if area > bestArea {
+                bestArea = area
+                bestFrame = frame
+            }
+        }
+
+        // Final fallback: first window with any frame
+        return bestFrame ?? frameForElement(windows[0])
     }
 
     /// Get frames of ALL windows for the given app.
@@ -58,10 +85,42 @@ final class WindowTracker {
         var windowsRef: AnyObject?
         AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &windowsRef)
 
-        if let windows = windowsRef as? [AXUIElement], let window = windows.first {
-            let selfPtr = Unmanaged.passUnretained(self).toOpaque()
-            AXObserverAddNotification(obs, window, kAXMovedNotification as CFString, selfPtr)
-            AXObserverAddNotification(obs, window, kAXResizedNotification as CFString, selfPtr)
+        if let windows = windowsRef as? [AXUIElement] {
+            // Find the main window to observe (same logic as getWindowFrame)
+            var targetWindow: AXUIElement? = nil
+
+            // Prefer AXMain window
+            for window in windows {
+                var mainRef: AnyObject?
+                AXUIElementCopyAttributeValue(window, kAXMainAttribute as CFString, &mainRef)
+                if let isMain = mainRef as? Bool, isMain {
+                    targetWindow = window
+                    break
+                }
+            }
+
+            // Fall back to largest window
+            if targetWindow == nil {
+                var bestArea: CGFloat = 0
+                for window in windows {
+                    guard let frame = frameForElement(window) else { continue }
+                    if frame.width < 100 || frame.height < 100 { continue }
+                    let area = frame.width * frame.height
+                    if area > bestArea {
+                        bestArea = area
+                        targetWindow = window
+                    }
+                }
+            }
+
+            // Final fallback
+            if targetWindow == nil { targetWindow = windows.first }
+
+            if let window = targetWindow {
+                let selfPtr = Unmanaged.passUnretained(self).toOpaque()
+                AXObserverAddNotification(obs, window, kAXMovedNotification as CFString, selfPtr)
+                AXObserverAddNotification(obs, window, kAXResizedNotification as CFString, selfPtr)
+            }
         }
 
         CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(obs), .defaultMode)

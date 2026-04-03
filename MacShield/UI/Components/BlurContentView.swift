@@ -1,215 +1,196 @@
 import AppKit
-import CoreImage
 
-/// NSView that renders a blurred version of the content behind it,
+/// NSView that renders a privacy blur over the content behind its window,
 /// with a circular "reveal zone" around the mouse position.
+///
+/// Uses NSVisualEffectView with .behindWindow blending — no screen capture
+/// or Screen Recording permission required. GPU-accelerated and always in sync.
 final class BlurContentView: NSView {
+
+    /// Controls tint darkness (mapped from user's 2–20 intensity setting).
     var blurRadius: CGFloat = 8.0 {
-        didSet { needsDisplay = true }
+        didSet { updateTintOpacity() }
     }
+
+    /// Center of the circular reveal zone (view coordinates).
     var revealCenter: NSPoint? = nil {
-        didSet { needsDisplay = true }
+        didSet { updateRevealMask() }
     }
+
+    /// Radius of the reveal zone in points.
     var revealRadius: CGFloat = 200.0 {
-        didSet { needsDisplay = true }
+        didSet { updateRevealMask() }
     }
+
+    /// true = reveal follows mouse hover; false = reveal on click.
     var revealOnHover: Bool = true
 
-    /// The window ID of the target app window we are blurring.
-    var targetWindowID: CGWindowID = 0
+    // MARK: - Subviews
 
-    private var trackingArea: NSTrackingArea?
-    private let ciContext = CIContext()
-    private var isRevealed = false
+    private let visualEffectView = NSVisualEffectView()
+    private let tintOverlay = NSView()
+
+    // MARK: - Init
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
-        setupTracking()
+        setup()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupTracking()
+        setup()
     }
 
-    private func setupTracking() {
-        updateTrackingArea()
+    // MARK: - Setup
+
+    private func setup() {
+        wantsLayer = true
+
+        // --- Visual effect (system blur of content behind this window) ---
+        visualEffectView.material = .fullScreenUI
+        visualEffectView.blendingMode = .behindWindow
+        visualEffectView.state = .active
+        visualEffectView.appearance = NSAppearance(named: .darkAqua)
+        visualEffectView.frame = bounds
+        visualEffectView.autoresizingMask = [.width, .height]
+        addSubview(visualEffectView)
+
+        // --- Tint overlay for additional privacy / intensity control ---
+        tintOverlay.wantsLayer = true
+        tintOverlay.frame = bounds
+        tintOverlay.autoresizingMask = [.width, .height]
+        addSubview(tintOverlay)
+
+        updateTintOpacity()
     }
 
-    override func updateTrackingAreas() {
-        super.updateTrackingAreas()
-        updateTrackingArea()
-    }
+    // MARK: - Public
 
-    private func updateTrackingArea() {
-        if let existing = trackingArea {
-            removeTrackingArea(existing)
+    /// Update the reveal zone position from a screen-space point.
+    /// Called by BlurWindowManager on each refresh tick.
+    func updateRevealFromScreenPoint(_ screenPoint: NSPoint) {
+        guard let window = self.window else {
+            revealCenter = nil
+            return
         }
-        let area = NSTrackingArea(
-            rect: bounds,
-            options: [.mouseMoved, .mouseEnteredAndExited, .activeAlways, .inVisibleRect],
-            owner: self,
-            userInfo: nil
-        )
-        addTrackingArea(area)
-        trackingArea = area
-    }
+        let windowRect = window.convertFromScreen(NSRect(origin: screenPoint, size: .zero))
+        let viewPoint = convert(windowRect.origin, from: nil)
 
-    // MARK: - Mouse Tracking
-
-    override func mouseMoved(with event: NSEvent) {
-        if revealOnHover {
-            revealCenter = convert(event.locationInWindow, from: nil)
-        }
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        if !revealOnHover {
-            let point = convert(event.locationInWindow, from: nil)
-            if isRevealed && revealCenter == point {
-                // Second click hides
-                revealCenter = nil
-                isRevealed = false
-            } else {
-                revealCenter = point
-                isRevealed = true
-            }
-        }
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        if revealOnHover {
+        if bounds.contains(viewPoint) {
+            revealCenter = viewPoint
+        } else {
             revealCenter = nil
         }
     }
 
-    // MARK: - Drawing
+    // MARK: - Layout
 
-    override func draw(_ dirtyRect: NSRect) {
-        guard let context = NSGraphicsContext.current?.cgContext else { return }
-
-        // Capture the content behind this overlay window.
-        // We need the target app's window content — use CGWindowListCreateImage
-        // to capture just that window.
-        guard targetWindowID != 0 else {
-            // Fallback: draw a solid frosted overlay
-            drawFallbackBlur(in: context, dirtyRect: dirtyRect)
-            return
-        }
-
-        // Get the overlay window's screen position
-        guard let overlayWindow = self.window else {
-            drawFallbackBlur(in: context, dirtyRect: dirtyRect)
-            return
-        }
-
-        let windowFrame = overlayWindow.frame
-
-        // Capture the target window content
-        let captureRect = windowFrame
-        guard let cgImage = CGWindowListCreateImage(
-            captureRect,
-            .optionIncludingWindow,
-            targetWindowID,
-            [.boundsIgnoreFraming, .nominalResolution]
-        ) else {
-            drawFallbackBlur(in: context, dirtyRect: dirtyRect)
-            return
-        }
-
-        let ciImage = CIImage(cgImage: cgImage)
-
-        // Apply Gaussian blur
-        guard let blurFilter = CIFilter(name: "CIGaussianBlur") else {
-            drawFallbackBlur(in: context, dirtyRect: dirtyRect)
-            return
-        }
-        blurFilter.setValue(ciImage, forKey: kCIInputImageKey)
-        blurFilter.setValue(blurRadius, forKey: kCIInputRadiusKey)
-
-        guard let blurredImage = blurFilter.outputImage else {
-            drawFallbackBlur(in: context, dirtyRect: dirtyRect)
-            return
-        }
-
-        // Render the blurred image
-        let extent = ciImage.extent
-        guard let renderedImage = ciContext.createCGImage(blurredImage, from: extent) else {
-            drawFallbackBlur(in: context, dirtyRect: dirtyRect)
-            return
-        }
-
-        // Draw the blurred image filling the view
-        context.saveGState()
-        context.draw(renderedImage, in: bounds)
-
-        // If there's a reveal center, cut a circular hole and draw the original (unblurred) image there
-        if let center = revealCenter {
-            // Clip to a circle and draw the original unblurred content
-            let revealRect = CGRect(
-                x: center.x - revealRadius,
-                y: center.y - revealRadius,
-                width: revealRadius * 2,
-                height: revealRadius * 2
-            )
-
-            // Create a soft-edge reveal using a radial gradient mask
-            context.saveGState()
-
-            // Use an ellipse clip for the reveal zone
-            let path = CGPath(ellipseIn: revealRect, transform: nil)
-            context.addPath(path)
-            context.clip()
-
-            // Draw the original (unblurred) content in the reveal zone
-            context.draw(cgImage, in: bounds)
-
-            context.restoreGState()
-        }
-
-        // Draw a subtle dark tint over the blurred area (outside the reveal)
-        context.setFillColor(NSColor.black.withAlphaComponent(0.15).cgColor)
-        if let center = revealCenter {
-            // Fill everything except the reveal circle
-            let fullPath = CGMutablePath()
-            fullPath.addRect(bounds)
-            let revealRect = CGRect(
-                x: center.x - revealRadius,
-                y: center.y - revealRadius,
-                width: revealRadius * 2,
-                height: revealRadius * 2
-            )
-            fullPath.addEllipse(in: revealRect)
-            context.addPath(fullPath)
-            context.fillPath(using: .evenOdd)
-        } else {
-            context.fill(bounds)
-        }
-
-        context.restoreGState()
+    override func layout() {
+        super.layout()
+        updateRevealMask()
     }
 
-    /// Fallback blur using NSVisualEffectView-style solid overlay.
-    private func drawFallbackBlur(in context: CGContext, dirtyRect: NSRect) {
-        // Draw a frosted dark overlay when we can't capture the window content
-        context.saveGState()
+    // MARK: - Reveal Mask
 
-        // Semi-transparent dark background
-        context.setFillColor(NSColor.black.withAlphaComponent(0.7).cgColor)
-        context.fill(dirtyRect)
+    /// Updates both the NSVisualEffectView mask and the tint overlay mask
+    /// to create a circular reveal zone with a soft gradient edge.
+    private func updateRevealMask() {
+        let size = bounds.size
+        guard size.width > 0, size.height > 0 else { return }
 
-        // If there's a reveal center, cut a hole
         if let center = revealCenter {
-            context.setBlendMode(.clear)
+            // --- Visual effect view: maskImage with soft gradient edge ---
+            visualEffectView.maskImage = createSoftMaskImage(center: center, size: size)
+
+            // --- Tint overlay: CAShapeLayer mask (hard circle, slightly smaller) ---
+            let tintMask = CAShapeLayer()
+            tintMask.frame = CGRect(origin: .zero, size: size)
+            let path = CGMutablePath()
+            path.addRect(CGRect(origin: .zero, size: size))
+            // Use 80% of revealRadius for the tint cutout to match the soft edge
+            let effectiveRadius = revealRadius * 0.8
             let revealRect = CGRect(
-                x: center.x - revealRadius,
-                y: center.y - revealRadius,
-                width: revealRadius * 2,
-                height: revealRadius * 2
+                x: center.x - effectiveRadius,
+                y: center.y - effectiveRadius,
+                width: effectiveRadius * 2,
+                height: effectiveRadius * 2
             )
-            context.fillEllipse(in: revealRect)
+            path.addEllipse(in: revealRect)
+            tintMask.path = path
+            tintMask.fillRule = .evenOdd
+            tintMask.fillColor = NSColor.white.cgColor
+            tintOverlay.layer?.mask = tintMask
+        } else {
+            // No reveal — full blur everywhere
+            visualEffectView.maskImage = nil   // nil = no mask = effect covers everything
+            tintOverlay.layer?.mask = nil       // full tint
+        }
+    }
+
+    /// Creates an NSImage mask for the visual effect view.
+    /// White regions = blurred; black regions = clear (show-through).
+    /// Uses a radial gradient for a soft edge on the reveal circle.
+    private func createSoftMaskImage(center: NSPoint, size: NSSize) -> NSImage {
+        let image = NSImage(size: size)
+        image.lockFocus()
+        defer { image.unlockFocus() }
+
+        guard let ctx = NSGraphicsContext.current?.cgContext else { return image }
+
+        // Fill white = effect visible everywhere
+        ctx.setFillColor(CGColor.white)
+        ctx.fill(CGRect(origin: .zero, size: size))
+
+        // Punch the reveal zone with a radial gradient:
+        //   center → 70% radius: black (fully clear)
+        //   70% radius → 100% radius: gradient black→white (soft edge)
+        ctx.saveGState()
+
+        // Clip to the reveal circle so the gradient doesn't spill
+        let revealRect = CGRect(
+            x: center.x - revealRadius,
+            y: center.y - revealRadius,
+            width: revealRadius * 2,
+            height: revealRadius * 2
+        )
+        ctx.addEllipse(in: revealRect)
+        ctx.clip()
+
+        let colorSpace = CGColorSpaceCreateDeviceGray()
+        let colors: [CGFloat] = [
+            0, 1,    // black, full alpha (center — clear)
+            0, 1,    // black, full alpha (70% — still clear)
+            1, 1     // white, full alpha (edge — blurred)
+        ]
+        let locations: [CGFloat] = [0.0, 0.7, 1.0]
+
+        if let gradient = CGGradient(
+            colorSpace: colorSpace,
+            colorComponents: colors,
+            locations: locations,
+            count: 3
+        ) {
+            ctx.drawRadialGradient(
+                gradient,
+                startCenter: center,
+                startRadius: 0,
+                endCenter: center,
+                endRadius: revealRadius,
+                options: []
+            )
         }
 
-        context.restoreGState()
+        ctx.restoreGState()
+        return image
+    }
+
+    // MARK: - Tint
+
+    /// Maps the user's blur intensity (2–20) to a tint opacity (0.05–0.45).
+    private func updateTintOpacity() {
+        let normalized = (blurRadius - 2.0) / 18.0   // 0.0 … 1.0
+        let opacity = 0.05 + normalized * 0.40        // 0.05 … 0.45
+        tintOverlay.layer?.backgroundColor = NSColor.black.withAlphaComponent(CGFloat(opacity)).cgColor
     }
 }
