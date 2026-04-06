@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
   "name": "MacShield Web — Chat Blur",
-  "version": "1.0.0",
-  "description": "Blur chat messages on web apps for privacy. Reveal on hover.",
+  "version": "1.1.0",
+  "description": "Blur chat messages on web apps for privacy. Reveal on hover or click. Per-site controls.",
   "permissions": ["storage", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -23,7 +26,8 @@
       ],
       "css": ["blur.css"],
       "js": ["content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "action": {

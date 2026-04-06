@@ -3,47 +3,557 @@
 <head>
   <meta charset="utf-8">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      width: 280px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #1a1a1a;
-      color: #fff;
-      padding: 16px;
+    :root {
+      --bg: #0a0a0c;
+      --bg-card: #161618;
+      --bg-elevated: #1c1c1e;
+      --bg-hover: #242426;
+      --accent: #FFD213;
+      --accent-dim: rgba(255, 210, 19, 0.08);
+      --accent-glow: rgba(255, 210, 19, 0.18);
+      --text: #ffffff;
+      --text-2: #a1a1a6;
+      --text-3: #636366;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-accent: rgba(255, 210, 19, 0.18);
+      --success: #34C759;
+      --error: #FF3B30;
+      --r: 12px;
+      --r-sm: 8px;
+      --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 340px;
+      min-height: 420px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--text-3); border-radius: 4px; }
+
+    /* ─── Lock Screen ─── */
+    .lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 10, 12, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      opacity: 0;
+      animation: fadeIn 0.3s var(--ease) forwards;
+    }
+    .lock-screen.hidden { display: none; }
+    .hidden { display: none !important; }
+
+    .lock-icon {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 0 18px var(--accent-glow));
+    }
+    .lock-icon svg { width: 100%; height: 100%; }
+
+    .lock-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .lock-subtitle {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-bottom: 20px;
+    }
+
+    .pin-dots {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .pin-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1.5px solid var(--text-3);
+      background: transparent;
+      transition: all 0.2s var(--ease);
+    }
+    .pin-dot.filled {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .pin-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .pin-area {
+      cursor: text;
+      padding: 8px 24px;
+    }
+
+    .lock-error {
+      font-size: 11px;
+      color: var(--error);
+      height: 16px;
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .lock-error.visible { opacity: 1; }
+
+    /* ─── Header ─── */
     .header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
     }
-    .header svg { width: 20px; height: 20px; fill: #4fd1c5; }
-    .header h1 { font-size: 15px; font-weight: 600; }
-    .toggle-row {
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header-logo {
+      width: 22px;
+      height: 22px;
+      filter: drop-shadow(0 0 6px var(--accent-glow));
+    }
+    .header-logo svg { width: 100%; height: 100%; }
+    .header-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      background: linear-gradient(135deg, var(--accent) 0%, #FFF0A0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header-action {
+      background: none;
+      border: none;
+      color: var(--text-3);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .header-action:hover {
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .header-action svg { width: 16px; height: 16px; }
+
+    /* ─── Tab Navigation ─── */
+    .tabs {
+      display: flex;
+      position: relative;
+      margin: 0 16px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 0;
+      background: none;
+      border: none;
+      color: var(--text-3);
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: color 0.25s var(--ease);
+      position: relative;
+      z-index: 1;
+      letter-spacing: 0.1px;
+    }
+    .tab svg { width: 13px; height: 13px; fill: currentColor; }
+    .tab.active { color: var(--bg); }
+
+    .tab-indicator {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 3px;
+      width: calc(33.333% - 2px);
+      background: var(--accent);
+      border-radius: 8px;
+      transition: transform 0.3s var(--ease);
+      box-shadow: 0 1px 8px var(--accent-glow);
+    }
+    .tab-indicator[data-pos="1"] { transform: translateX(100%); }
+    .tab-indicator[data-pos="2"] { transform: translateX(200%); }
+
+    /* ─── Content ─── */
+    .content {
+      padding: 14px 16px 8px;
+      min-height: 300px;
+    }
+    .tab-panel { display: none; animation: fadeIn 0.25s var(--ease); }
+    .tab-panel.active { display: block; }
+
+    /* ─── Shield Tab ─── */
+    .shield-hero {
+      display: flex;
+      justify-content: center;
+      padding: 16px 0 12px;
+    }
+    .shield-svg {
+      width: 72px;
+      height: 72px;
+      filter: drop-shadow(0 0 24px var(--accent-glow));
+      transition: filter 0.3s;
+    }
+    .shield-svg.disabled {
+      filter: grayscale(1) opacity(0.4);
+    }
+    .shield-svg svg { width: 100%; height: 100%; }
+
+    .shield-pulse {
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px rgba(52, 199, 89, 0.4);
+    }
+    .status-dot.off {
+      background: var(--text-3);
+      box-shadow: none;
+    }
+    .status-text {
+      font-size: 12px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    /* Master Toggle */
+    .master-toggle {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #333;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.25s;
     }
-    .toggle-label { font-size: 13px; color: #ccc; }
+    .master-toggle:hover { border-color: var(--border-accent); }
+    .master-toggle-label {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.1px;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px;
+      text-align: center;
+      transition: border-color 0.25s;
+    }
+    .stat:hover { border-color: var(--border-accent); }
+    .stat-value {
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .stat-label {
+      display: block;
+      font-size: 10px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+
+    /* ─── Sites Tab ─── */
+    .sites-list {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
+    }
+    .site-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      transition: all 0.2s var(--ease);
+    }
+    .site-row:hover {
+      border-color: var(--border-accent);
+      background: var(--bg-elevated);
+    }
+    .site-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: -0.3px;
+    }
+    .site-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* ─── Settings Tab ─── */
+    .setting-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      transition: border-color 0.25s;
+    }
+    .setting-group:hover { border-color: var(--border-accent); }
+
+    .setting-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Slider */
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      flex: 1;
+      height: 4px;
+      background: var(--bg-hover);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-glow), 0 1px 3px rgba(0,0,0,0.3);
+      transition: transform 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .slider-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* Segmented Control */
+    .segmented {
+      display: flex;
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      padding: 2px;
+      border: 1px solid var(--border);
+    }
+    .seg-btn {
+      flex: 1;
+      padding: 7px 0;
+      background: none;
+      border: none;
+      color: var(--text-3);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s var(--ease);
+    }
+    .seg-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      box-shadow: 0 1px 6px var(--accent-glow);
+    }
+
+    /* Shortcut Display */
+    .shortcut-display {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    kbd {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-2);
+      font-family: inherit;
+    }
+    .shortcut-plus {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* PIN Setup */
+    .pin-setup {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+    }
+    .pin-setup.hidden { display: none; }
+    .pin-field {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      letter-spacing: 4px;
+      text-align: center;
+    }
+    .pin-field:focus { border-color: var(--accent); }
+    .pin-field::placeholder {
+      letter-spacing: 0;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .btn-gold {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--r-sm);
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-gold:hover {
+      background: #ffe04a;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .btn-danger {
+      background: none;
+      color: var(--error);
+      border: 1px solid rgba(255, 59, 48, 0.2);
+      border-radius: var(--r-sm);
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn-danger:hover {
+      background: rgba(255, 59, 48, 0.1);
+      border-color: rgba(255, 59, 48, 0.3);
+    }
+
+    /* About */
+    .about {
+      text-align: center;
+      padding: 12px 0 4px;
+      font-size: 10px;
+      color: var(--text-3);
+      letter-spacing: 0.3px;
+    }
+
+    /* ─── Toggle Switch ─── */
     .toggle {
       position: relative;
       width: 40px;
       height: 22px;
       cursor: pointer;
+      display: inline-block;
     }
     .toggle input { display: none; }
-    .toggle .slider {
+    .toggle-track {
       position: absolute;
       inset: 0;
-      background: #555;
+      background: #3a3a3c;
       border-radius: 11px;
-      transition: background 0.2s;
+      transition: background 0.25s var(--ease);
     }
-    .toggle input:checked + .slider { background: #4fd1c5; }
-    .toggle .slider::before {
-      content: "";
+    .toggle input:checked + .toggle-track {
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    .toggle-thumb {
       position: absolute;
       width: 18px;
       height: 18px;
@@ -51,64 +561,249 @@
       border-radius: 50%;
       top: 2px;
       left: 2px;
-      transition: transform 0.2s;
+      transition: transform 0.25s var(--ease);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .toggle input:checked + .slider::before { transform: translateX(18px); }
-    .slider-row {
-      padding: 12px 0 8px;
+    .toggle input:checked + .toggle-track .toggle-thumb {
+      transform: translateX(18px);
     }
-    .slider-row label {
-      font-size: 12px;
-      color: #999;
-      display: block;
-      margin-bottom: 6px;
-    }
-    .slider-row input[type="range"] {
-      width: 100%;
-      accent-color: #4fd1c5;
-    }
-    .slider-value {
-      font-size: 11px;
-      color: #666;
-      text-align: right;
-    }
-    .shortcut {
-      margin-top: 12px;
-      font-size: 11px;
-      color: #666;
+
+    /* ─── Footer ─── */
+    .footer {
+      padding: 6px 16px 12px;
       text-align: center;
+      font-size: 10px;
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
-    kbd {
-      background: #333;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 11px;
-      color: #ccc;
+    .footer kbd {
+      font-size: 9px;
+      padding: 2px 5px;
     }
+
+    /* ─── Animations ─── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { filter: drop-shadow(0 0 20px var(--accent-glow)); }
+      50% { filter: drop-shadow(0 0 32px rgba(255, 210, 19, 0.3)); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .shake { animation: shake 0.4s ease; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    <h1>MacShield Web</h1>
+
+  <!-- ═══ Lock Screen ═══ -->
+  <div id="lockScreen" class="lock-screen hidden">
+    <div class="lock-icon">
+      <svg viewBox="0 0 128 128">
+        <defs>
+          <linearGradient id="lsg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFD213"/>
+            <stop offset="100%" stop-color="#E6B800"/>
+          </linearGradient>
+        </defs>
+        <path d="M64 8C64 8 30 18 18 24C18 24 14 72 64 110C114 72 110 24 110 24C98 18 64 8 64 8Z" fill="url(#lsg)"/>
+        <path d="M64 14C64 14 34 23 24 28C24 28 20 70 64 104C108 70 104 28 104 28C94 23 64 14 64 14Z" fill="#131315"/>
+        <g transform="translate(64,58)">
+          <rect x="-10" y="-2" width="20" height="14" rx="3" fill="#FFD213"/>
+          <path d="M-6 -2L-6 -10A6 6 0 0 1 6 -10L6 -2" fill="none" stroke="#FFD213" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="0" cy="4" r="2.5" fill="#131315"/>
+        </g>
+      </svg>
+    </div>
+    <div class="lock-title">MacShield Web</div>
+    <div class="lock-subtitle">Enter PIN to unlock</div>
+    <div class="pin-area" id="pinArea">
+      <div class="pin-dots">
+        <span class="pin-dot" id="dot0"></span>
+        <span class="pin-dot" id="dot1"></span>
+        <span class="pin-dot" id="dot2"></span>
+        <span class="pin-dot" id="dot3"></span>
+      </div>
+      <input type="password" class="pin-input" id="pinInput" maxlength="4" inputmode="numeric" autofocus>
+    </div>
+    <div class="lock-error" id="lockError">Incorrect PIN</div>
   </div>
 
-  <div class="toggle-row">
-    <span class="toggle-label">Chat Blur</span>
-    <label class="toggle">
-      <input type="checkbox" id="blurToggle" checked>
-      <span class="slider"></span>
-    </label>
-  </div>
+  <!-- ═══ Main App ═══ -->
+  <div id="app">
 
-  <div class="slider-row">
-    <label>Blur Intensity</label>
-    <input type="range" id="blurSlider" min="2" max="20" value="8" step="1">
-    <div class="slider-value" id="blurValue">8px</div>
-  </div>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="header-logo">
+          <svg viewBox="0 0 128 128">
+            <defs>
+              <linearGradient id="hsg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FFD213"/>
+                <stop offset="100%" stop-color="#E6B800"/>
+              </linearGradient>
+            </defs>
+            <path d="M64 8C64 8 30 18 18 24C18 24 14 72 64 110C114 72 110 24 110 24C98 18 64 8 64 8Z" fill="url(#hsg)"/>
+            <path d="M64 14C64 14 34 23 24 28C24 28 20 70 64 104C108 70 104 28 104 28C94 23 64 14 64 14Z" fill="#131315"/>
+            <path d="M34 60C42 48 52 42 64 42C76 42 86 48 94 60C86 72 76 78 64 78C52 78 42 72 34 60Z" fill="none" stroke="#FFD213" stroke-width="2.5"/>
+            <circle cx="64" cy="60" r="9" fill="none" stroke="#FFD213" stroke-width="2"/>
+            <circle cx="64" cy="60" r="3.5" fill="#FFD213"/>
+            <line x1="38" y1="74" x2="90" y2="46" stroke="#FFD213" stroke-width="3" stroke-linecap="round"/>
+            <line x1="38" y1="74" x2="90" y2="46" stroke="#131315" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="header-name">MacShield</span>
+      </div>
+      <button id="lockBtn" class="header-action" title="Extension Lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </button>
+    </header>
 
-  <div class="shortcut">
-    Toggle: <kbd>Alt</kbd> + <kbd>X</kbd>
+    <!-- Tab Bar -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="shield">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Shield
+      </button>
+      <button class="tab" data-tab="sites">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+        Sites
+      </button>
+      <button class="tab" data-tab="settings">
+        <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+      <div class="tab-indicator" data-pos="0"></div>
+    </nav>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- ── Shield Tab ── -->
+      <section id="tabShield" class="tab-panel active">
+        <div class="shield-hero">
+          <div class="shield-svg shield-pulse" id="shieldIcon">
+            <svg viewBox="0 0 128 128">
+              <defs>
+                <linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FFD213"/>
+                  <stop offset="100%" stop-color="#E6B800"/>
+                </linearGradient>
+                <linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1A1A1C"/>
+                  <stop offset="100%" stop-color="#111113"/>
+                </linearGradient>
+              </defs>
+              <path d="M64 8C64 8 30 18 18 24C18 24 14 72 64 110C114 72 110 24 110 24C98 18 64 8 64 8Z" fill="url(#sg1)"/>
+              <path d="M64 14C64 14 34 23 24 28C24 28 20 70 64 104C108 70 104 28 104 28C94 23 64 14 64 14Z" fill="url(#sg2)"/>
+              <path d="M34 60C42 48 52 42 64 42C76 42 86 48 94 60C86 72 76 78 64 78C52 78 42 72 34 60Z" fill="none" stroke="#FFD213" stroke-width="2.5" stroke-linejoin="round"/>
+              <circle cx="64" cy="60" r="9" fill="none" stroke="#FFD213" stroke-width="2"/>
+              <circle cx="64" cy="60" r="3.5" fill="#FFD213"/>
+              <line x1="38" y1="74" x2="90" y2="46" stroke="#FFD213" stroke-width="3" stroke-linecap="round"/>
+              <line x1="38" y1="74" x2="90" y2="46" stroke="#131315" stroke-width="1.2" stroke-linecap="round"/>
+              <g transform="translate(64, 90)">
+                <rect x="-5" y="-1" width="10" height="7" rx="1.5" fill="#FFD213"/>
+                <path d="M-3 -1L-3 -5A3 3 0 0 1 3 -5L3 -1" fill="none" stroke="#FFD213" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="0" cy="2" r="1.3" fill="#131315"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="status-badge">
+          <span class="status-dot" id="statusDot"></span>
+          <span class="status-text" id="statusText">Protection Active</span>
+        </div>
+        <div class="master-toggle">
+          <span class="master-toggle-label">Chat Blur</span>
+          <label class="toggle">
+            <input type="checkbox" id="blurToggle" checked>
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value" id="siteCount">0</span>
+            <span class="stat-label">Sites Active</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="blurLevel">8px</span>
+            <span class="stat-label">Blur Level</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Sites Tab ── -->
+      <section id="tabSites" class="tab-panel">
+        <div class="sites-list" id="sitesList">
+          <!-- Generated by JS -->
+        </div>
+      </section>
+
+      <!-- ── Settings Tab ── -->
+      <section id="tabSettings" class="tab-panel">
+
+        <!-- Blur Intensity -->
+        <div class="setting-group">
+          <span class="setting-label">Blur Intensity</span>
+          <div class="slider-container">
+            <input type="range" id="blurSlider" min="2" max="20" value="8" step="1">
+            <span class="slider-val" id="blurValueDisplay">8px</span>
+          </div>
+        </div>
+
+        <!-- Reveal Mode -->
+        <div class="setting-group">
+          <span class="setting-label">Reveal Mode</span>
+          <div class="segmented">
+            <button class="seg-btn active" data-mode="hover">Hover</button>
+            <button class="seg-btn" data-mode="click">Click</button>
+          </div>
+        </div>
+
+        <!-- Keyboard Shortcut -->
+        <div class="setting-group">
+          <span class="setting-label">Keyboard Shortcut</span>
+          <div class="shortcut-display">
+            <kbd>Alt</kbd>
+            <span class="shortcut-plus">+</span>
+            <kbd>X</kbd>
+          </div>
+        </div>
+
+        <!-- PIN Lock -->
+        <div class="setting-group">
+          <div class="setting-row">
+            <span class="setting-label" style="margin:0">PIN Lock</span>
+            <label class="toggle">
+              <input type="checkbox" id="pinToggle">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div id="pinSetup" class="pin-setup hidden">
+            <input type="password" id="newPin" class="pin-field" maxlength="4" placeholder="4-digit PIN" inputmode="numeric">
+            <button id="savePin" class="btn-gold">Save</button>
+            <button id="removePin" class="btn-danger hidden">Remove</button>
+          </div>
+        </div>
+
+        <div class="about">MacShield Web v1.0.0</div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Toggle blur: <kbd>Alt</kbd><span class="shortcut-plus">+</span><kbd>X</kbd>
+    </footer>
   </div>
 
   <script src="popup.js"></script>

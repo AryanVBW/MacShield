@@ -1,0 +1,554 @@
+/* ============================================================
+   MacShield v3.0 — Privacy Lock & Blur
+   Blur or hide messages, names & avatars. Hover to reveal.
+   ============================================================ */
+
+:root {
+  --pb-blur:    12px;
+  --pb-speed:   0.2s;
+  --pb-opacity: 1;
+}
+
+/* Shared mixin via utility class — applied by content.js on unknown sites */
+body.privyblur-active .pb-blur-target {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active .pb-blur-target:hover,
+body.privyblur-active .pb-blur-parent:hover .pb-blur-target {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   WHATSAPP WEB — web.whatsapp.com
+   ============================================================ */
+
+/* Chat list: contact name + last message preview */
+body.privyblur-active [data-testid="cell-frame-container"] span[title],
+body.privyblur-active [data-testid="cell-frame-container"] [data-testid="cell-frame-title"],
+body.privyblur-active [data-testid="last-msg-status"],
+body.privyblur-active [data-testid="cell-frame-container"] .ggj6brxn,
+body.privyblur-active [data-testid="cell-frame-container"] ._11JPr {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-testid="cell-frame-container"]:hover span[title],
+body.privyblur-active [data-testid="cell-frame-container"]:hover [data-testid="cell-frame-title"],
+body.privyblur-active [data-testid="cell-frame-container"]:hover [data-testid="last-msg-status"],
+body.privyblur-active [data-testid="cell-frame-container"]:hover .ggj6brxn,
+body.privyblur-active [data-testid="cell-frame-container"]:hover ._11JPr {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Message bubbles + group sender names */
+body.privyblur-active .message-in  .copyable-text,
+body.privyblur-active .message-out .copyable-text,
+body.privyblur-active .message-in  [data-testid="msg-container"],
+body.privyblur-active .message-out [data-testid="msg-container"],
+body.privyblur-active [data-testid="msg-container"] img,
+body.privyblur-active [data-testid="msg-container"] video,
+body.privyblur-active [data-testid="author"],
+body.privyblur-active .message-in  .vW7d1 span,
+body.privyblur-active .message-out .vW7d1 span {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active .message-in:hover  .copyable-text,
+body.privyblur-active .message-out:hover .copyable-text,
+body.privyblur-active .message-in:hover  [data-testid="msg-container"],
+body.privyblur-active .message-out:hover [data-testid="msg-container"],
+body.privyblur-active .message-in:hover  [data-testid="msg-container"] img,
+body.privyblur-active .message-out:hover [data-testid="msg-container"] img,
+body.privyblur-active .message-in:hover  [data-testid="msg-container"] video,
+body.privyblur-active .message-out:hover [data-testid="msg-container"] video,
+body.privyblur-active .message-in:hover  [data-testid="author"],
+body.privyblur-active .message-out:hover [data-testid="author"],
+body.privyblur-active .message-in:hover  .vW7d1 span,
+body.privyblur-active .message-out:hover .vW7d1 span {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* WhatsApp avatars (optional — toggled by .privyblur-blur-avatars on body) */
+body.privyblur-active.privyblur-blur-avatars [data-testid="cell-frame-container"] [data-testid="default-user"],
+body.privyblur-active.privyblur-blur-avatars [data-testid="cell-frame-container"] img:not([data-testid="qrcode"]),
+body.privyblur-active.privyblur-blur-avatars .message-in img.avatar,
+body.privyblur-active.privyblur-blur-avatars [data-testid="msg-avatar"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [data-testid="cell-frame-container"]:hover [data-testid="default-user"],
+body.privyblur-active.privyblur-blur-avatars [data-testid="cell-frame-container"]:hover img,
+body.privyblur-active.privyblur-blur-avatars .message-in:hover img.avatar,
+body.privyblur-active.privyblur-blur-avatars .message-in:hover [data-testid="msg-avatar"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   INSTAGRAM — www.instagram.com (DMs)
+   ============================================================ */
+
+/* Conversation list: usernames + last message snippets */
+body.privyblur-active [role="listbox"] [role="option"] span,
+body.privyblur-active [class*="x9f619"] a[href*="/direct/t/"] span {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [role="listbox"] [role="option"]:hover span,
+body.privyblur-active [class*="x9f619"] a[href*="/direct/t/"]:hover span {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Message bubbles, images, videos */
+body.privyblur-active [role="row"] [dir="auto"],
+body.privyblur-active [class*="html-div"] [role="row"] img:not([alt*="profile"]),
+body.privyblur-active [class*="html-div"] [role="row"] video {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [role="row"]:hover [dir="auto"],
+body.privyblur-active [role="row"]:hover img,
+body.privyblur-active [role="row"]:hover video {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Instagram avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars [role="listbox"] [role="option"] img,
+body.privyblur-active.privyblur-blur-avatars [role="row"] img[alt*="profile"],
+body.privyblur-active.privyblur-blur-avatars img[alt*="'s profile picture"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [role="listbox"] [role="option"]:hover img,
+body.privyblur-active.privyblur-blur-avatars [role="row"]:hover img[alt*="profile"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   TELEGRAM WEB — web.telegram.org
+   ============================================================ */
+
+/* Chat list: names + last message */
+body.privyblur-active .chatlist-chat .peer-title,
+body.privyblur-active .chatlist-chat .subtitle,
+body.privyblur-active .dialog-subtitle,
+body.privyblur-active .dialogname,
+body.privyblur-active .row-subtitle {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active .chatlist-chat:hover .peer-title,
+body.privyblur-active .chatlist-chat:hover .subtitle,
+body.privyblur-active .chatlist-chat:hover .dialog-subtitle,
+body.privyblur-active .chatlist-chat:hover .dialogname,
+body.privyblur-active .chatlist-chat:hover .row-subtitle {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Message content + sender names */
+body.privyblur-active .message .text-content,
+body.privyblur-active .message .media-container,
+body.privyblur-active .message .media-photo,
+body.privyblur-active .message .media-video,
+body.privyblur-active .message .sticker-container,
+body.privyblur-active .bubble .message,
+body.privyblur-active .message .name,
+body.privyblur-active .message .sender-title,
+body.privyblur-active .bubble-content .name {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active .message:hover .text-content,
+body.privyblur-active .message:hover .media-container,
+body.privyblur-active .message:hover .media-photo,
+body.privyblur-active .message:hover .media-video,
+body.privyblur-active .message:hover .sticker-container,
+body.privyblur-active .bubble:hover .message,
+body.privyblur-active .message:hover .name,
+body.privyblur-active .message:hover .sender-title,
+body.privyblur-active .bubble:hover .bubble-content .name {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Telegram avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars .chatlist-chat .avatar,
+body.privyblur-active.privyblur-blur-avatars .message .avatar-element,
+body.privyblur-active.privyblur-blur-avatars .peer-avatar {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars .chatlist-chat:hover .avatar,
+body.privyblur-active.privyblur-blur-avatars .message:hover .avatar-element {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   FACEBOOK MESSENGER — www.messenger.com
+   ============================================================ */
+
+body.privyblur-active [data-testid="mwthreads-list-item"] span,
+body.privyblur-active [data-testid="mwthreads-list-item"] [dir="auto"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-testid="mwthreads-list-item"]:hover span,
+body.privyblur-active [data-testid="mwthreads-list-item"]:hover [dir="auto"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+body.privyblur-active [role="presentation"] [dir="auto"],
+body.privyblur-active [data-testid="incoming_group"] [dir="auto"],
+body.privyblur-active [data-testid="outgoing_group"]  [dir="auto"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [role="presentation"]:hover [dir="auto"],
+body.privyblur-active [data-testid="incoming_group"]:hover [dir="auto"],
+body.privyblur-active [data-testid="outgoing_group"]:hover  [dir="auto"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Messenger avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars [data-testid="mwthreads-list-item"] img,
+body.privyblur-active.privyblur-blur-avatars [data-testid="incoming_group"] img {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [data-testid="mwthreads-list-item"]:hover img,
+body.privyblur-active.privyblur-blur-avatars [data-testid="incoming_group"]:hover img {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   DISCORD — discord.com
+   ============================================================ */
+
+body.privyblur-active [class*="messageContent"],
+body.privyblur-active [class*="embedDescription"],
+body.privyblur-active [class*="imageWrapper"] img,
+body.privyblur-active [class*="attachment"],
+body.privyblur-active [class*="username"][class*="header"],
+body.privyblur-active [class*="headerText"],
+body.privyblur-active [class*="messageListItem"] [class*="username"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [class*="message-"]:hover [class*="messageContent"],
+body.privyblur-active [class*="message-"]:hover [class*="embedDescription"],
+body.privyblur-active [class*="message-"]:hover [class*="imageWrapper"] img,
+body.privyblur-active [class*="message-"]:hover [class*="attachment"],
+body.privyblur-active [class*="message-"]:hover [class*="username"],
+body.privyblur-active [class*="message-"]:hover [class*="headerText"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Discord avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars [class*="avatar"]:not([class*="avatarContainer"]) img,
+body.privyblur-active.privyblur-blur-avatars [class*="message-"] [class*="avatar"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [class*="message-"]:hover [class*="avatar"] img,
+body.privyblur-active.privyblur-blur-avatars [class*="message-"]:hover [class*="avatar"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   SLACK — app.slack.com
+   ============================================================ */
+
+body.privyblur-active [data-qa="message_container"] .c-message__body,
+body.privyblur-active [data-qa="message_container"] .c-message_kit__text,
+body.privyblur-active [data-qa="message_container"] img.c-message_kit__file__image,
+body.privyblur-active [data-qa="message_container"] .c-message__sender,
+body.privyblur-active [data-qa="message_container"] .c-message_kit__sender {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-qa="message_container"]:hover .c-message__body,
+body.privyblur-active [data-qa="message_container"]:hover .c-message_kit__text,
+body.privyblur-active [data-qa="message_container"]:hover img.c-message_kit__file__image,
+body.privyblur-active [data-qa="message_container"]:hover .c-message__sender,
+body.privyblur-active [data-qa="message_container"]:hover .c-message_kit__sender {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Slack conversation list names */
+body.privyblur-active [data-qa="channel_sidebar_name"],
+body.privyblur-active .p-channel_sidebar__name {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-qa="channel_sidebar_name"]:hover,
+body.privyblur-active .p-channel_sidebar__name:hover {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Slack avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars [data-qa="message_container"] .c-avatar,
+body.privyblur-active.privyblur-blur-avatars [data-qa="message_container"] img.c-avatar__image {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [data-qa="message_container"]:hover .c-avatar,
+body.privyblur-active.privyblur-blur-avatars [data-qa="message_container"]:hover img.c-avatar__image {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   TWITTER / X — twitter.com, x.com
+   ============================================================ */
+
+/* DMs */
+body.privyblur-active [data-testid="messageEntry"] [dir="auto"],
+body.privyblur-active [data-testid="DMConversationEntry"] [dir="auto"],
+body.privyblur-active [data-testid="DMConversationEntry"] span[class] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-testid="messageEntry"]:hover [dir="auto"],
+body.privyblur-active [data-testid="DMConversationEntry"]:hover [dir="auto"],
+body.privyblur-active [data-testid="DMConversationEntry"]:hover span[class] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Tweets in timeline */
+body.privyblur-active [data-testid="tweetText"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-testid="tweetText"]:hover {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Twitter/X avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars [data-testid="DMConversationEntry"] img,
+body.privyblur-active.privyblur-blur-avatars [data-testid="messageEntry"] img {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [data-testid="DMConversationEntry"]:hover img,
+body.privyblur-active.privyblur-blur-avatars [data-testid="messageEntry"]:hover img {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   LINKEDIN — www.linkedin.com (messaging)
+   ============================================================ */
+
+body.privyblur-active .msg-s-event-listitem__body,
+body.privyblur-active .msg-s-message-group__meta,
+body.privyblur-active .msg-conversation-card__message-snippet,
+body.privyblur-active .msg-conversation-card__participant-names,
+body.privyblur-active .msg-s-message-group__name,
+body.privyblur-active .msg-s-event__sender-name {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active .msg-s-event-listitem:hover .msg-s-event-listitem__body,
+body.privyblur-active .msg-s-message-group:hover .msg-s-message-group__meta,
+body.privyblur-active .msg-conversation-card:hover .msg-conversation-card__message-snippet,
+body.privyblur-active .msg-conversation-card:hover .msg-conversation-card__participant-names,
+body.privyblur-active .msg-s-message-group:hover .msg-s-message-group__name,
+body.privyblur-active .msg-s-event-listitem:hover .msg-s-event__sender-name {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* LinkedIn avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars .msg-conversation-card__image-container img,
+body.privyblur-active.privyblur-blur-avatars .presence-entity__image,
+body.privyblur-active.privyblur-blur-avatars img.EntityPhoto-circle {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars .msg-conversation-card:hover .msg-conversation-card__image-container img,
+body.privyblur-active.privyblur-blur-avatars .msg-s-event-listitem:hover .presence-entity__image {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   GMAIL — mail.google.com
+   ============================================================ */
+
+/* Email list: sender name + subject/snippet */
+body.privyblur-active .xT .y2,
+body.privyblur-active .xT .y6,
+body.privyblur-active tr.zA .bog,
+body.privyblur-active tr.zA .y2,
+body.privyblur-active tr.zA .zF,
+body.privyblur-active tr.zA .bA4 span {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active tr.zA:hover .bog,
+body.privyblur-active tr.zA:hover .y2,
+body.privyblur-active tr.zA:hover .zF,
+body.privyblur-active tr.zA:hover .bA4 span,
+body.privyblur-active tr.zA:hover .xT .y6 {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Email body */
+body.privyblur-active .a3s.aiL,
+body.privyblur-active .gmail_quote {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active .a3s.aiL:hover,
+body.privyblur-active .gmail_quote:hover {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Gmail avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars tr.zA .oZ,
+body.privyblur-active.privyblur-blur-avatars tr.zA .zW img {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars tr.zA:hover .oZ,
+body.privyblur-active.privyblur-blur-avatars tr.zA:hover .zW img {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   MICROSOFT TEAMS — teams.microsoft.com
+   ============================================================ */
+
+body.privyblur-active [data-tid="chat-pane-message"],
+body.privyblur-active .message-body-content,
+body.privyblur-active [data-tid="chat-list-item-title"],
+body.privyblur-active .fui-ChatMyMessage__body,
+body.privyblur-active .fui-ChatMessage__body {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [data-tid="chat-pane-message"]:hover,
+body.privyblur-active .message-body-content:hover,
+body.privyblur-active [data-tid="chat-list-item"]:hover [data-tid="chat-list-item-title"],
+body.privyblur-active .fui-ChatMyMessage:hover .fui-ChatMyMessage__body,
+body.privyblur-active .fui-ChatMessage:hover .fui-ChatMessage__body {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+/* Teams avatars (optional) */
+body.privyblur-active.privyblur-blur-avatars [data-tid="chat-pane-message"] .fui-Avatar,
+body.privyblur-active.privyblur-blur-avatars [data-tid="chat-list-item"] .fui-Avatar {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active.privyblur-blur-avatars [data-tid="chat-pane-message"]:hover .fui-Avatar,
+body.privyblur-active.privyblur-blur-avatars [data-tid="chat-list-item"]:hover .fui-Avatar {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   OUTLOOK — outlook.live.com / outlook.office.com
+   ============================================================ */
+
+body.privyblur-active [class*="subjectLine"],
+body.privyblur-active [class*="senderName"],
+body.privyblur-active [class*="previewText"],
+body.privyblur-active .lvHighlight {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [role="option"]:hover [class*="subjectLine"],
+body.privyblur-active [role="option"]:hover [class*="senderName"],
+body.privyblur-active [role="option"]:hover [class*="previewText"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   FACEBOOK — www.facebook.com (Messenger sidebar)
+   ============================================================ */
+
+body.privyblur-active [aria-label*="Chat"] [dir="auto"] span,
+body.privyblur-active [data-pagelet*="MercuryThread"] [dir="auto"] {
+  filter:     blur(var(--pb-blur))   !important;
+  opacity:    var(--pb-opacity)      !important;
+  transition: filter var(--pb-speed) ease, opacity var(--pb-speed) ease !important;
+}
+body.privyblur-active [aria-label*="Chat"]:hover [dir="auto"] span,
+body.privyblur-active [data-pagelet*="MercuryThread"]:hover [dir="auto"] {
+  filter:  blur(0px) !important;
+  opacity: 1         !important;
+}
+
+
+/* ============================================================
+   GLOBAL: Ensure nothing leaks through when blur is OFF
+   ============================================================ */
+
+body:not(.privyblur-active) * {
+  filter:  unset !important;
+  opacity: unset !important;
+}

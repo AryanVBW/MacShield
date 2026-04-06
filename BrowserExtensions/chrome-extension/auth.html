@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MacShield — Touch ID</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  background: #000000;
+  color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.auth-card {
+  text-align: center;
+  padding: 40px 36px 32px;
+  max-width: 340px;
+  width: 100%;
+}
+
+/* Fingerprint ring with pulse */
+.fingerprint-ring {
+  width: 84px; height: 84px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.fingerprint-ring::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.30);
+  animation: pulse-ring 2s ease-out infinite;
+}
+.fingerprint-ring::after {
+  content: '';
+  position: absolute; inset: -12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.10);
+  animation: pulse-ring 2s ease-out infinite 0.6s;
+}
+.fingerprint-ring svg {
+  width: 44px; height: 44px;
+  color: #FFFFFF;
+  position: relative; z-index: 1;
+}
+
+.auth-title {
+  font-size: 19px; font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+.auth-sub {
+  font-size: 13px; color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.auth-host {
+  font-size: 11.5px; color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px; padding: 3px 11px;
+  display: inline-block; margin-bottom: 26px;
+  font-weight: 500;
+}
+.auth-host-enroll {
+  font-size: 11.5px; color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px; padding: 3px 11px;
+  display: inline-block; margin-bottom: 26px;
+  font-weight: 500;
+}
+
+.status-msg {
+  font-size: 13px; color: rgba(255, 255, 255, 0.65);
+  margin-top: 16px;
+  min-height: 20px;
+  transition: color 0.2s;
+  line-height: 1.5;
+}
+.status-msg.error   { color: #FF453A; }
+.status-msg.success { color: #FFFFFF; }
+
+.action-btn {
+  margin-top: 16px;
+  padding: 10px 26px;
+  font-size: 13px; font-weight: 600;
+  color: #000000;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, opacity 0.15s;
+  display: inline-block;
+  width: 100%;
+}
+.action-btn:hover { opacity: 0.85; }
+.action-btn.secondary {
+  color: #C0C6DC;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.09);
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-card">
+  <div class="fingerprint-ring">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+    </svg>
+  </div>
+
+  <h1 class="auth-title" id="authTitle">Passkey</h1>
+  <p class="auth-sub" id="authSub">Authorize with Touch ID or device biometric</p>
+  <p id="hostBadge"></p>
+
+  <p class="status-msg" id="statusMsg">Waiting to begin…</p>
+  <button class="action-btn" id="actionBtn">Start Passkey</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const params    = new URLSearchParams(location.search);
+  const hostname  = params.get("host") || "Unknown";
+  const mode      = params.get("mode") || "auth"; // "auth" or "enroll"
+  const isEnroll  = mode === "enroll";
+
+  const statusEl  = document.getElementById("statusMsg");
+  const actionBtn = document.getElementById("actionBtn");
+  const hostBadge = document.getElementById("hostBadge");
+  const authTitle = document.getElementById("authTitle");
+  const authSub   = document.getElementById("authSub");
+
+  // ── Customise UI for enroll mode ──
+  if (isEnroll) {
+    authTitle.textContent = "Enroll Passkey";
+    authSub.textContent   = "Set up Touch ID or device biometric";
+    hostBadge.className   = "auth-host-enroll";
+    hostBadge.textContent = "One-time enrollment";
+    actionBtn.textContent = "Start Setup";
+  } else {
+    hostBadge.className   = "auth-host";
+    hostBadge.textContent = hostname;
+    actionBtn.textContent = "Authenticate";
+  }
+
+  // ── WebAuthn helpers ──
+  const MS_CRED_KEY = "ms_webauthn_cred_id";
+
+  function bufToB64(buf) {
+    return btoa(String.fromCharCode(...new Uint8Array(buf)));
+  }
+  function b64ToBuf(b64) {
+    const binary = atob(b64);
+    const buf = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
+    return buf.buffer;
+  }
+
+  // ── Start: check for existing credential ──
+  async function start() {
+    actionBtn.style.display = "none";
+    statusEl.textContent = "Checking authorization...";
+    statusEl.className = "status-msg";
+
+    const result = await chrome.storage.local.get([MS_CRED_KEY]);
+    if (result[MS_CRED_KEY] && !isEnroll) {
+      authenticate(result[MS_CRED_KEY]);
+    } else {
+      register();
+    }
+  }
+
+  // ── Register new credential ──
+  async function register() {
+    statusEl.textContent = "Creating Passkey…";
+    statusEl.className   = "status-msg";
+
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+      const userId    = crypto.getRandomValues(new Uint8Array(16));
+
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: {
+            name: "MacShield",
+          },
+          user: {
+            id: userId,
+            name: "macshield-user",
+            displayName: "MacShield User",
+          },
+          pubKeyCredParams: [
+            { alg: -7,   type: "public-key" }, // ES256
+            { alg: -257, type: "public-key" }, // RS256
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            userVerification: "required",
+          },
+          timeout: 60000,
+          attestation: "none",
+        },
+      });
+
+      const credId = bufToB64(credential.rawId);
+      await chrome.storage.local.set({ [MS_CRED_KEY]: credId });
+
+      if (isEnroll) {
+        // Enrollment complete — no need to authenticate
+        statusEl.textContent = "Passkey enrolled successfully!";
+        statusEl.className   = "status-msg success";
+        setTimeout(() => window.close(), 1200);
+      } else {
+        // Proceed to authenticate
+        authenticate(credId);
+      }
+
+    } catch (err) {
+      const reason = err.name === "NotAllowedError" ? "Cancelled by user" : err.message;
+      statusEl.textContent = "Setup failed: " + reason;
+      statusEl.className   = "status-msg error";
+      actionBtn.style.display = "inline-block";
+      actionBtn.textContent = "Try Again";
+      actionBtn.classList.add("secondary");
+    }
+  }
+
+  // ── Authenticate with existing credential ──
+  async function authenticate(credIdB64) {
+    statusEl.textContent = "Waiting for authorization…";
+    statusEl.className   = "status-msg";
+    actionBtn.style.display = "none";
+
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+
+      await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          allowCredentials: [{
+            id: b64ToBuf(credIdB64),
+            type: "public-key",
+          }],
+          userVerification: "required",
+          timeout: 60000,
+        },
+      });
+
+      statusEl.textContent = "Authenticated — unlocking…";
+      statusEl.className   = "status-msg success";
+
+      chrome.runtime.sendMessage({
+        action:   "ms_touchIDSuccess",
+        hostname: hostname,
+      });
+
+      setTimeout(() => window.close(), 600);
+
+    } catch (err) {
+      if (err.name === "NotAllowedError") {
+        statusEl.textContent = "Authentication cancelled or timed out";
+      } else {
+        statusEl.textContent = "Passkey auth failed: " + err.message;
+      }
+      statusEl.className   = "status-msg error";
+      actionBtn.style.display = "inline-block";
+      actionBtn.textContent = "Try Again";
+      actionBtn.classList.add("secondary");
+    }
+  }
+
+  actionBtn.addEventListener("click", start);
+  statusEl.textContent = "Click button to authorize";
+})();
+</script>
+</body>
+</html>

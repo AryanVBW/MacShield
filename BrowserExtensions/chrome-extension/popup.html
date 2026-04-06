@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+/* ── Reset & Design Tokens ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg:           #000000;
+  --surface:      #050505;
+  --surface-2:    rgba(255,255,255,0.05);
+  --surface-3:    rgba(255,255,255,0.08);
+  --border:       rgba(255,255,255,0.10);
+  --border-2:     rgba(255,255,255,0.15);
+  --text:         #FFFFFF;
+  --text-2:       rgba(255,255,255,0.65);
+  --text-3:       rgba(255,255,255,0.40);
+  --accent:       #FFFFFF;
+  --accent-bg:    rgba(255,255,255,0.12);
+  --accent-brd:   rgba(255,255,255,0.25);
+  --green:        #FFFFFF;
+  --green-bg:     rgba(255,255,255,0.10);
+  --green-brd:    rgba(255,255,255,0.20);
+  --red:          #FF453A;
+  --red-bg:       rgba(255,69,58,0.12);
+  --red-brd:      rgba(255,69,58,0.25);
+  --amber:        #FF9F0A;
+  --amber-bg:     rgba(255,159,10,0.12);
+  --amber-brd:    rgba(255,159,10,0.25);
+  --radius:       10px;
+  --radius-lg:    13px;
+}
+html { background: var(--bg); }
+body {
+  width: 380px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ── Scroll ── */
+.popup-scroll { max-height: 560px; overflow-y: auto; }
+.popup-scroll::-webkit-scrollbar { width: 3px; }
+.popup-scroll::-webkit-scrollbar-track { background: transparent; }
+.popup-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+/* ── Header ── */
+.header {
+  padding: 13px 15px 11px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 11px;
+  position: sticky; top: 0; z-index: 10;
+}
+.logo-wrap {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(255,255,255,0.05);
+}
+.logo-wrap svg { width: 22px; height: 22px; }
+.header-meta { flex: 1; }
+.header-title {
+  font-size: 15px; font-weight: 700;
+  letter-spacing: -0.3px; color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+}
+.header-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.v-pill {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.6px;
+  color: var(--accent); background: var(--accent-bg);
+  border: 1px solid var(--accent-brd);
+  border-radius: 4px; padding: 2px 5px;
+  align-self: center; line-height: 1;
+}
+
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 53px; z-index: 9;
+}
+.tab-btn {
+  flex: 1; padding: 9px 0;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.1px;
+  color: var(--text-3);
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer; font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.tab-btn:hover { color: var(--text-2); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ── Panels ── */
+.tab-panel { display: none; padding-bottom: 10px; }
+.tab-panel.active { display: block; }
+
+/* ── Sections ── */
+.section {
+  margin: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.section-header {
+  padding: 8px 13px 7px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.9px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-body { padding: 12px 13px; }
+
+/* ── Toggle switch ── */
+.sw { position: relative; width: 36px; height: 20px; cursor: pointer; flex-shrink: 0; }
+.sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+.sw-track {
+  position: absolute; inset: 0;
+  background: var(--surface-3);
+  border-radius: 10px;
+  border: 1px solid var(--border-2);
+  transition: background 0.18s, border-color 0.18s;
+}
+.sw-track::before {
+  content: '';
+  position: absolute; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--text-3);
+  left: 3px; top: 3px;
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1), background 0.18s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.sw input:checked + .sw-track { background: var(--accent); border-color: var(--accent-brd); }
+.sw input:checked + .sw-track::before { transform: translateX(16px); background: #fff; }
+.sw-big { width: 44px; height: 24px; }
+.sw-big .sw-track::before { width: 18px; height: 18px; }
+.sw-big input:checked + .sw-track { background: var(--green); border-color: var(--green-brd); }
+.sw-big input:checked + .sw-track::before { transform: translateX(20px); }
+
+/* ── Option rows ── */
+.opt-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.opt-row:last-child { border-bottom: none; }
+.opt-row:hover { background: var(--surface-3); }
+.opt-info { flex: 1; margin-right: 12px; }
+.opt-label { font-size: 13px; font-weight: 500; color: var(--text); display: block; }
+.opt-desc  { font-size: 11px; color: var(--text-3); margin-top: 2px; display: block; }
+
+/* ── Status card ── */
+.status-card {
+  margin: 8px 12px;
+  padding: 12px 13px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: space-between;
+  transition: border-color 0.25s, background 0.25s;
+}
+.status-card.on  { background: var(--green-bg); border-color: var(--green-brd); }
+.status-card.off { background: var(--red-bg);   border-color: var(--red-brd); }
+.status-left { display: flex; align-items: center; gap: 10px; }
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-3); flex-shrink: 0;
+  transition: background 0.25s, box-shadow 0.25s;
+}
+.status-card.on  .status-dot { background: var(--green); box-shadow: 0 0 8px rgba(48,209,88,0.5); }
+.status-card.off .status-dot { background: var(--red);   box-shadow: 0 0 8px rgba(255,69,58,0.4); }
+.status-label { font-size: 13.5px; font-weight: 600; }
+.status-sub   { font-size: 11px; color: var(--text-2); margin-top: 1px; }
+
+/* ── Slider ── */
+.slider-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+.slider-title { font-size: 13px; font-weight: 500; }
+.val-pill {
+  font-size: 11px; font-weight: 600;
+  color: var(--accent); background: var(--accent-bg);
+  border: 1px solid var(--accent-brd);
+  border-radius: 5px; padding: 2px 8px;
+  min-width: 38px; text-align: center;
+  transition: opacity 0.2s;
+}
+.val-pill.dim { opacity: 0.25; }
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 4px;
+  border-radius: 2px; background: var(--surface-2); outline: none;
+  transition: opacity 0.2s;
+}
+input[type="range"].dim { opacity: 0.2; pointer-events: none; }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--accent);
+  cursor: pointer; border: 2.5px solid var(--bg);
+  box-shadow: 0 1px 5px rgba(255,255,255,0.2);
+  margin-top: -6px;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--fill,42%), var(--surface-2) var(--fill,42%));
+  height: 4px; border-radius: 2px;
+}
+.preset-row { display: flex; gap: 4px; margin-top: 10px; }
+.preset-btn {
+  flex: 1; padding: 5px 0;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-2); background: var(--surface-2);
+  border: 1px solid var(--border-2); border-radius: 7px;
+  cursor: pointer; font-family: inherit;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.preset-btn:hover  { color: var(--accent); border-color: var(--accent-brd); background: var(--accent-bg); }
+.preset-btn.active { color: var(--accent); border-color: var(--accent-brd); background: var(--accent-bg); }
+.preset-btn:disabled { opacity: 0.2; pointer-events: none; }
+
+/* ── Platform badges ── */
+.plat-grid { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 13px; }
+.plat-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 500;
+  padding: 3px 8px; border-radius: 6px;
+  background: var(--accent-bg); color: var(--accent);
+  border: 1px solid var(--accent-brd);
+}
+.plat-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+/* ── Buttons ── */
+.btn {
+  height: 36px; padding: 0 14px;
+  font-size: 12.5px; font-weight: 600;
+  border: none; border-radius: var(--radius);
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  white-space: nowrap;
+}
+.btn:hover   { opacity: 0.85; }
+.btn:active  { opacity: 0.70; }
+.btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+.btn-primary { background: var(--accent); color: #000000; }
+.btn-ghost   { background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border-2); }
+.btn-danger  { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-brd); }
+.btn-full    { width: 100%; }
+
+/* ── Password forms ── */
+.pw-wrap { padding: 12px 13px; }
+.pw-status {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px; border-radius: var(--radius);
+  margin-bottom: 12px;
+  font-size: 12px; font-weight: 500;
+}
+.pw-status.set   { background: var(--green-bg); color: var(--text); border: 1px solid var(--green-brd); }
+.pw-status.unset { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-brd); }
+.pw-input {
+  width: 100%; height: 38px; padding: 0 12px;
+  font-size: 13px; color: var(--text);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border-2);
+  border-radius: 9px; outline: none; font-family: inherit;
+  display: block; margin-bottom: 6px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pw-input:focus { border-color: var(--accent-brd); box-shadow: 0 0 0 3px rgba(64,112,255,0.10); }
+.pw-input::placeholder { color: var(--text-3); }
+.btn-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.btn-row .btn-ghost { flex: 1; }
+.pw-msg { font-size: 11px; min-height: 16px; margin-top: 4px; }
+.pw-msg.ok  { color: var(--text); }
+.pw-msg.err { color: var(--red); }
+
+/* ── Lock site rows (predefined) ── */
+.lock-site-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 13px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.lock-site-row:last-child { border-bottom: none; }
+.lock-site-row:hover { background: var(--surface-3); }
+.site-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9.5px; font-weight: 800; letter-spacing: -0.2px;
+  flex-shrink: 0;
+}
+.lock-site-name { flex: 1; min-width: 0; }
+.lock-site-name strong { font-size: 12.5px; font-weight: 500; color: var(--text); display: block; }
+.lock-site-name small { font-size: 10px; color: var(--text-3); }
+
+/* ── Custom sites section ── */
+.lock-any-body { padding: 11px 13px; }
+.lock-any-desc { font-size: 11px; color: var(--text-3); margin-bottom: 10px; line-height: 1.5; }
+.lock-any-row { display: flex; gap: 6px; align-items: center; }
+.lock-any-input { flex: 1; height: 36px; margin-bottom: 0; font-size: 12.5px; }
+.lock-any-input::placeholder { font-size: 12px; }
+.custom-sites-list { margin-top: 10px; }
+.custom-site-row {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+.custom-site-row:last-child { border-bottom: none; }
+.custom-site-name {
+  flex: 1; font-size: 12.5px; font-weight: 500;
+  color: var(--text); min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.remove-site-btn {
+  height: 26px; padding: 0 9px;
+  font-size: 11px; font-weight: 600;
+  background: var(--red-bg); color: var(--red);
+  border: 1px solid var(--red-brd); border-radius: 7px;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s; flex-shrink: 0;
+}
+.remove-site-btn:hover { opacity: 0.8; }
+.no-custom-sites { font-size: 11px; color: var(--text-3); padding: 4px 0; }
+
+/* ── Biometric card ── */
+.bio-card {
+  padding: 12px 13px;
+  display: flex; align-items: center; gap: 11px;
+}
+.bio-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--accent-bg); border: 1px solid var(--accent-brd);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.bio-icon svg { width: 17px; height: 17px; color: var(--accent); }
+.bio-info { flex: 1; }
+.bio-label { font-size: 13px; font-weight: 500; }
+.bio-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; display: flex; align-items: center; gap: 5px; }
+.bio-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-3); flex-shrink: 0;
+  transition: background 0.2s;
+}
+.bio-dot.enrolled { background: var(--green); box-shadow: 0 0 5px rgba(48,209,88,0.5); }
+
+/* ── About ── */
+.about-body {
+  padding: 12px 13px;
+  font-size: 12px; color: var(--text-2); line-height: 1.65;
+}
+.about-body strong { color: var(--text); }
+.about-body small  { color: var(--text-3); display: block; margin-top: 6px; font-size: 11px; }
+
+/* ── Info note ── */
+.info-note { padding: 4px 12px 8px; font-size: 11px; color: var(--text-3); line-height: 1.5; }
+
+/* ── Footer ── */
+.footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 10.5px; color: var(--text-3);
+  background: var(--surface);
+}
+kbd {
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px;
+  font-family: inherit; font-size: 10px; color: var(--text-2);
+}
+body.locked > :not(#masterOverlay) { display: none !important; }
+
+/* ── Master Lock Overlay ── */
+#masterOverlay {
+  position: relative; width: 100%; height: 480px;
+  background: var(--bg); z-index: 99999;
+  display: flex; flex-direction: column;
+  padding: 24px; text-align: center; overflow-y: auto;
+  align-items: center; justify-content: center;
+}
+#masterOverlay .logo-wrap { width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 16px; flex-shrink: 0; }
+#masterOverlay .logo-wrap svg { width: 32px; height: 32px; }
+#masterOverlay h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -0.4px; }
+#masterOverlay p { font-size: 12.5px; color: var(--text-2); margin-bottom: 24px; line-height: 1.5; }
+</style>
+</head>
+<body class="locked">
+
+<div id="masterOverlay">
+    <!-- Setup State -->
+    <div id="masterSetup" style="display:none; width: 100%;">
+      <div class="logo-wrap">
+        <img src="icons/logo.svg" alt="MacShield" style="width:100%; height:100%;">
+      </div>
+      <h2>Welcome to MacShield</h2>
+      <p>Please create a master password to secure your extension.</p>
+      <div class="pw-wrap" style="padding:0;">
+        <input type="password" id="mSetupPw1" class="pw-input" placeholder="New master password">
+        <input type="password" id="mSetupPw2" class="pw-input" placeholder="Confirm password">
+        <button class="btn btn-primary btn-full" id="mSetupBtn" style="margin-top:6px; height:42px;">Set Password</button>
+        <div id="mSetupMsg" class="pw-msg" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Login State -->
+    <div id="masterLogin" style="display:none; width: 100%;">
+      <div class="logo-wrap">
+        <img src="icons/logo.svg" alt="MacShield" style="width:100%; height:100%;">
+      </div>
+      <h2>MacShield Locked</h2>
+      <p>Enter your master password to access settings.</p>
+      <div class="pw-wrap" style="padding:0;">
+        <input type="password" id="mLoginPw" class="pw-input" placeholder="Master password" autofocus>
+        <button class="btn btn-primary btn-full" id="mLoginBtn" style="margin-top:6px; height:42px;">Unlock</button>
+        <button class="btn btn-ghost btn-full" id="mTouchIDBtn" style="margin-top:8px; height:42px; display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+          </svg>
+          <span style="margin-left:4px;">Use Touch ID</span>
+        </button>
+        <div id="mLoginMsg" class="pw-msg err" style="margin-top:8px;"></div>
+      </div>
+    </div>
+</div>
+
+<!-- ══ Header ══ -->
+<div class="header">
+  <div class="logo-wrap">
+    <img src="icons/logo.svg" alt="MacShield" style="width:100%; height:100%;">
+  </div>
+  <div class="header-meta">
+    <div class="header-title">MacShield <span class="v-pill">V3</span></div>
+    <div class="header-sub">Privacy Lock &amp; Blur</div>
+  </div>
+</div>
+
+<!-- ══ Tab Bar ══ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="shield">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Shield
+  </button>
+  <button class="tab-btn" data-tab="lock">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0110 0v4"/>
+    </svg>
+    App Lock
+  </button>
+  <button class="tab-btn" data-tab="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+    </svg>
+    Settings
+  </button>
+</div>
+
+<div class="popup-scroll">
+
+<!-- ═══════════════════════════ SHIELD TAB ═══════════════════════════ -->
+<div class="tab-panel active" id="panel-shield">
+
+  <div class="status-card off" id="blurStatusCard">
+    <div class="status-left">
+      <div class="status-dot"></div>
+      <div>
+        <div class="status-label" id="blurStatusLabel">Loading…</div>
+        <div class="status-sub" id="blurStatusSub">Checking status</div>
+      </div>
+    </div>
+    <label class="sw sw-big">
+      <input type="checkbox" id="blurToggle">
+      <span class="sw-track"></span>
+    </label>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Blur Intensity</div>
+    <div class="section-body">
+      <div class="slider-top">
+        <span class="slider-title">Strength</span>
+        <span class="val-pill" id="blurValPill">12px</span>
+      </div>
+      <input type="range" id="blurSlider" min="2" max="30" value="12" step="1">
+      <div class="preset-row">
+        <button class="preset-btn" data-val="5">Light</button>
+        <button class="preset-btn active" data-val="12">Medium</button>
+        <button class="preset-btn" data-val="22">Deep</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Privacy Options</div>
+    <div class="opt-row">
+      <div class="opt-info">
+        <span class="opt-label">Blur Profile Pictures</span>
+        <span class="opt-desc">Also blur avatars and user photos</span>
+      </div>
+      <label class="sw"><input type="checkbox" id="blurAvatarsToggle"><span class="sw-track"></span></label>
+    </div>
+    <div class="opt-row">
+      <div class="opt-info">
+        <span class="opt-label">Hide Mode</span>
+        <span class="opt-desc">Completely hide content instead of blurring</span>
+      </div>
+      <label class="sw"><input type="checkbox" id="hideModeToggle"><span class="sw-track"></span></label>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      Protected Platforms
+      <span style="color:var(--accent);font-weight:700;">13</span>
+    </div>
+    <div class="plat-grid">
+      <span class="plat-badge"><span class="plat-dot"></span>WhatsApp</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Instagram</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Telegram</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Messenger</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Discord</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Slack</span>
+      <span class="plat-badge"><span class="plat-dot"></span>X / Twitter</span>
+      <span class="plat-badge"><span class="plat-dot"></span>LinkedIn</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Gmail</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Outlook</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Teams</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Facebook</span>
+      <span class="plat-badge"><span class="plat-dot"></span>Element</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════ LOCK TAB ═══════════════════════════ -->
+<div class="tab-panel" id="panel-lock">
+
+  <!-- Password management -->
+  <div class="section">
+    <div class="section-header">
+      Password
+      <span id="pwStatusBadge"></span>
+    </div>
+    <div class="pw-wrap">
+      <div class="pw-status unset" id="pwStatus">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+          <circle cx="12" cy="16" r=".5" fill="currentColor"/>
+        </svg>
+        <span id="pwStatusText">No password set — required to enable locks</span>
+      </div>
+
+      <!-- Manage area (password is set) -->
+      <div id="pwChangeArea" style="display:none;">
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="pwChangeBtn">Change Password</button>
+          <button class="btn btn-danger" id="pwRemoveBtn">Remove</button>
+        </div>
+      </div>
+
+      <!-- Change password form -->
+      <div id="pwChangeForm" style="display:none;">
+        <input type="password" id="pwCurrentInput" class="pw-input" placeholder="Current password" autocomplete="current-password">
+        <input type="password" id="pwNewInput1"    class="pw-input" placeholder="New password or PIN" autocomplete="new-password">
+        <input type="password" id="pwNewInput2"    class="pw-input" placeholder="Confirm new password" autocomplete="new-password">
+        <div class="btn-row">
+          <button class="btn btn-primary" id="pwConfirmChangeBtn">Update Password</button>
+          <button class="btn btn-ghost"   id="pwCancelChangeBtn">Cancel</button>
+        </div>
+        <div class="pw-msg" id="pwChangeMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lock any website -->
+  <div class="section">
+    <div class="section-header">
+      Lock Any Website
+      <span id="customLockCount" style="color:var(--accent);font-weight:700;font-size:10px;"></span>
+    </div>
+    <div class="lock-any-body">
+      <p class="lock-any-desc">Enter any domain. A full-screen lock appears when anyone visits it, blocking access until authenticated.</p>
+      <div class="lock-any-row">
+        <input type="text" id="customSiteInput" class="pw-input lock-any-input"
+               placeholder="github.com or notion.so" autocomplete="off" spellcheck="false">
+        <button class="btn btn-primary" id="addCustomSiteBtn" style="height:36px;flex-shrink:0;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Lock Site
+        </button>
+      </div>
+      <div class="pw-msg err" id="customSiteError" style="display:none;margin-top:6px;"></div>
+      <div class="custom-sites-list" id="customSitesList"></div>
+    </div>
+  </div>
+
+  <!-- Popular apps -->
+  <div class="section">
+    <div class="section-header">
+      Popular Apps
+      <span id="lockCount" style="font-size:10px;font-weight:600;color:var(--accent);">none locked</span>
+    </div>
+    <div id="lockSitesList"></div>
+  </div>
+
+  <div class="info-note">
+    Locks reset each browser session. Set a password to enable all locks.
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════ SETTINGS TAB ═══════════════════════════ -->
+<div class="tab-panel" id="panel-settings">
+
+  <div class="section">
+    <div class="section-header">Biometric Authentication</div>
+    <div class="bio-card">
+      <div class="bio-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+        </svg>
+      </div>
+      <div class="bio-info">
+        <div class="bio-label">Touch ID</div>
+        <div class="bio-sub">
+          <span class="bio-dot" id="bioDot"></span>
+          <span id="bioStatusText">Not enrolled</span>
+        </div>
+      </div>
+      <button class="btn btn-ghost" id="bioActionBtn" style="font-size:11.5px;height:32px;padding:0 12px;">Enroll</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">General</div>
+    <div class="opt-row">
+      <div class="opt-info">
+        <span class="opt-label">Auto-Lock on Tab Switch</span>
+        <span class="opt-desc">Re-lock the site whenever you leave the tab</span>
+      </div>
+      <label class="sw"><input type="checkbox" id="autoRelockToggle"><span class="sw-track"></span></label>
+    </div>
+    <div class="opt-row" style="cursor:default;">
+      <div class="opt-info">
+        <span class="opt-label">Keyboard Shortcut</span>
+        <span class="opt-desc">Toggle blur: <kbd>Alt</kbd> + <kbd>X</kbd></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">About</div>
+    <div class="about-body">
+      <strong>MacShield v3.1</strong> — Privacy Lock &amp; Blur<br>
+      Lock any website with a full-screen auth screen. Blur private content on popular apps.
+      <small>All data stored locally. Nothing is sent externally.</small>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- end .popup-scroll -->
+
+<div class="footer">
+  <span>Toggle blur: <kbd>Alt</kbd> <kbd>X</kbd></span>
+  <span style="color:var(--text-3);">MacShield</span>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

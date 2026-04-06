@@ -1,5 +1,5 @@
 /* MacShield Web — Chat Blur CSS */
-/* Blur rules per chat platform. Messages are blurred by default, revealed on hover. */
+/* Messages blurred by default, revealed on hover (or click when in click mode). */
 
 :root {
   --gv-blur: 8px;
@@ -7,13 +7,13 @@
 }
 
 /* ===== WhatsApp Web ===== */
-.web.whatsapp.com .message-in .copyable-text,
-.web.whatsapp.com .message-out .copyable-text,
-[data-testid="msg-container"] .selectable-text {
+[data-testid="msg-container"] .selectable-text,
+[data-testid="msg-container"] .copyable-text {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-[data-testid="msg-container"]:hover .selectable-text {
+body:not(.macshield-click-mode) [data-testid="msg-container"]:hover .selectable-text,
+body:not(.macshield-click-mode) [data-testid="msg-container"]:hover .copyable-text {
   filter: blur(0);
 }
 
@@ -22,19 +22,18 @@
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-[data-testid="cell-frame-container"]:hover [data-testid="last-msg-status"] {
+body:not(.macshield-click-mode) [data-testid="cell-frame-container"]:hover [data-testid="last-msg-status"] {
   filter: blur(0);
 }
 
 /* ===== Instagram DMs ===== */
-/* Message bubbles */
 div[role="listbox"] div[role="row"] span,
 div[role="listbox"] div[role="row"] p {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-div[role="listbox"] div[role="row"]:hover span,
-div[role="listbox"] div[role="row"]:hover p {
+body:not(.macshield-click-mode) div[role="listbox"] div[role="row"]:hover span,
+body:not(.macshield-click-mode) div[role="listbox"] div[role="row"]:hover p {
   filter: blur(0);
 }
 
@@ -44,8 +43,8 @@ div[role="listbox"] div[role="row"]:hover p {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-.message:hover .text-content,
-.message:hover .media-container {
+body:not(.macshield-click-mode) .message:hover .text-content,
+body:not(.macshield-click-mode) .message:hover .media-container {
   filter: blur(0);
 }
 
@@ -56,9 +55,9 @@ div[role="listbox"] div[role="row"]:hover p {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-[class*="message-"]:hover [class*="messageContent-"],
-[class*="message-"]:hover [class*="embedDescription-"],
-[class*="message-"]:hover [class*="markup-"] {
+body:not(.macshield-click-mode) [class*="message-"]:hover [class*="messageContent-"],
+body:not(.macshield-click-mode) [class*="message-"]:hover [class*="embedDescription-"],
+body:not(.macshield-click-mode) [class*="message-"]:hover [class*="markup-"] {
   filter: blur(0);
 }
 
@@ -68,8 +67,8 @@ div[role="listbox"] div[role="row"]:hover p {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-.c-message:hover .c-message__body,
-.c-message_kit__message:hover .c-message_kit__text {
+body:not(.macshield-click-mode) .c-message:hover .c-message__body,
+body:not(.macshield-click-mode) .c-message_kit__message:hover .c-message_kit__text {
   filter: blur(0);
 }
 
@@ -79,8 +78,8 @@ div[role="listbox"] div[role="row"]:hover p {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-[data-testid="messageEntry"]:hover [data-testid="tweetText"],
-[data-testid="DmActivityViewRenderer"]:hover [dir="auto"] {
+body:not(.macshield-click-mode) [data-testid="messageEntry"]:hover [data-testid="tweetText"],
+body:not(.macshield-click-mode) [data-testid="DmActivityViewRenderer"]:hover [dir="auto"] {
   filter: blur(0);
 }
 
@@ -90,21 +89,21 @@ div[role="listbox"] div[role="row"]:hover p {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-.msg-s-event-listitem:hover .msg-s-event-listitem__body,
-.msg-s-message-group:hover .msg-s-message-group__msg {
+body:not(.macshield-click-mode) .msg-s-event-listitem:hover .msg-s-event-listitem__body,
+body:not(.macshield-click-mode) .msg-s-message-group:hover .msg-s-message-group__msg {
   filter: blur(0);
 }
 
 /* ===== Gmail ===== */
-.a3s.aiL, /* Email body */
-.y2 /* Snippet in list */ {
+.a3s.aiL,
+.y2 {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-tr:hover .y2 {
+body:not(.macshield-click-mode) tr:hover .y2 {
   filter: blur(0);
 }
-.a3s.aiL:hover {
+body:not(.macshield-click-mode) .a3s.aiL:hover {
   filter: blur(0);
 }
 
@@ -114,8 +113,8 @@ tr:hover .y2 {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-[data-tid="messageBodyContent"]:hover,
-.cke_contents:hover {
+body:not(.macshield-click-mode) [data-tid="messageBodyContent"]:hover,
+body:not(.macshield-click-mode) .cke_contents:hover {
   filter: blur(0);
 }
 
@@ -125,8 +124,8 @@ tr:hover .y2 {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-[data-scope="messages_table"] [role="row"]:hover [dir="auto"],
-.__fb-light-mode [role="row"]:hover [dir="auto"] {
+body:not(.macshield-click-mode) [data-scope="messages_table"] [role="row"]:hover [dir="auto"],
+body:not(.macshield-click-mode) .__fb-light-mode [role="row"]:hover [dir="auto"] {
   filter: blur(0);
 }
 
@@ -136,11 +135,16 @@ mws-relative-timestamp + div {
   filter: blur(var(--gv-blur));
   transition: filter var(--gv-transition);
 }
-mws-message-wrapper:hover .text-msg-content {
+body:not(.macshield-click-mode) mws-message-wrapper:hover .text-msg-content {
   filter: blur(0);
 }
 
-/* ===== Global disabled state ===== */
+/* ===== Click-to-Reveal ===== */
+.macshield-revealed {
+  filter: blur(0) !important;
+}
+
+/* ===== Global Disabled State ===== */
 body.macshield-disabled * {
   filter: none !important;
 }
