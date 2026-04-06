@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MacShield Security Check</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  background: #000000;
+  color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+}
+.card {
+  text-align: center;
+  padding: 40px 36px 32px;
+  max-width: 360px;
+  width: 100%;
+  background: rgba(5, 5, 5, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+.logo { margin: 0 auto 20px; width: 64px; height: 64px; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.4px; }
+p { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-bottom: 24px; }
+.input {
+  width: 100%; height: 48px; padding: 0 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px; font-size: 14.5px; color: #FFF;
+  outline: none; transition: border-color 0.2s;
+  margin-bottom: 12px;
+  -webkit-text-security: disc;
+}
+.input:focus { border-color: rgba(255,255,255,0.45); }
+.btn {
+  width: 100%; height: 48px;
+  background: #FFF; color: #000;
+  border-radius: 12px; font-size: 14.5px; font-weight: 600;
+  border: none; cursor: pointer; transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.85; }
+.err { font-size: 13px; color: #FF453A; margin-top: 12px; display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <img src="icons/logo.svg" alt="MacShield" style="width:100%; height:100%;">
+  </div>
+  <h2>MacShield Security Check</h2>
+  <p>To access Chrome settings or extensions, please verify your identity.</p>
+  <input type="password" id="pw" class="input" placeholder="Master password" autofocus>
+  <button id="btn" class="btn">Unlock Access</button>
+  <div id="err" class="err">Incorrect password.</div>
+</div>
+<script>
+  const pw = document.getElementById("pw");
+  const btn = document.getElementById("btn");
+  const err = document.getElementById("err");
+  function auth() {
+    if (!pw.value) return;
+    btn.textContent = "Verifying...";
+    btn.disabled = true;
+    chrome.runtime.sendMessage({ action: "ms_verifyPassword", password: pw.value }, resp => {
+      btn.disabled = false;
+      btn.textContent = "Unlock Access";
+      if (resp && resp.ok) {
+        const rt = new URLSearchParams(location.search).get("rt");
+        const targetUrl = rt || "chrome://extensions/";
+        chrome.runtime.sendMessage({ action: "ms_unlockUninstall", targetUrl: targetUrl }, () => window.close());
+      } else {
+        err.style.display = "block";
+        pw.value = "";
+        pw.focus();
+      }
+    });
+  }
+  btn.addEventListener("click", auth);
+  pw.addEventListener("keydown", e => {
+    if (e.key === "Enter") auth();
+    err.style.display = "none";
+  });
+</script>
+</body>
+</html>

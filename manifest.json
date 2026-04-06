@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "MacShield — Privacy Lock & Blur",
+  "version": "3.1.0",
+  "description": "Lock any website with password or Touch ID. A full-screen auth screen blocks access until authenticated. Also blurs private content on WhatsApp, Gmail, Discord and more.",
+  "permissions": ["storage", "activeTab", "tabs", "background"],
+  "host_permissions": ["<all_urls>"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["lock-guard.js"],
+      "css": ["lock.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "*://web.whatsapp.com/*",
+        "*://www.instagram.com/*",
+        "*://web.telegram.org/*",
+        "*://www.messenger.com/*",
+        "*://discord.com/*",
+        "*://app.slack.com/*",
+        "*://twitter.com/*",
+        "*://x.com/*",
+        "*://www.facebook.com/*",
+        "*://www.linkedin.com/*",
+        "*://mail.google.com/*",
+        "*://outlook.live.com/*",
+        "*://outlook.office.com/*",
+        "*://teams.microsoft.com/*",
+        "*://signal.group/*",
+        "*://app.element.io/*"
+      ],
+      "js": ["content.js"],
+      "css": ["blur.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/logo.svg", "icons/touch-id.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
