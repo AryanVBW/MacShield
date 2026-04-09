@@ -1,8 +1,13 @@
 import AppKit
 
 /// Full-screen overlay panel that blocks interaction with a protected app.
+///
 /// Uses NSPanel with .nonactivatingPanel so MacShield does NOT become the active app
 /// when the overlay is shown — this lets the system Touch ID dialog keep focus.
+///
+/// animationBehavior is set to .documentWindow so macOS applies its built-in
+/// cross-fade when the panel is ordered front/back, giving a smoother appearance
+/// than the previous .none (instant pop).
 final class LockOverlayWindow: NSPanel {
     init(for screen: NSScreen) {
         super.init(
@@ -19,7 +24,8 @@ final class LockOverlayWindow: NSPanel {
         self.ignoresMouseEvents = false
         self.hasShadow = false
         self.isReleasedWhenClosed = false
-        self.animationBehavior = .none
+        // Cross-fade provided by macOS — more fluid than .none
+        self.animationBehavior = .documentWindow
         self.hidesOnDeactivate = false
         self.becomesKeyOnlyIfNeeded = true
     }

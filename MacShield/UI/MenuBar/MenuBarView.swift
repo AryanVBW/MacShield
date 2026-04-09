@@ -13,7 +13,7 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
-                Image(systemName: "lock.fill")
+                Image(systemName: "shield.fill")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(MacShieldColors.gold)
                 Text("MacShield")

@@ -38,7 +38,7 @@ struct AppSettings: Codable {
     /// Whether chat blur is globally enabled.
     var isBlurEnabled: Bool = false
 
-    /// Gaussian blur radius (2–20).
+    /// Blur intensity mapped to tint opacity (2–20).
     var blurIntensity: Double = 8.0
 
     /// Radius in points of the clear reveal zone around the cursor.
@@ -46,4 +46,11 @@ struct AppSettings: Codable {
 
     /// Reveal mode: hover to reveal or click to reveal.
     var revealOnHover: Bool = true
+
+    /// Width of the soft feathered edge on the reveal zone (0.10–0.50).
+    /// 0.10 = very sharp edge, 0.50 = very gradual fade.
+    var blurFeatherWidth: Double = 0.28
+
+    /// Whether the blur overlay should animate in when it first appears.
+    var blurAnimatesIn: Bool = true
 }

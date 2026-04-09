@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="20" y1="5" x2="100" y2="115" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4FC3F7"/>
+      <stop offset="35%" stop-color="#2196F3"/>
+      <stop offset="100%" stop-color="#0D47A1"/>
+    </linearGradient>
+    <linearGradient id="lockGrad" x1="48" y1="48" x2="72" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E0E7FF"/>
+    </linearGradient>
+    <linearGradient id="fpGrad" x1="30" y1="30" x2="90" y2="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#80D8FF" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#448AFF" stop-opacity="0.15"/>
+    </linearGradient>
+    <clipPath id="shieldClip">
+      <path d="M60 8 L104 26 L104 62 Q104 96 60 114 Q16 96 16 62 L16 26 Z"/>
+    </clipPath>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Drop shadow -->
+  <path d="M60 8 L104 26 L104 62 Q104 96 60 114 Q16 96 16 62 L16 26 Z"
+        fill="#000" fill-opacity="0.25" transform="translate(2,4)"/>
+
+  <!-- Shield body -->
+  <path d="M60 8 L104 26 L104 62 Q104 96 60 114 Q16 96 16 62 L16 26 Z"
+        fill="url(#shieldGrad)"/>
+
+  <!-- Inner border -->
+  <path d="M60 14 L99 30 L99 62 Q99 92 60 108 Q21 92 21 62 L21 30 Z"
+        fill="none" stroke="white" stroke-width="1.2" stroke-opacity="0.18"/>
+
+  <!-- Fingerprint arcs (background, clipped to shield) -->
+  <g clip-path="url(#shieldClip)" opacity="0.25">
+    <path d="M60 40 Q45 40 40 55 Q35 70 45 82" fill="none" stroke="url(#fpGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M60 36 Q42 36 36 55 Q30 74 42 88" fill="none" stroke="url(#fpGrad)" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M60 44 Q48 44 44 55 Q40 66 48 76" fill="none" stroke="url(#fpGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M60 40 Q75 40 80 55 Q85 70 75 82" fill="none" stroke="url(#fpGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M60 36 Q78 36 84 55 Q90 74 78 88" fill="none" stroke="url(#fpGrad)" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M60 44 Q72 44 76 55 Q80 66 72 76" fill="none" stroke="url(#fpGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Lock body -->
+  <rect x="46" y="58" width="28" height="24" rx="4" fill="url(#lockGrad)" filter="url(#glow)"/>
+
+  <!-- Lock shackle -->
+  <path d="M50 58 L50 48 Q50 38 60 38 Q70 38 70 48 L70 58"
+        fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Keyhole -->
+  <circle cx="60" cy="68" r="3.5" fill="#0D47A1"/>
+  <path d="M58.5 70 L60 78 L61.5 70" fill="#0D47A1"/>
+
+  <!-- Top accent -->
+  <path d="M60 8 L104 26" stroke="white" stroke-width="0.8" stroke-opacity="0.35" stroke-linecap="round"/>
+  <path d="M60 8 L16 26"  stroke="white" stroke-width="0.8" stroke-opacity="0.35" stroke-linecap="round"/>
+
+  <!-- Bottom checkmark glow -->
+  <circle cx="60" cy="98" r="7" fill="white" fill-opacity="0.12"/>
+  <path d="M55 98 L59 102 L66 94" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+</svg>
