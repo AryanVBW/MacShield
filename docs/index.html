@@ -1,759 +1,358 @@
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-body,html{background:#080810;color:#e8e8f4;font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65}
-.site{max-width:1100px;margin:0 auto;padding:0 32px}
-
-/* NAV */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid rgba(255,255,255,0.06);background:#080810}
-.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff}
-.nav-logo-icon{width:32px;height:32px;background:rgba(0,232,122,0.12);border:1px solid rgba(0,232,122,0.3);border-radius:9px;display:flex;align-items:center;justify-content:center}
-.nav-logo-icon svg{width:18px;height:18px}
-.nav-links{display:flex;gap:32px;list-style:none}
-.nav-links a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;font-weight:400;transition:color .2s}
-.nav-links a:hover{color:#fff}
-.nav-cta{background:#00e87a;color:#001a0d;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
-
-/* SECTION LABELS */
-.sec-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;color:#00e87a;text-transform:uppercase;margin-bottom:12px}
-
-/* HERO */
-.hero{padding:100px 40px 40px;text-align:center}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.2);border-radius:100px;padding:5px 14px;font-size:12px;color:#00e87a;margin-bottom:28px}
-.badge-dot{width:6px;height:6px;border-radius:50%;background:#00e87a;animation:blink 2s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.hero h1{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:1.05;letter-spacing:-.03em;color:#fff;margin-bottom:20px;max-width:800px;margin-left:auto;margin-right:auto}
-.hero h1 span{color:#00e87a}
-.hero-sub{font-size:18px;color:rgba(255,255,255,0.5);font-weight:300;max-width:560px;margin:0 auto 40px;line-height:1.7}
-.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
-.btn-main{display:inline-flex;align-items:center;gap:8px;background:#00e87a;color:#001a0d;border:none;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s, transform 0.2s}
-.btn-main:hover{background:#00ff86;transform:translateY(-2px)}
-.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 28px;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s, border-color 0.2s}
-.btn-ghost:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.3)}
-
-/* HERO SHOWCASE */
-.hero-showcase { padding: 0 40px 80px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.showcase-wrapper { perspective: 1200px; display: flex; justify-content: center; position: relative; }
-.showcase-wrapper::before { content: ''; position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 70%; height: 80%; background: #00e87a; filter: blur(120px); opacity: 0.15; z-index: -1; pointer-events: none; }
-.showcase-img { width: 100%; max-width: 340px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0, 232, 122, 0.05); transform: rotateX(6deg) rotateY(0deg); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease; cursor: pointer; }
-.showcase-img:hover { transform: rotateX(0deg) translateY(-8px); box-shadow: 0 40px 80px rgba(0, 232, 122, 0.25), 0 0 0 1px rgba(0, 232, 122, 0.2); }
-
-
-/* TRUST STRIP */
-.trust{display:flex;align-items:center;justify-content:center;gap:32px;padding:18px 40px;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,0.4)}
-.trust-check{color:#00e87a;font-size:13px}
-
-/* BROWSER MOCKUP */
-.mockup-section{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center}
-.mockup-section h2{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:-.02em}
-.mockup-section p{color:rgba(255,255,255,0.45);margin-bottom:40px;font-size:16px}
-.browser-frame{background:#12121e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;max-width:760px;margin:0 auto}
-.browser-bar{background:#1a1a2e;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 16px;display:flex;align-items:center;gap:10px}
-.browser-dots{display:flex;gap:6px}
-.dot-r{width:10px;height:10px;border-radius:50%;background:#ff5f57}
-.dot-y{width:10px;height:10px;border-radius:50%;background:#febc2e}
-.dot-g{width:10px;height:10px;border-radius:50%;background:#28c840}
-.url-bar{flex:1;background:rgba(255,255,255,0.06);border-radius:6px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,0.4);text-align:center}
-.browser-content{padding:24px;text-align:left}
-.blur-demo{display:flex;flex-direction:column;gap:12px}
-.msg-row{display:flex;gap:10px;align-items:flex-start}
-.msg-row.right{flex-direction:row-reverse}
-.avatar-sm{width:28px;height:28px;border-radius:50%;background:rgba(0,232,122,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#00e87a;font-weight:600}
-.bubble{padding:9px 13px;border-radius:10px;font-size:12px;max-width:260px;line-height:1.5}
-.bubble.blurred{background:rgba(255,255,255,0.06);color:transparent;text-shadow:0 0 10px rgba(255,255,255,0.5);filter:blur(5px);border:1px solid rgba(255,255,255,0.08)}
-.bubble.clear{background:rgba(0,232,122,0.12);border:1px solid rgba(0,232,122,0.2);color:#d0ffe8;filter:blur(0);text-shadow:none}
-.bubble.left-bubble{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.7)}
-.reveal-label{font-size:10px;color:#00e87a;margin-top:4px;opacity:.7}
-.lock-demo{background:#0f1020;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:24px;text-align:center;margin-top:16px}
-.lock-icon-big{width:48px;height:48px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.2);border-radius:12px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
-.lock-site-name{font-size:11px;background:rgba(255,255,255,0.06);border-radius:6px;padding:3px 10px;display:inline-block;color:rgba(255,255,255,0.5);margin-bottom:14px}
-.pw-row{display:flex;gap:8px;max-width:240px;margin:0 auto}
-.pw-field{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:12px;color:rgba(255,255,255,0.3)}
-.pw-btn{background:#fff;color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer}
-
-/* FEATURES */
-.features{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.features-header{text-align:center;margin-bottom:56px}
-.features-header h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:12px}
-.features-header p{color:rgba(255,255,255,0.4);font-size:16px}
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.feat-card{background:#0f0f1c;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px;transition:border-color .2s}
-.feat-card:hover{border-color:rgba(0,232,122,0.2)}
-.feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-.feat-icon svg{width:20px;height:20px}
-.feat-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:8px}
-.feat-card p{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6}
-
-/* HOW IT WORKS */
-.how{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.how-header{text-align:center;margin-bottom:56px}
-.how-header h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:12px}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
-.step{text-align:center;padding:0 16px;position:relative}
-.step:not(:last-child)::after{content:'';position:absolute;top:24px;right:-4px;width:calc(100% - 48px + 8px);height:1px;background:rgba(0,232,122,0.2);left:50%}
-.step-num{width:48px;height:48px;border-radius:50%;background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#00e87a;position:relative;z-index:1}
-.step h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
-.step p{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6}
-
-/* PLATFORMS */
-.platforms{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.platforms-header{text-align:center;margin-bottom:40px}
-.platforms-header h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:12px}
-.plat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
-.plat-card{background:#0f0f1c;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 8px;text-align:center}
-.plat-abbr{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,0.6);display:block;margin-bottom:6px}
-.plat-name{font-size:10px;color:rgba(255,255,255,0.3)}
-.plat-dot-row{width:6px;height:6px;border-radius:50%;background:#00e87a;margin:6px auto 0}
-
-/* WEBLOCK */
-.weblock{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.weblock-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
-.weblock-text h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:16px;line-height:1.15}
-.weblock-text h2 span{color:#00e87a}
-.weblock-text p{color:rgba(255,255,255,0.45);font-size:15px;line-height:1.75;margin-bottom:24px}
-.check-list{list-style:none;display:flex;flex-direction:column;gap:10px}
-.check-list li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:rgba(255,255,255,0.55)}
-.check-list li::before{content:'✓';color:#00e87a;font-weight:700;flex-shrink:0;margin-top:1px}
-.lock-mockup{background:#0f0f1c;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden}
-.lock-top{background:#1a1a2e;padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.lock-body{padding:40px 24px;text-align:center}
-.lock-shield{width:56px;height:56px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.25);border-radius:14px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
-.lock-shield svg{width:28px;height:28px}
-.lock-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;margin-bottom:6px}
-.lock-sub{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px}
-.lock-host-pill{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.5);display:inline-block;margin-bottom:20px}
-.lock-input-full{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:10px;font-family:'DM Sans',sans-serif}
-.lock-btn-full{width:100%;background:#fff;color:#000;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:'DM Sans',sans-serif}
-.lock-or{font-size:11px;color:rgba(255,255,255,0.25);margin:8px 0}
-.lock-touch{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;font-size:12px;color:rgba(255,255,255,0.5);cursor:pointer;font-family:'DM Sans',sans-serif}
-
-/* SECURITY */
-.security{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.security-header{text-align:center;margin-bottom:56px}
-.security-header h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:12px}
-.security-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.sec-card{background:#0f0f1c;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px}
-.sec-card-icon{width:36px;height:36px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.2);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.sec-card-icon svg{width:18px;height:18px}
-.sec-card h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:8px}
-.sec-card p{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6}
-
-/* REVIEWS */
-.reviews{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.reviews-header{text-align:center;margin-bottom:56px}
-.reviews-header h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:12px}
-.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.review-card{background:#0f0f1c;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:24px}
-.review-stars{color:#f5c543;font-size:13px;margin-bottom:12px;letter-spacing:1px}
-.review-text{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:16px;font-style:italic}
-.reviewer{display:flex;align-items:center;gap:10px}
-.reviewer-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.reviewer-name{font-size:12px;font-weight:500;color:rgba(255,255,255,0.7)}
-.reviewer-role{font-size:11px;color:rgba(255,255,255,0.3)}
-
-/* FAQ */
-.faq{padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06);max-width:720px;margin:0 auto}
-.faq-header{text-align:center;margin-bottom:48px}
-.faq-header h2{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:12px}
-.faq-item{border-bottom:1px solid rgba(255,255,255,0.07);padding:20px 0}
-.faq-q{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.faq-q span{color:rgba(0,232,122,0.6);font-size:18px;font-weight:300}
-.faq-a{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.75}
-
-/* CTA */
-.cta{padding:100px 40px;text-align:center}
-.cta h2{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px}
-.cta h2 span{color:#00e87a}
-.cta p{color:rgba(255,255,255,0.4);font-size:17px;margin-bottom:36px;max-width:480px;margin-left:auto;margin-right:auto}
-.cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.cta-note{font-size:12px;color:rgba(255,255,255,0.25);margin-top:20px}
-
-/* FOOTER */
-.footer{border-top:1px solid rgba(255,255,255,0.07);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
-.footer-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff}
-.footer-logo span{color:#00e87a}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none}
-.footer-copy{font-size:12px;color:rgba(255,255,255,0.2)}
-
-.green-ic{color:#00e87a}
-.divider{width:100%;height:1px;background:rgba(255,255,255,0.06);margin:0}
-</style>
-
-<!-- NAV -->
-<div class="nav">
-  <a href="#" class="nav-logo" style="text-decoration:none">
-    <div class="nav-logo-icon">
-      <svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5L2.5 4v5.5c0 4 2.7 7.6 6.5 8.9C12.8 17.1 15.5 13.5 15.5 9.5V4L9 1.5z" fill="rgba(0,232,122,0.15)" stroke="#00e87a" stroke-width="1.2"/><path d="M6.5 9l2 2 3-3.5" stroke="#00e87a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    Mac<span style="color:#00e87a">Shield</span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#weblock">Web Lock</a></li>
-    <li><a href="#platforms">Platforms</a></li>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="https://github.com/AryanVBW/MacShield" target="_blank">GitHub</a></li>
-  </ul>
-  <button class="nav-cta" onclick="window.open('https://chrome.google.com/webstore', '_blank')">Add to Chrome — Free</button>
-</div>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-badge"><div class="badge-dot"></div> v3.1 — Now with Touch ID support</div>
-  <h1>Your browser.<br><span>Locked. Blurred. Private.</span></h1>
-  <p class="hero-sub">MacShield blurs every chat and message on 13 platforms. Locks any website with a password or Touch ID. Nobody sees what you're doing — unless you let them.</p>
-  <div class="hero-actions">
-    <button class="btn-main">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Add to Chrome — It's Free
-    </button>
-    <button class="btn-ghost">View Source on GitHub →</button>
-  </div>
-</div>
-
-<!-- HERO SHOWCASE -->
-<div class="hero-showcase site" style="border: none; margin-bottom: 80px;">
-  <div class="cinematic-container" id="cine-container">
-    <canvas id="particle-canvas"></canvas>
-    
-    <div class="cine-browser">
-      <div class="cine-browser-bar">
-        <div class="cine-dot" style="background:#ff5f57"></div><div class="cine-dot" style="background:#febc2e"></div><div class="cine-dot" style="background:#28c840"></div>
-      </div>
-      <div class="cine-content">
-        <div class="cine-blur-line" style="width: 70%; height: 16px; background: rgba(255,255,255,0.1);"></div>
-        <div class="cine-blur-line" style="width: 40%; height: 16px; background: rgba(255,255,255,0.1);"></div>
-        <div class="cine-blur-line" style="width: 85%; height: 16px; background: rgba(255,255,255,0.1); margin-top:24px;"></div>
-        <div class="cine-blur-line" style="width: 60%; height: 16px; background: rgba(255,255,255,0.1);"></div>
-      </div>
-      <div class="cine-lock-overlay">
-         <div class="cine-pw-box"></div>
-         <div class="cine-unlock-btn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#000" stroke-width="2" style="margin-left:4px"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MacShield - Private app locking and browser blur for macOS</title>
+  <meta name="description" content="MacShield protects macOS apps and sensitive browser content with Touch ID, Apple Watch proximity, password fallback, website locks, and local-only privacy controls.">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html" aria-label="MacShield home"><img src="icon.png" alt=""><span>Mac<span>Shield</span></span></a>
+      <ul class="nav-links">
+        <li><a aria-current="page" href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="support.html">Support</a></li>
+        <li><a href="credits.html">Credits</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light and dark theme">Theme</button>
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="Open menu" aria-expanded="false">Menu</button>
+        <a class="btn btn-primary btn-small" href="https://github.com/AryanVBW/MacShield/releases/latest">Download</a>
       </div>
     </div>
-    
-    <div class="cine-shield">
-       <svg viewBox="0 0 24 24" class="cine-check"><path d="M20 6L9 17l-5-5"/></svg>
-       <div class="cine-padlock">
-         <svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-       </div>
-    </div>
-    
-    <div class="cine-final-dot"></div>
-  </div>
-</div>
+  </nav>
 
-<style>
-.cinematic-container {
-  width: 100%; max-width: 900px; margin: 0 auto;
-  aspect-ratio: 16/9;
-  background: #080810;
-  position: relative; overflow: hidden;
-  border-radius: 16px; border: 1px solid rgba(255,255,255,0.04);
-  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-  display: flex; align-items: center; justify-content: center;
-  perspective: 1000px;
-}
-#particle-canvas {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-  pointer-events: none;
-}
-.cine-browser {
-  position: absolute; width: 75%; height: 65%;
-  border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
-  background: #151520; z-index: 2;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  animation: seqBrowser 22s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
-}
-.cine-browser-bar {
-  height: 36px; background: #1a1a2e; border-bottom: 1px solid rgba(255,255,255,0.05);
-  display: flex; align-items: center; padding: 0 16px; gap: 8px;
-}
-.cine-dot { width: 10px; height: 10px; border-radius: 50%; opacity: 0.8; }
-.cine-content { padding: 40px; display: flex; flex-direction: column; gap: 14px; }
-.cine-blur-line { border-radius: 4px; filter: blur(4px); box-shadow: 0 0 10px rgba(255,255,255,0.2); animation: seqBlurPulse 4s ease-in-out infinite alternate; }
-.cine-lock-overlay {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: radial-gradient(circle at center, rgba(0,232,122,0.1) 0%, rgba(8,8,16,0.95) 70%);
-  z-index: 3; display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 16px; backdrop-filter: blur(8px);
-  animation: seqLockOverlay 22s ease-in-out infinite;
-}
-.cine-pw-box { width: 160px; height: 32px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.03); }
-.cine-unlock-btn { width: 160px; height: 32px; background: #00e87a; border-radius: 6px; display:flex; align-items:center; justify-content:center; }
-.cine-shield {
-  position: absolute; z-index: 4;
-  width: 90px; height: 105px;
-  background: linear-gradient(135deg, #1f1f33, #0f0f1c); border: 2px solid rgba(0,232,122,0.9);
-  border-radius: 20px; 
-  display: flex; align-items: center; justify-content: center;
-  animation: seqShieldAssemble 22s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
-  transform-style: preserve-3d;
-}
-.cine-check { width: 44px; height: 44px; stroke: #fff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 12px rgba(255,255,255,0.6)); animation: seqCheck 22s ease-in-out infinite; }
-.cine-padlock {
-  position: absolute; bottom: -60px; width: 28px; height: 28px;
-  stroke: #00e87a; stroke-width: 2; fill: none; 
-  filter: drop-shadow(0 0 15px rgba(0,232,122,0.5));
-  animation: seqPadlock 22s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite;
-}
-.cine-final-dot {
-  position: absolute; width: 8px; height: 8px; background: #00e87a; border-radius: 50%;
-  box-shadow: 0 0 40px 15px rgba(0,232,122,0.8); z-index: 5;
-  animation: seqFinalDot 22s ease-in-out infinite;
-}
-
-@keyframes seqShieldAssemble {
-  0%, 13.6% { opacity: 0; transform: scale(0.2) translateZ(0); box-shadow: 0 0 0 rgba(0,232,122,0); }
-  14% { opacity: 1; transform: scale(0.9) translateZ(0); box-shadow: 0 0 40px rgba(0,232,122,0.5); }
-  27% { transform: scale(1.15) rotateY(18deg) translateZ(60px); box-shadow: 0 0 80px rgba(0,232,122,0.7); }
-  81% { opacity: 1; transform: scale(0.95) rotateY(-5deg) translateZ(20px); box-shadow: 0 0 50px rgba(0,232,122,0.4); }
-  85%, 100% { opacity: 0; transform: scale(1.2) translateZ(0); box-shadow: 0 0 0 rgba(0,232,122,0); }
-}
-@keyframes seqCheck {
-  0%, 14% { opacity: 0; stroke-dasharray: 40; stroke-dashoffset: 40; }
-  16% { opacity: 1; stroke-dashoffset: 0; }
-  81% { opacity: 1; }
-  83%, 100% { opacity: 0; }
-}
-@keyframes seqBrowser {
-  0%, 27% { opacity: 0; transform: scale(0.85) translateY(40px) translateZ(-100px); }
-  40%, 63% { opacity: 1; transform: scale(1) translateY(0) translateZ(-50px); }
-  64%, 81% { opacity: 1; transform: scale(0.96) translateY(0) translateZ(-50px); }
-  85%, 100% { opacity: 0; transform: scale(0.9) translateY(-20px) translateZ(-100px); }
-}
-@keyframes seqBlurPulse {
-  0% { filter: blur(3px); opacity: 0.9; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-  100% { filter: blur(5px); opacity: 0.5; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
-}
-@keyframes seqPadlock {
-  0%, 45% { opacity: 0; transform: translateY(-20px) scale(0.5); }
-  50%, 81% { opacity: 1; transform: translateY(0) scale(1); }
-  83%, 100% { opacity: 0; transform: translateY(15px) scale(0.6); }
-}
-@keyframes seqLockOverlay {
-  0%, 63% { opacity: 0; }
-  68%, 81% { opacity: 1; }
-  85%, 100% { opacity: 0; }
-}
-@keyframes seqFinalDot {
-  0%, 86% { opacity: 0; transform: scale(0); }
-  90% { opacity: 1; transform: scale(1); }
-  92%, 100% { opacity: 0; transform: scale(0); box-shadow: 0 0 0 rgba(0,232,122,0); }
-}
-</style>
-
-<script>
-(function(){
-  const canvas = document.getElementById('particle-canvas');
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  
-  let cw = 0, ch = 0;
-  const particles = [];
-  const NUM_PARTICLES = 600;
-  
-  function resize() {
-    cw = canvas.offsetWidth;
-    ch = canvas.offsetHeight;
-    if(cw === 0) return;
-    canvas.width = cw;
-    canvas.height = ch;
-    
-    if(particles.length === 0) {
-      for(let i=0; i<NUM_PARTICLES; i++) {
-        particles.push({
-          angle: Math.random() * Math.PI * 2,
-          radius: Math.random() * Math.max(cw, ch),
-          tx: (Math.random() - 0.5) * 60,
-          ty: (Math.random() - 0.5) * 80,
-          size: Math.random() * 1.5 + 0.5,
-          speed: Math.random() * 0.5 + 0.5
-        });
-      }
-    }
-  }
-  
-  window.addEventListener('resize', resize);
-  
-  let startTime = Date.now();
-  
-  function draw() {
-    if(cw === 0) resize();
-    ctx.clearRect(0,0,cw,ch);
-    
-    const now = Date.now();
-    const elapsed = now - startTime;
-    const TOTAL_DURATION = 22000;
-    const seqTime = (elapsed % TOTAL_DURATION) / TOTAL_DURATION; 
-    
-    let pAlpha = 0;
-    let assemble = 0;
-    let dissolve = 0;
-    
-    // 0 to 3s (13.6%) : Assembly
-    if (seqTime < 0.136) {
-      const p = seqTime / 0.136;
-      assemble = Math.pow(p, 3); // ease in
-      pAlpha = Math.sin(p * Math.PI); // fade in and out during assembly
-    } 
-    // 18 to 22s (81.8% to 100%) : Dissolve
-    else if (seqTime > 0.818) {
-      const p = (seqTime - 0.818) / (1 - 0.818);
-      dissolve = Math.pow(p, 2);
-      pAlpha = 1 - p;
-    }
-    
-    if(pAlpha > 0) {
-      ctx.fillStyle = `rgba(0, 232, 122, ${pAlpha * 0.8})`;
-      const centerX = cw / 2;
-      const centerY = ch / 2;
-      
-      particles.forEach(p => {
-        let x, y;
-        if(seqTime < 0.136) {
-           const startX = centerX + Math.cos(p.angle) * p.radius;
-           const startY = centerY + Math.sin(p.angle) * p.radius;
-           const endX = centerX + p.tx;
-           const endY = centerY + p.ty;
-           x = startX + (endX - startX) * assemble;
-           y = startY + (endY - startY) * assemble;
-        } else {
-           const startX = centerX + p.tx;
-           const startY = centerY + p.ty;
-           x = startX + Math.cos(p.angle) * (dissolve * cw * p.speed);
-           y = startY + Math.sin(p.angle) * (dissolve * ch * p.speed) - dissolve * 200 * p.speed;
-        }
-        ctx.beginPath();
-        ctx.arc(x, y, p.size, 0, Math.PI*2);
-        ctx.fill();
-      });
-    }
-    
-    requestAnimationFrame(draw);
-  }
-  
-  setTimeout(() => {
-    resize();
-    draw();
-  }, 50);
-})();
-</script>
-
-
-<!-- TRUST -->
-<div class="trust">
-  <div class="trust-item"><span class="trust-check">✓</span> 100% open source</div>
-  <div class="trust-item"><span class="trust-check">✓</span> Zero data collection</div>
-  <div class="trust-item"><span class="trust-check">✓</span> No account required</div>
-  <div class="trust-item"><span class="trust-check">✓</span> Passwords never leave your device</div>
-  <div class="trust-item"><span class="trust-check">✓</span> MIT licensed</div>
-  <div class="trust-item"><span class="trust-check">✓</span> Under 200KB</div>
-</div>
-
-<!-- MOCKUP DEMO -->
-<div class="mockup-section site">
-  <div class="sec-label">See it in action</div>
-  <h2>Everything blurred. Only you can read it.</h2>
-  <p>Select any text to reveal it — hover to peek — or press Alt+X to toggle instantly.</p>
-  <div class="browser-frame">
-    <div class="browser-bar">
-      <div class="browser-dots"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div></div>
-      <div class="url-bar">web.whatsapp.com</div>
-      <div style="width:20px;height:20px;background:rgba(0,232,122,0.15);border:1px solid rgba(0,232,122,0.3);border-radius:5px;display:flex;align-items:center;justify-content:center">
-        <svg width="10" height="10" fill="none" viewBox="0 0 18 18"><path d="M9 1.5L2.5 4v5.5c0 4 2.7 7.6 6.5 8.9C12.8 17.1 15.5 13.5 15.5 9.5V4L9 1.5z" fill="rgba(0,232,122,0.3)" stroke="#00e87a" stroke-width="1.2"/></svg>
-      </div>
-    </div>
-    <div class="browser-content">
-      <div class="blur-demo">
-        <div class="msg-row">
-          <div class="avatar-sm">A</div>
-          <div><div class="bubble blurred">Hey! Did you see the contract details I sent over?</div></div>
-        </div>
-        <div class="msg-row right">
-          <div class="avatar-sm" style="background:rgba(68,136,255,0.2);color:#4488ff">Y</div>
-          <div style="text-align:right">
-            <div class="bubble blurred">Yes, reviewing now. The numbers look good but the deadline is tight.</div>
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Local-first privacy for macOS</div>
+          <h1>MacShield</h1>
+          <p class="hero-statement">One security system for macOS apps and Chrome.</p>
+          <p class="hero-copy">MacShield protects the desktop and the browser together: native app locks for macOS, Website Lock for Chrome, and privacy blur for sensitive conversations.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://github.com/AryanVBW/MacShield/releases/latest">Download for macOS</a>
+            <a class="btn btn-secondary" href="docs.html#quick-start">Start setup</a>
+          </div>
+          <div class="mini-trust" aria-label="Privacy promises">
+            <span>No account</span>
+            <span>No analytics</span>
+            <span>Open source</span>
+            <span>Local storage</span>
           </div>
         </div>
-        <div class="msg-row">
-          <div class="avatar-sm">A</div>
-          <div>
-            <div class="bubble clear">Can we jump on a call at 3pm? I'll explain the full plan.</div>
-            <div class="reveal-label">← selected text revealed</div>
+
+        <div class="product-stage security-illustration" aria-label="MacShield unified macOS and Chrome security illustration">
+          <div class="signal-grid" aria-hidden="true"></div>
+          <div class="depth-particles" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="security-node node-mac">
+            <div class="node-top">
+              <span class="node-dot"></span><span class="node-dot"></span><span class="node-dot"></span>
+              <span>macOS app lock</span>
+            </div>
+            <div class="node-body">
+              <div class="app-stack">
+                <span>Messages</span>
+                <span>Mail</span>
+                <span>Notes</span>
+              </div>
+              <div class="blur-lines" aria-hidden="true">
+                <i></i><i></i><i></i>
+              </div>
+              <div class="lock-sheet">
+                <strong>App protected</strong>
+                <small>Touch ID, Watch, or password</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="security-core" aria-label="Shared authentication core">
+            <span class="core-ring"></span>
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path d="M32 7l19 7v15c0 13-8 24-19 28C21 53 13 42 13 29V14l19-7z" fill="none" stroke="currentColor" stroke-width="3"/>
+              <path d="M22 32l7 7 14-16" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Local auth</span>
+          </div>
+
+          <div class="security-node node-browser">
+            <div class="node-top">
+              <span class="node-dot"></span><span class="node-dot"></span><span class="node-dot"></span>
+              <span>Chrome extension</span>
+            </div>
+            <div class="node-body passkey-body">
+              <div class="fingerprint" aria-hidden="true">
+                <svg viewBox="0 0 64 64">
+                  <path d="M18 31c0-9 6-15 14-15s14 6 14 15" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                  <path d="M24 47c2-6 2-10 2-16 0-4 3-7 6-7s6 3 6 7c0 8-1 14-4 20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                  <path d="M18 41c1-4 1-7 1-10 0-8 6-13 13-13s13 5 13 13c0 5 0 10-2 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+                </svg>
+              </div>
+              <strong>Website locked</strong>
+              <small>Passkey or password before content renders</small>
+              <div class="passkey-button">Authorize browser access</div>
+            </div>
+          </div>
+
+          <div class="security-path path-one" aria-hidden="true"></div>
+          <div class="security-path path-two" aria-hidden="true"></div>
+          <div class="auth-beam" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="wrap section-head">
+        <div>
+          <div class="section-kicker">Product pillars</div>
+          <h2>One privacy layer for apps, chats, and websites.</h2>
+        </div>
+        <p class="section-lead">MacShield is structured around three clear jobs: cover private app content, blur sensitive conversations, and block chosen websites until the right person authenticates.</p>
+      </div>
+      <div class="wrap grid grid-3">
+        <article class="card">
+          <div class="icon">01</div>
+          <h3>Lock macOS apps</h3>
+          <p>Protect Messages, Mail, notes, finance tools, work apps, or any selected app with an overlay that appears during launch and app switching.</p>
+        </article>
+        <article class="card">
+          <div class="icon">02</div>
+          <h3>Blur private content</h3>
+          <p>Reduce shoulder-surfing risk by blurring sensitive chat content and revealing only the parts you actively choose to read.</p>
+        </article>
+        <article class="card">
+          <div class="icon">03</div>
+          <h3>Lock browser sites</h3>
+          <p>Add custom domains to Website Lock, then require authentication before pages such as dashboards, mail, or social tools render.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap section-head">
+        <div>
+          <div class="section-kicker">Protection map</div>
+          <h2>Choose the layer that matches the risk.</h2>
+        </div>
+      </div>
+      <div class="wrap matrix" role="table" aria-label="MacShield protection map">
+        <div class="head" role="columnheader">Situation</div>
+        <div class="head" role="columnheader">Protection</div>
+        <div class="head" role="columnheader">Unlock</div>
+        <div class="head" role="columnheader">Where data stays</div>
+        <div class="strong" role="rowheader">Someone opens a private app</div>
+        <div>Full-screen app overlay</div>
+        <div>Touch ID, Apple Watch, or password</div>
+        <div>On your Mac</div>
+        <div class="strong" role="rowheader">A chat is visible during work</div>
+        <div>Blur or hide mode</div>
+        <div>Hover, select, or toggle</div>
+        <div>Local UI only</div>
+        <div class="strong" role="rowheader">A protected website loads</div>
+        <div>Browser lock screen</div>
+        <div>Password or platform biometric</div>
+        <div>Chrome local/session storage</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap section-head">
+        <div>
+          <div class="section-kicker">Setup flow</div>
+          <h2>From install to protected in four steps.</h2>
+        </div>
+      </div>
+      <div class="wrap grid grid-4">
+        <article class="card"><div class="icon">1</div><h3>Install</h3><p>Download the latest release, move MacShield to Applications, and launch it from the menu bar.</p></article>
+        <article class="card"><div class="icon">2</div><h3>Grant access</h3><p>Enable the macOS permissions needed for app detection, overlays, blur, and optional watch proximity.</p></article>
+        <article class="card"><div class="icon">3</div><h3>Add targets</h3><p>Select protected apps, configure blur behavior, and optionally add browser domains to Website Lock.</p></article>
+        <article class="card"><div class="icon">4</div><h3>Authenticate</h3><p>Unlock with Touch ID, Apple Watch proximity, or password fallback when protected content is accessed.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap split">
+        <div>
+          <div class="section-kicker">Native macOS app</div>
+          <h2>Built for the moments when private app content flashes on screen.</h2>
+          <p class="section-lead">MacShield lives quietly in the menu bar and watches protected app launches and activations. When a protected app opens or returns to focus, MacShield covers the screen until the user authenticates.</p>
+          <ul class="check-list">
+            <li>Touch ID through Apple's LocalAuthentication framework.</li>
+            <li>Password fallback stored through the macOS Keychain.</li>
+            <li>Apple Watch proximity unlock and relock where configured.</li>
+            <li>Idle, sleep, and optional auto-close protections.</li>
+          </ul>
+        </div>
+        <div class="passkey-showcase" aria-label="MacShield passkey authentication prompt illustration" role="img">
+          <div class="pk-phone">
+            <div class="pk-phone-top">
+              <span class="pk-dot"></span><span class="pk-dot"></span><span class="pk-dot"></span>
+            </div>
+            <div class="pk-body">
+              <div class="pk-fp-outer" aria-hidden="true">
+                <!-- SVG progress ring, rotated so stroke starts from top -->
+                <svg class="pk-ring-svg" viewBox="0 0 130 130" fill="none">
+                  <circle class="pk-ring-track" cx="65" cy="65" r="58"/>
+                  <circle class="pk-ring-prog"  cx="65" cy="65" r="58" stroke-dasharray="364" stroke-dashoffset="364"/>
+                </svg>
+                <!-- fingerprint + scan beam, clipped to circle -->
+                <div class="pk-fp-ring">
+                  <!-- 7-ridge dim base (always visible) -->
+                  <svg class="pk-fp-base" viewBox="0 0 64 64" fill="none">
+                    <ellipse cx="32" cy="33" rx="3" ry="4.2" stroke="rgba(255,255,255,.24)" stroke-width="2"/>
+                    <path d="M29 36 Q32 27 35 36 Q35 41.5 32 44 Q29 41.5 29 36" stroke="rgba(255,255,255,.22)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M25 35 Q32 21 39 35 Q39 46 32 50 Q25 46 25 35" stroke="rgba(255,255,255,.18)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M21 34 Q32 15 43 34 Q43 49 32 54.5 Q21 49 21 34" stroke="rgba(255,255,255,.14)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M17 33 Q32 9 47 33 Q47 52 32 58 Q17 52 17 33" stroke="rgba(255,255,255,.10)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M13 33 Q32 3 51 33" stroke="rgba(255,255,255,.07)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                    <path d="M9 36 Q32 -3 55 36" stroke="rgba(255,255,255,.04)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  </svg>
+                  <!-- 7-ridge bright layer, revealed by scan clip -->
+                  <div class="pk-fp-lit-wrap">
+                    <svg class="pk-fp-lit" viewBox="0 0 64 64" fill="none">
+                      <ellipse cx="32" cy="33" rx="3" ry="4.2" stroke="white" stroke-width="2"/>
+                      <path d="M29 36 Q32 27 35 36 Q35 41.5 32 44 Q29 41.5 29 36" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                      <path d="M25 35 Q32 21 39 35 Q39 46 32 50 Q25 46 25 35" stroke="rgba(255,255,255,.90)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                      <path d="M21 34 Q32 15 43 34 Q43 49 32 54.5 Q21 49 21 34" stroke="rgba(255,255,255,.80)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                      <path d="M17 33 Q32 9 47 33 Q47 52 32 58 Q17 52 17 33" stroke="rgba(255,255,255,.68)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                      <path d="M13 33 Q32 3 51 33" stroke="rgba(255,255,255,.52)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                      <path d="M9 36 Q32 -3 55 36" stroke="rgba(255,255,255,.36)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                    </svg>
+                  </div>
+                  <div class="pk-scan-beam"></div>
+                </div>
+                <!-- success checkmark, springs in on authenticated -->
+                <div class="pk-check">
+                  <svg viewBox="0 0 32 32" fill="none">
+                    <polyline points="7,17 13,23 25,10" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <h3 class="pk-title">Passkey</h3>
+              <p class="pk-sub">Authorize with Touch ID or device biometric</p>
+              <div class="pk-status-wrap">
+                <span class="pk-st pk-st-idle">Place your finger to begin</span>
+                <span class="pk-st pk-st-scan">Scanning fingerprint…</span>
+                <span class="pk-st pk-st-done">&#10003;&nbsp;Authenticated</span>
+              </div>
+              <button class="pk-btn" type="button" tabindex="-1">Start Passkey</button>
+            </div>
+          </div>
+          <div class="pk-glow" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap split">
+        <div class="media-panel">
+          <img src="MacShield-2.png" alt="MacShield browser extension lock screen">
+        </div>
+        <div>
+          <div class="section-kicker">Browser extension</div>
+          <h2>Blur supported platforms. Lock any domain you choose.</h2>
+          <p class="section-lead">The extension is structured around local Chrome storage, Web Crypto password hashing, WebAuthn where available, and CSS-based blur rules that do not read message content.</p>
+          <ul class="check-list">
+            <li>WhatsApp, Gmail, Slack, Discord, Teams, Telegram, Messenger, LinkedIn, X, Outlook, Facebook, Signal, and Element support.</li>
+            <li>Custom Website Lock for work tools, social sites, mail, finance, and admin dashboards.</li>
+            <li>Session unlocks clear when Chrome closes.</li>
+          </ul>
+          <div class="platform-strip" aria-label="Supported browser platforms">
+            <span>WhatsApp</span><span>Gmail</span><span>Slack</span><span>Discord</span><span>Teams</span><span>Telegram</span><span>Outlook</span><span>LinkedIn</span><span>Element</span>
           </div>
         </div>
-        <div class="msg-row right">
-          <div class="avatar-sm" style="background:rgba(68,136,255,0.2);color:#4488ff">Y</div>
-          <div><div class="bubble blurred">Perfect. I'll block it in my calendar. See you then!</div></div>
-        </div>
       </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<!-- FEATURES -->
-<div id="features" class="features">
-  <div class="site">
-    <div class="features-header">
-      <div class="sec-label">Features</div>
-      <h2>Two shields. One extension.</h2>
-      <p>Privacy blur for your chats. Web lock for your sites. Built together, works perfectly.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.2)">
-          <svg fill="none" viewBox="0 0 20 20" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><path d="M10 2L3 5v6c0 5 3.5 8.7 7 9.9C13.5 19.7 17 15.5 17 11V5L10 2z"/></svg>
+    <section class="section">
+      <div class="wrap section-head">
+        <div>
+          <div class="section-kicker">Use cases</div>
+          <h2>Designed around real privacy pressure.</h2>
         </div>
-        <h3>Privacy blur</h3>
-        <p>All messages blur automatically on WhatsApp, Gmail, Discord, Slack and 10 more platforms. Hover to peek. Select to read. Nobody nearby sees a thing.</p>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.2)">
-          <svg fill="none" viewBox="0 0 20 20" stroke="#4488ff" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V7a3 3 0 016 0v2"/></svg>
-        </div>
-        <h3>Website lock</h3>
-        <p>Lock any website with a password or Touch ID. A full-screen auth wall blocks access until authenticated. No password — no entry. Works on any domain you choose.</p>
+      <div class="wrap grid grid-4">
+        <article class="card"><h3>Open offices</h3><p>Keep messages and mail readable only when you intentionally reveal them.</p></article>
+        <article class="card"><h3>Shared Macs</h3><p>Lock apps and browser sites without relying on cloud accounts or subscriptions.</p></article>
+        <article class="card"><h3>Client work</h3><p>Protect confidential chats, roadmaps, contracts, and internal dashboards during context switches.</p></article>
+        <article class="card"><h3>Walk-away moments</h3><p>Auto-lock or auto-close sensitive apps when you sleep, idle, or leave watch range.</p></article>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(168,100,255,0.1);border:1px solid rgba(168,100,255,0.2)">
-          <svg fill="none" viewBox="0 0 20 20" stroke="#b060ff" stroke-width="1.5" stroke-linecap="round"><path d="M6.5 9l2 2 4-4"/><circle cx="10" cy="10" r="7"/></svg>
-        </div>
-        <h3>Touch ID unlock</h3>
-        <p>Enroll your Mac's Touch ID via WebAuthn. Authenticate with your fingerprint instead of typing a password. Biometric data never leaves the Secure Enclave.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(255,175,50,0.1);border:1px solid rgba(255,175,50,0.2)">
-          <svg fill="none" viewBox="0 0 20 20" stroke="#ffb332" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="3"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2"/></svg>
-        </div>
-        <h3>Alt+X instant toggle</h3>
-        <p>Hit Alt+X on any supported page to instantly toggle blur on and off. No popup needed. One keystroke to go from fully private to fully visible and back.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.2)">
-          <svg fill="none" viewBox="0 0 20 20" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
-        </div>
-        <h3>Blur intensity control</h3>
-        <p>Slider from 2px light to 30px heavy. Three presets — Light, Medium, Deep — for quick switching. Hide mode completely removes content instead of blurring.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.2)">
-          <svg fill="none" viewBox="0 0 20 20" stroke="#4488ff" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M10 7v6M7 10h6"/></svg>
-        </div>
-        <h3>Auto-relock on tab leave</h3>
-        <p>Enable auto-relock and the moment you switch away from a protected tab, it locks again. Return — enter password — continue. Airtight protection on shared machines.</p>
-      </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<!-- HOW IT WORKS -->
-<div class="how">
-  <div class="site">
-    <div class="how-header">
-      <div class="sec-label">How it works</div>
-      <h2>Up and running in 60 seconds</h2>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3>Install</h3>
-        <p>Add MacShield from the Chrome Web Store. No account. No signup. Open Chrome and go.</p>
+    <section class="section">
+      <div class="wrap section-head">
+        <div>
+          <div class="section-kicker">Trust and ownership</div>
+          <h2>Clear permissions, proper credits, and no hidden backend.</h2>
+        </div>
+        <a class="btn btn-secondary" href="privacy.html">Read privacy policy</a>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3>Set password</h3>
-        <p>Create your master password in the popup. It's hashed with SHA-256 and stored only on your device.</p>
+      <div class="wrap grid grid-3">
+        <article class="card"><h3>Local by default</h3><p>No analytics, advertising SDKs, hosted accounts, or product telemetry pipeline. Protected app settings and extension preferences stay local.</p></article>
+        <article class="card"><h3>Documented permissions</h3><p>Accessibility, Bluetooth, Screen Recording, Chrome storage, tabs, and all URLs are explained in plain language in the docs.</p></article>
+        <article class="card"><h3>Proper attribution</h3><p>Credits are documented for MakLock, Sparkle, HotKey, Apple frameworks, Chrome APIs, Web Crypto, WebAuthn, and contributors.</p></article>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3>Lock or blur</h3>
-        <p>Toggle blur on any chat platform. Lock any website by entering its domain in the Web Lock tab.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h3>Browse privately</h3>
-        <p>Select text to reveal it. Hover to peek. Visit locked sites and see the password wall appear instantly.</p>
-      </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<!-- PLATFORMS -->
-<div id="platforms" class="platforms">
-  <div class="site">
-    <div class="platforms-header">
-      <div class="sec-label">Supported platforms</div>
-      <h2>13 platforms. Every message blurred.</h2>
-      <p style="color:rgba(255,255,255,0.4);font-size:16px">Every major chat app, email client, and messaging platform — covered out of the box.</p>
-    </div>
-    <div class="plat-grid">
-      <div class="plat-card"><span class="plat-abbr">WA</span><span class="plat-name">WhatsApp</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">IG</span><span class="plat-name">Instagram</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">TG</span><span class="plat-name">Telegram</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">DC</span><span class="plat-name">Discord</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">SL</span><span class="plat-name">Slack</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">GM</span><span class="plat-name">Gmail</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">X</span><span class="plat-name">X / Twitter</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">LI</span><span class="plat-name">LinkedIn</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">ME</span><span class="plat-name">Messenger</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">MS</span><span class="plat-name">Teams</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">OL</span><span class="plat-name">Outlook</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">FB</span><span class="plat-name">Facebook</span><div class="plat-dot-row"></div></div>
-      <div class="plat-card"><span class="plat-abbr">EL</span><span class="plat-name">Element</span><div class="plat-dot-row"></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- WEB LOCK DEEP DIVE -->
-<div id="weblock" class="weblock">
-  <div class="site">
-    <div class="weblock-inner">
-      <div class="weblock-text">
-        <div class="sec-label">Web Lock</div>
-        <h2>Lock any site.<br><span>Your password.</span><br>Your rules.</h2>
-        <p>Type any domain into MacShield and it becomes password-protected instantly. A full-screen wall appears the moment anyone navigates there — on your browser, on your Mac. No password, no access. Every browser session resets the unlock, so it's always locked when Chrome starts fresh.</p>
-        <ul class="check-list">
-          <li>Lock social media, banking, work tools, anything</li>
-          <li>Full-screen overlay injected before the page even renders</li>
-          <li>Touch ID support on Mac — fingerprint to unlock</li>
-          <li>Auto-relock when you leave the tab</li>
-          <li>Passwords hashed with SHA-256 + random salt, stored locally</li>
-          <li>Uninstall protection — password required to remove the extension</li>
-        </ul>
-      </div>
-      <div class="weblock-image-container" style="perspective: 1200px;">
-        <div style="position: relative; display: inline-block; transform: rotateY(-6deg) rotateX(4deg); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; cursor: pointer;" onmouseover="this.style.transform='rotateY(0deg) rotateX(0deg) translateY(-8px)'" onmouseout="this.style.transform='rotateY(-6deg) rotateX(4deg)'">
-          <div style="content: ''; position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 70%; height: 80%; background: #00e87a; filter: blur(100px); opacity: 0.15; z-index: -1;"></div>
-          <img src="MacShield-2.png" alt="MacShield Web Lock Screen" style="width: 100%; max-width: 320px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0, 232, 122, 0.05); display: block; margin: 0 auto;">
+    <section class="section">
+      <div class="wrap section-head">
+        <div>
+          <div class="section-kicker">Resource hub</div>
+          <h2>Everything important has a proper page.</h2>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+      <div class="wrap grid grid-3">
+        <article class="card"><h3>Documentation</h3><p>Install, setup, browser extension, permissions, examples, architecture, troubleshooting, FAQ, contributing, and changelog.</p><p><a href="docs.html">Open docs</a></p></article>
+        <article class="card"><h3>Help and support</h3><p>Support categories, bug report guidance, troubleshooting flow, and response expectations for the open-source project.</p><p><a href="support.html">Get support</a></p></article>
+        <article class="card"><h3>Legal and credits</h3><p>Copyright, terms, privacy, ownership, dependency attribution, third-party rights, roadmap, and system health.</p><p><a href="credits.html">View credits</a></p></article>
+      </div>
+    </section>
 
-<!-- SECURITY -->
-<div class="security">
-  <div class="site">
-    <div class="security-header">
-      <div class="sec-label">Security & privacy</div>
-      <h2>Nothing leaves your device. Ever.</h2>
-      <p style="color:rgba(255,255,255,0.4);font-size:16px">Every security claim in MacShield is verifiable — the full source code is public on GitHub.</p>
-    </div>
-    <div class="security-grid">
-      <div class="sec-card">
-        <div class="sec-card-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-        <h3>SHA-256 hashed passwords</h3>
-        <p>Your master password is immediately hashed with a random 16-byte salt using the Web Crypto API. The original password is never stored anywhere in any form.</p>
+    <section class="section faq">
+      <div class="wrap">
+        <div class="section-kicker">FAQ</div>
+        <h2>Common questions</h2>
+        <details><summary>Does MacShield collect personal data?</summary><p>No. MacShield has no analytics, advertising SDKs, or hosted account service. See the privacy policy for exact local storage and permission details.</p></details>
+        <details><summary>Why does the macOS app need Accessibility permission?</summary><p>It needs app activation visibility to detect when protected apps launch or return to focus, so private content can be covered immediately.</p></details>
+        <details><summary>Why does the extension need all URLs?</summary><p>Website Lock supports user-selected domains. To lock arbitrary domains before content renders, the lock guard must be allowed to run on all URLs.</p></details>
+        <details><summary>What happens if I forget my extension password?</summary><p>The extension stores only a salted one-way hash, so there is no recovery backdoor. Remove and reinstall the extension to reset local extension state.</p></details>
       </div>
-      <div class="sec-card">
-        <div class="sec-card-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-        <h3>Local storage only</h3>
-        <p>All data — preferences, locked sites, password hash — lives in chrome.storage.local on your own machine. No backend. No cloud. No servers. Zero outbound requests.</p>
-      </div>
-      <div class="sec-card">
-        <div class="sec-card-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M2 12a10 10 0 0 1 18-6"/></svg></div>
-        <h3>Secure Enclave Touch ID</h3>
-        <p>Biometric authentication runs entirely inside your Mac's Secure Enclave via WebAuthn. MacShield stores only a credential reference ID — no fingerprint data, ever.</p>
-      </div>
-      <div class="sec-card">
-        <div class="sec-card-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <h3>CSS-only blur</h3>
-        <p>The blur feature works by applying filter:blur() CSS to page elements. It never reads, copies, logs, or processes the content of any message or email.</p>
-      </div>
-      <div class="sec-card">
-        <div class="sec-card-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-        <h3>Session-based unlocks</h3>
-        <p>Unlocked sites are tracked in chrome.storage.session which clears automatically when Chrome closes. Every new browser session starts with all sites locked again.</p>
-      </div>
-      <div class="sec-card">
-        <div class="sec-card-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#00e87a" stroke-width="1.5" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg></div>
-        <h3>Fully open source</h3>
-        <p>Every line of code is public at github.com/AryanVBW/MacShield under the MIT license. Audit it, fork it, verify every privacy claim independently.</p>
-      </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<!-- REVIEWS -->
-<div class="reviews">
-  <div class="site">
-    <div class="reviews-header">
-      <div class="sec-label">User reviews</div>
-    </div>
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"I work in open-plan offices and this extension is a lifesaver. I can check WhatsApp and Gmail without worrying about who's looking over my shoulder. The hover-to-reveal is genius."</p>
-        <div class="reviewer">
-          <div class="reviewer-av" style="background:rgba(0,232,122,0.12);color:#00e87a">SR</div>
-          <div><div class="reviewer-name">Siddharth R.</div><div class="reviewer-role">Product Designer, Bangalore</div></div>
+    <section class="section tight">
+      <div class="wrap cta-band">
+        <div class="section-kicker">Start with the docs</div>
+        <h2>Install MacShield only after you understand the permissions.</h2>
+        <p>Security tools should be reviewed before use. Read setup, verify the source, enable only the features you need, then protect your first app.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="docs.html#quick-start">Read quick start</a>
+          <a class="btn btn-secondary" href="https://github.com/AryanVBW/MacShield/releases/latest">Download release</a>
         </div>
       </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"The Web Lock feature is exactly what I needed for my kids' computer. Locked YouTube, Reddit and every gaming site. They can't get in without the password. Works perfectly."</p>
-        <div class="reviewer">
-          <div class="reviewer-av" style="background:rgba(68,136,255,0.12);color:#4488ff">MK</div>
-          <div><div class="reviewer-name">Marcus K.</div><div class="reviewer-role">Father of 3, Berlin</div></div>
-        </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="icon.png" alt=""><span>Mac<span>Shield</span></span></a>
+        <p>Open-source privacy protection for macOS apps and browser content.</p>
       </div>
-      <div class="review-card">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Checked the source code before installing — everything it claims checks out. No telemetry, no tracking, SHA-256 hashed passwords. Rare to find an extension this transparent."</p>
-        <div class="reviewer">
-          <div class="reviewer-av" style="background:rgba(168,100,255,0.12);color:#b060ff">AV</div>
-          <div><div class="reviewer-name">Anya V.</div><div class="reviewer-role">Security Engineer, London</div></div>
-        </div>
-      </div>
+      <div><h3>Product</h3><a href="docs.html">Documentation</a><a href="roadmap.html">Roadmap</a><a href="status.html">Status</a></div>
+      <div><h3>Company</h3><a href="about.html">About</a><a href="contact.html">Contact</a><a href="support.html">Help and support</a></div>
+      <div><h3>Legal</h3><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="copyright.html">Copyright</a></div>
+      <div><h3>Open source</h3><a href="credits.html">Credits</a><a href="https://github.com/AryanVBW/MacShield">GitHub</a><a href="https://github.com/AryanVBW/MacShield/issues">Issues</a></div>
     </div>
-  </div>
-</div>
-
-<!-- FAQ -->
-<div style="padding:80px 40px;border-bottom:1px solid rgba(255,255,255,0.06)">
-  <div style="max-width:680px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:48px">
-      <div class="sec-label">FAQ</div>
-      <h2 style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em">Common questions</h2>
-    </div>
-    <div class="faq-item"><div class="faq-q">Does MacShield read my messages? <span>+</span></div><div class="faq-a">No. The blur is pure CSS — filter:blur() applied to page elements. MacShield never reads, copies, logs, or processes the text of any message, email, or chat. It only knows the hostname of the page you're on.</div></div>
-    <div class="faq-item"><div class="faq-q">Where is my password stored? <span>+</span></div><div class="faq-a">Your password is hashed immediately using SHA-256 with a random salt via the Web Crypto API, then the hash is stored in chrome.storage.local on your own device. The original password is never stored anywhere. Nothing is sent to any server.</div></div>
-    <div class="faq-item"><div class="faq-q">Why does it need the &lt;all_urls&gt; permission? <span>+</span></div><div class="faq-a">The Web Lock feature lets you lock any domain you choose — not just a hardcoded list. To inject the password lock screen before a locked page renders, the extension needs permission to run at document_start on all URLs. Without this, custom site locking would be impossible.</div></div>
-    <div class="faq-item"><div class="faq-q">Does it work in incognito mode? <span>+</span></div><div class="faq-a">Not by default. Chrome requires you to explicitly enable extensions in incognito mode. Go to chrome://extensions, find MacShield, and toggle "Allow in incognito" to enable it there.</div></div>
-    <div class="faq-item"><div class="faq-q">What happens if I forget my password? <span>+</span></div><div class="faq-a">Since passwords are stored locally as a one-way hash, there is no password recovery. You would need to remove the extension and reinstall it, which clears all settings. This is by design — no recovery means no backdoor.</div></div>
-    <div class="faq-item"><div class="faq-q">Is Touch ID available on Windows? <span>+</span></div><div class="faq-a">Touch ID is currently Mac-only via WebAuthn platform authenticator. Windows Hello support is planned for a future version. On non-Mac devices the biometric option is hidden and only password authentication is available.</div></div>
-  </div>
-</div>
-
-<!-- CTA -->
-<div class="cta">
-  <div class="sec-label">Get started</div>
-  <h2>Install free.<br><span>Be private instantly.</span></h2>
-  <p>No account. No subscription. No data collected. Just open Chrome, click install, and your browser is private in under 60 seconds.</p>
-  <div class="cta-actions">
-    <button class="btn-main" style="font-size:16px;padding:16px 36px">
-      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Add to Chrome — Free
-    </button>
-    <button class="btn-ghost" style="font-size:16px;padding:16px 36px">View on GitHub →</button>
-  </div>
-  <div class="cta-note">Open source · MIT License · Built by AryanVBW · v3.1.0</div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-  <a href="#" class="footer-logo" style="text-decoration:none">Mac<span>Shield</span></a>
-  <div class="footer-links">
-    <a href="#features">Features</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="https://github.com/AryanVBW/MacShield" target="_blank">GitHub</a>
-    <a href="https://chrome.google.com/webstore" target="_blank">Chrome Store</a>
-    <a href="https://github.com/AryanVBW/MacShield/issues" target="_blank">Report Issue</a>
-  </div>
-  <div class="footer-copy">© 2026 AryanVBW — MIT License</div>
-</div>
+    <div class="wrap copyright-line">&copy; 2026 Vivek W (AryanVBW). MacShield. All rights reserved except where open-source licenses apply.</div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>
