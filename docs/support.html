@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help and Support - MacShield</title>
+  <meta name="description" content="Get help with MacShield setup, permissions, Touch ID, Apple Watch unlock, browser extension behavior, and bug reports.">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .sup-section { margin-bottom: 72px; scroll-margin-top: 96px; }
+    .sup-section h2 { font-size: clamp(26px, 3vw, 40px); margin-bottom: 4px; }
+    .sup-section .lead { max-width: 720px; color: var(--muted); font-size: 17px; margin: 10px 0 28px; line-height: 1.72; }
+    .sidebar-label { display: block; padding: 8px 10px 4px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .07em; color: var(--faint); }
+
+    /* contact channel cards */
+    .contact-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 24px; }
+    .contact-card {
+      display: flex; align-items: flex-start; gap: 18px;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 24px; background: color-mix(in srgb, var(--surface) 92%, transparent);
+      text-decoration: none; color: inherit;
+      transition: border-color .2s, background .2s;
+    }
+    .contact-card:hover { border-color: color-mix(in srgb, var(--brand) 32%, var(--line)); background: color-mix(in srgb, var(--surface-2) 80%, transparent); }
+    .contact-card.primary { border-color: color-mix(in srgb, var(--brand) 24%, var(--line)); background: color-mix(in srgb, var(--surface-2) 70%, transparent); grid-column: 1 / -1; }
+    .cc-icon {
+      flex-shrink: 0; width: 48px; height: 48px; border-radius: var(--radius);
+      border: 1px solid var(--line); background: color-mix(in srgb, var(--surface-3) 80%, transparent);
+      display: grid; place-items: center; font-size: 22px;
+    }
+    .cc-body h3 { font-size: 18px; margin: 0 0 6px; }
+    .cc-body p  { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.65; }
+    .cc-body .cc-link { display: inline-block; margin-top: 10px; color: color-mix(in srgb, var(--brand) 62%, var(--text)); font-size: 13px; font-weight: 800; }
+
+    /* maintainer profile */
+    .maintainer-card {
+      display: flex; align-items: flex-start; gap: 22px;
+      border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+      border-radius: var(--radius); padding: 28px;
+      background: color-mix(in srgb, var(--surface) 90%, transparent);
+      position: relative; overflow: hidden;
+    }
+    .maintainer-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 54%, transparent), transparent);
+    }
+    .m-avatar {
+      flex-shrink: 0; width: 72px; height: 72px; border-radius: 50%;
+      border: 1px solid var(--line); display: grid; place-items: center;
+      background: color-mix(in srgb, var(--surface-3) 80%, transparent);
+      font-family: var(--display-font); font-size: 30px; font-weight: 900;
+      color: color-mix(in srgb, var(--brand) 70%, var(--text));
+    }
+    .m-info h3 { font-size: 22px; margin: 0 0 6px; }
+    .m-info .m-role { color: color-mix(in srgb, var(--brand) 62%, var(--muted)); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; display: block; }
+    .m-info p { color: var(--muted); font-size: 15px; margin: 0 0 16px; line-height: 1.7; }
+    .m-links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .m-links a {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 8px 14px; color: var(--muted); font-size: 13px;
+      font-weight: 700; text-decoration: none;
+      background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+    }
+    .m-links a:hover { color: var(--text); border-color: color-mix(in srgb, var(--brand) 30%, var(--line)); }
+    .m-links a.primary-link {
+      background: var(--text); color: var(--bg); border-color: transparent;
+    }
+    .m-links a.primary-link:hover { opacity: .9; }
+
+    /* steps */
+    .step-list { display: grid; gap: 14px; margin-top: 20px; }
+    .step-item { display: flex; align-items: flex-start; gap: 16px; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; background: color-mix(in srgb, var(--surface) 90%, transparent); }
+    .step-num { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface-2) 80%, transparent); display: grid; place-items: center; font-family: var(--display-font); font-weight: 900; font-size: 14px; color: color-mix(in srgb, var(--brand) 68%, var(--text)); }
+    .step-item h4 { font-size: 16px; margin: 0 0 4px; }
+    .step-item p  { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.65; }
+
+    /* priority table */
+    .priority-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-top: 20px; }
+    .priority-table th { background: color-mix(in srgb, var(--surface-2) 90%, transparent); color: var(--text); font-family: var(--display-font); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; padding: 12px 18px; border-bottom: 1px solid var(--line); text-align: left; }
+    .priority-table td { padding: 14px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .priority-table tr:last-child td { border-bottom: 0; }
+    .priority-table td:first-child { color: var(--text); font-weight: 700; }
+    .p-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .p-high   { background: #ff8b8b; }
+    .p-medium { background: var(--gold); }
+    .p-low    { background: color-mix(in srgb, var(--brand) 72%, var(--text)); }
+
+    /* faq */
+    .sup-section .faq details { border-top: 1px solid var(--line); padding: 18px 0; }
+    .sup-section .faq details:last-child { border-bottom: 1px solid var(--line); }
+    .sup-section .faq summary { cursor: pointer; color: var(--text); font-weight: 850; font-size: 16px; }
+    .sup-section .faq p { margin: 12px 0 0; color: var(--muted); font-size: 15px; line-height: 1.72; }
+
+    @media (max-width: 980px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .contact-card.primary { grid-column: 1; }
+      .maintainer-card { flex-direction: column; gap: 14px; }
+    }
+    @media (max-width: 760px) {
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img src="icon.png" alt="MacShield logo"><span>Mac<span>Shield</span></span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a aria-current="page" href="support.html">Support</a></li>
+        <li><a href="credits.html">Credits</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light and dark theme">Theme</button>
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="Open menu" aria-expanded="false">Menu</button>
+        <a class="btn btn-primary btn-small" href="https://github.com/AryanVBW/MacShield/releases/latest">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header class="page-hero wrap">
+      <div class="eyebrow"><span class="dot"></span> Help and support</div>
+      <h1>How can we help?</h1>
+      <p>Find the right support path for your issue — setup guidance, troubleshooting, bug reports, or a direct line to the MacShield maintainer. MacShield is maintained by one person, so clear reports get faster responses.</p>
+      <div class="pill-row" style="margin-top:24px">
+        <span class="pill">Open source project</span>
+        <span class="pill">Best-effort support</span>
+        <span class="pill">GitHub-first</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="wrap doc-layout">
+
+        <!-- Sidebar -->
+        <aside class="doc-sidebar" aria-label="Support sections">
+          <span class="sidebar-label">On this page</span>
+          <a href="#contact">Contact the maintainer</a>
+          <a href="#channels">Support channels</a>
+          <a href="#flow">Support flow</a>
+          <a href="#priority">Response priority</a>
+          <a href="#troubleshooting">Troubleshooting</a>
+          <a href="#faq">Common questions</a>
+          <a href="#report">Report a bug</a>
+        </aside>
+
+        <!-- Content -->
+        <div class="doc-content">
+
+          <!-- Contact the maintainer -->
+          <section id="contact" class="sup-section">
+            <div class="section-kicker">Maintainer</div>
+            <h2>Contact the maintainer</h2>
+            <p class="lead">MacShield is designed, built, and maintained by <strong>Vivek W (AryanVBW)</strong>. GitHub is the primary and preferred contact channel for all project-related communication.</p>
+            <div class="maintainer-card">
+              <div class="m-avatar">V</div>
+              <div class="m-info">
+                <h3>Vivek W &mdash; AryanVBW</h3>
+                <span class="m-role">MacShield creator &amp; maintainer</span>
+                <p>MacShield is a solo open-source project. Vivek W handles all bug reports, feature discussions, documentation updates, and releases. The most reliable way to reach the maintainer is through a GitHub Issue or Discussion on the MacShield repository.</p>
+                <div class="m-links">
+                  <a class="primary-link" href="https://github.com/AryanVBW/MacShield/issues/new" target="_blank" rel="noopener">Open a GitHub issue &rarr;</a>
+                  <a href="https://github.com/AryanVBW" target="_blank" rel="noopener">GitHub &mdash; @AryanVBW</a>
+                  <a href="https://github.com/AryanVBW/MacShield" target="_blank" rel="noopener">MacShield repository</a>
+                  <a href="https://github.com/AryanVBW/MacShield/discussions" target="_blank" rel="noopener">GitHub Discussions</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Support channels -->
+          <section id="channels" class="sup-section">
+            <div class="section-kicker">Channels</div>
+            <h2>Support channels</h2>
+            <p class="lead">Choose the channel that fits your situation. GitHub Issues is the right place for almost everything.</p>
+            <div class="contact-grid">
+              <a class="contact-card primary" href="https://github.com/AryanVBW/MacShield/issues" target="_blank" rel="noopener">
+                <div class="cc-icon">&#128030;</div>
+                <div class="cc-body">
+                  <h3>GitHub Issues &mdash; primary channel</h3>
+                  <p>The main support channel. Use this for bug reports, crashes, permission issues, extension problems, broken blur selectors, and anything reproducible. Public issues help other users with the same problem.</p>
+                  <span class="cc-link">github.com/AryanVBW/MacShield/issues &rarr;</span>
+                </div>
+              </a>
+              <a class="contact-card" href="https://github.com/AryanVBW/MacShield/discussions" target="_blank" rel="noopener">
+                <div class="cc-icon">&#128172;</div>
+                <div class="cc-body">
+                  <h3>GitHub Discussions</h3>
+                  <p>For questions, feature ideas, general feedback, and open-ended conversations about MacShield. Not for bugs — use Issues for reproducible problems.</p>
+                  <span class="cc-link">GitHub Discussions &rarr;</span>
+                </div>
+              </a>
+              <a class="contact-card" href="https://github.com/AryanVBW" target="_blank" rel="noopener">
+                <div class="cc-icon">&#128100;</div>
+                <div class="cc-body">
+                  <h3>GitHub Profile &mdash; @AryanVBW</h3>
+                  <p>View the maintainer's GitHub profile for other projects, activity, and any contact information they have listed publicly.</p>
+                  <span class="cc-link">github.com/AryanVBW &rarr;</span>
+                </div>
+              </a>
+              <a class="contact-card" href="https://github.com/AryanVBW/MacShield/security" target="_blank" rel="noopener">
+                <div class="cc-icon">&#128274;</div>
+                <div class="cc-body">
+                  <h3>Security reports</h3>
+                  <p>For sensitive security vulnerabilities, use GitHub's private security advisory feature. Do not post secrets, credentials, or private data in public issues.</p>
+                  <span class="cc-link">Private security advisory &rarr;</span>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          <!-- Support flow -->
+          <section id="flow" class="sup-section">
+            <div class="section-kicker">Before you report</div>
+            <h2>Support flow &mdash; fastest path to an answer</h2>
+            <p class="lead">Following these steps before opening an issue helps the maintainer triage and fix your problem much faster.</p>
+            <div class="step-list">
+              <div class="step-item">
+                <div class="step-num">1</div>
+                <div>
+                  <h4>Check the troubleshooting guide</h4>
+                  <p>Most common issues are covered in the <a href="docs.html#troubleshooting">docs troubleshooting section</a>. Check it first — it covers overlay behavior, Touch ID, Apple Watch, browser extension, and permissions.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num">2</div>
+                <div>
+                  <h4>Search existing GitHub issues</h4>
+                  <p>Search <a href="https://github.com/AryanVBW/MacShield/issues" target="_blank" rel="noopener">open and closed issues</a> for your symptom. If one exists, add a comment with your macOS version and any new information. Duplicate issues slow down triage.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num">3</div>
+                <div>
+                  <h4>Gather information</h4>
+                  <p>Collect: MacShield version, macOS version, Mac model, browser version (if extension-related), exact reproduction steps, expected behavior, and actual behavior. Screenshots are helpful — redact any private content.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num">4</div>
+                <div>
+                  <h4>Open a clear GitHub issue</h4>
+                  <p>Use the issue template. Fill in all fields. A good issue title describes the symptom precisely (e.g. "Overlay not appearing on second monitor with M3 MacBook Pro, macOS 15.2"). Vague titles get slower responses.</p>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num">5</div>
+                <div>
+                  <h4>Never include sensitive data</h4>
+                  <p>Never paste passwords, private messages, access tokens, customer data, or unredacted personal screenshots into public issues. If your reproduction case requires sensitive information, describe it in abstract terms only.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Response priority -->
+          <section id="priority" class="sup-section">
+            <div class="section-kicker">Response times</div>
+            <h2>Response priority</h2>
+            <p class="lead">MacShield is maintained by one person as an open-source side project. Support is best-effort. Clear and complete reports are triaged faster.</p>
+            <table class="priority-table">
+              <thead>
+                <tr>
+                  <th>Report type</th>
+                  <th>Priority</th>
+                  <th>What helps</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Security vulnerability or data exposure</td>
+                  <td><span class="p-dot p-high"></span>Highest</td>
+                  <td>Use GitHub private security advisory. Minimal reproduction only — no private data.</td>
+                </tr>
+                <tr>
+                  <td>Crash or data loss</td>
+                  <td><span class="p-dot p-high"></span>Highest</td>
+                  <td>Include crash log, macOS version, Mac model, and reproduction steps.</td>
+                </tr>
+                <tr>
+                  <td>Accessibility permission regression</td>
+                  <td><span class="p-dot p-high"></span>High</td>
+                  <td>macOS version, MacShield version, and whether a prior version worked.</td>
+                </tr>
+                <tr>
+                  <td>Overlay not appearing or wrong screen</td>
+                  <td><span class="p-dot p-medium"></span>Medium</td>
+                  <td>Display setup, macOS version, and exact app that triggered the issue.</td>
+                </tr>
+                <tr>
+                  <td>Touch ID or Apple Watch unlock broken</td>
+                  <td><span class="p-dot p-medium"></span>Medium</td>
+                  <td>Mac model, watchOS version, macOS version, and error message if any.</td>
+                </tr>
+                <tr>
+                  <td>Browser blur broken on a platform</td>
+                  <td><span class="p-dot p-medium"></span>Medium</td>
+                  <td>Platform name, URL, Chrome version, extension version, and redacted screenshot.</td>
+                </tr>
+                <tr>
+                  <td>Website Lock not blocking a domain</td>
+                  <td><span class="p-dot p-medium"></span>Medium</td>
+                  <td>Domain pattern, Chrome version, extension version.</td>
+                </tr>
+                <tr>
+                  <td>Feature request</td>
+                  <td><span class="p-dot p-low"></span>Reviewed</td>
+                  <td>Describe the user problem, privacy impact, and why it belongs in MacShield.</td>
+                </tr>
+                <tr>
+                  <td>Documentation question or improvement</td>
+                  <td><span class="p-dot p-low"></span>Reviewed</td>
+                  <td>Link to the specific page or section and describe what is unclear or wrong.</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Troubleshooting -->
+          <section id="troubleshooting" class="sup-section">
+            <div class="section-kicker">Self-service fixes</div>
+            <h2>Troubleshooting checklist</h2>
+            <p class="lead">Try these fixes before opening an issue. They resolve the majority of common problems.</p>
+            <div class="faq">
+              <details>
+                <summary>MacShield does not react when I open a protected app</summary>
+                <p>Open <strong>System Settings &rarr; Privacy &amp; Security &rarr; Accessibility</strong> and confirm MacShield is listed and enabled. If missing, drag MacShield in manually. After enabling, restart MacShield. Remove the protected app from the list, re-add it, then quit and relaunch that app to test.</p>
+              </details>
+              <details>
+                <summary>The lock overlay appears on the wrong screen or not at all</summary>
+                <p>Reconnect or rearrange displays in <strong>System Settings &rarr; Displays</strong>. Restart MacShield. If you use multiple monitors, confirm macOS display arrangement is correct. Include your monitor configuration in any bug report.</p>
+              </details>
+              <details>
+                <summary>Touch ID prompt does not appear when unlocking</summary>
+                <p>Verify Touch ID works in macOS (try unlocking a Keychain item). In MacShield settings, confirm Touch ID is enabled. Relaunch MacShield. If the issue persists, use the password fallback and include your Mac model and macOS version in a GitHub issue.</p>
+              </details>
+              <details>
+                <summary>Apple Watch unlock is not triggering</summary>
+                <p>Confirm the Watch is paired and unlocked on your wrist. Open MacShield settings and verify the Apple Watch feature is enabled. Bluetooth must be on. Move closer to your Mac. Note: Apple Watch unlock requires macOS 13+ and a supported Apple Watch model.</p>
+              </details>
+              <details>
+                <summary>Browser blur stopped working on WhatsApp, Gmail, or another platform</summary>
+                <p>Web apps frequently change their DOM structure, which can break CSS selectors. Update the MacShield Chrome extension to the latest version. If the issue persists on the latest version, open a GitHub issue with the platform name, your Chrome version, extension version, and a redacted screenshot showing the unblurred area.</p>
+              </details>
+              <details>
+                <summary>Website Lock is not blocking a domain I added</summary>
+                <p>Confirm the domain is entered without <code>https://</code> prefix (e.g. <code>mail.google.com</code> not <code>https://mail.google.com</code>). Reload the Chrome extension from <code>chrome://extensions</code>. If it still fails, provide the exact domain string and Chrome version in an issue.</p>
+              </details>
+              <details>
+                <summary>I forgot my browser extension password</summary>
+                <p>There is no recovery mechanism. MacShield stores only a salted SHA-256 hash — there is no way to reverse it. To reset: go to <code>chrome://extensions</code>, remove the MacShield extension, reinstall it from the Chrome Web Store, and set a new password. All locally stored extension settings will be cleared.</p>
+              </details>
+              <details>
+                <summary>MacShield does not start at login</summary>
+                <p>Open MacShield preferences and toggle the &ldquo;Launch at login&rdquo; option off and back on. If the option is missing, open <strong>System Settings &rarr; General &rarr; Login Items</strong> and add MacShield manually. This uses <code>SMAppService</code> on macOS 13+.</p>
+              </details>
+              <details>
+                <summary>MacShield is not detecting idle time for auto-lock</summary>
+                <p>Auto-lock relies on IOKit idle time detection. Confirm the idle threshold is set correctly in MacShield preferences. Some peripherals (game controllers, USB audio devices) reset idle time. Disconnect non-essential peripherals to test.</p>
+              </details>
+            </div>
+          </section>
+
+          <!-- FAQ -->
+          <section id="faq" class="sup-section">
+            <div class="section-kicker">Questions</div>
+            <h2>Common questions</h2>
+            <div class="faq">
+              <details>
+                <summary>Is MacShield free?</summary>
+                <p>Yes. MacShield is free and open-source under the MIT License. There is no paid tier, subscription, or in-app purchase. The source code is available at <a href="https://github.com/AryanVBW/MacShield" target="_blank" rel="noopener">github.com/AryanVBW/MacShield</a>.</p>
+              </details>
+              <details>
+                <summary>Does MacShield collect any data?</summary>
+                <p>No. MacShield has no analytics, advertising SDK, hosted account service, or telemetry pipeline. Protected app settings, passwords (as one-way hashes), and extension preferences all stay local on your device. See the <a href="privacy.html">privacy policy</a> for full details.</p>
+              </details>
+              <details>
+                <summary>Why does MacShield need Accessibility permission?</summary>
+                <p>Accessibility permission allows MacShield to detect when a protected app is launched or returns to focus. Without it, the overlay cannot appear at the right moment. MacShield uses this permission only to watch for app activation events — it does not read screen content.</p>
+              </details>
+              <details>
+                <summary>Why does the Chrome extension need access to all URLs?</summary>
+                <p>Website Lock supports any domain the user chooses to protect. To show the lock screen before content renders on an arbitrary domain, the extension must be allowed to run content scripts on all URLs. The extension only activates on domains you have added to the protected list.</p>
+              </details>
+              <details>
+                <summary>Can I contribute to MacShield?</summary>
+                <p>Yes. Bug reports, documentation improvements, pull requests, and feature discussions are all welcome. Read the contributing guide in the repository and open a GitHub issue before starting a large change, to align with the project direction.</p>
+              </details>
+            </div>
+          </section>
+
+          <!-- Report -->
+          <section id="report" class="sup-section">
+            <div class="section-kicker">Bug reports</div>
+            <h2>Report a bug</h2>
+            <p class="lead">Include everything the maintainer needs to reproduce and fix the issue on the first pass.</p>
+            <div class="grid grid-2">
+              <article class="card">
+                <h3>What to include</h3>
+                <ul class="plain-list">
+                  <li>MacShield version (from menu bar icon)</li>
+                  <li>macOS version and Mac model</li>
+                  <li>Chrome version (for extension issues)</li>
+                  <li>Exact steps to reproduce</li>
+                  <li>Expected behavior vs. actual behavior</li>
+                  <li>Screenshots with private content redacted</li>
+                  <li>Console logs if available</li>
+                </ul>
+              </article>
+              <article class="card">
+                <h3>What not to include</h3>
+                <ul class="plain-list">
+                  <li>Passwords or passkeys in any form</li>
+                  <li>Private messages or conversations</li>
+                  <li>API tokens, SSH keys, or credentials</li>
+                  <li>Unredacted personal or customer data</li>
+                  <li>Screenshots showing unlocked private content</li>
+                </ul>
+              </article>
+            </div>
+            <div style="margin-top:20px">
+              <a class="btn btn-primary" href="https://github.com/AryanVBW/MacShield/issues/new" target="_blank" rel="noopener">Open GitHub issue &rarr;</a>
+            </div>
+          </section>
+
+        </div><!-- /.doc-content -->
+      </div><!-- /.doc-layout -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="icon.png" alt="MacShield logo"><span>Mac<span>Shield</span></span></a>
+        <p>Support resources for MacShield by Vivek W (AryanVBW).</p>
+      </div>
+      <div><h3>Product</h3><a href="docs.html">Documentation</a><a href="roadmap.html">Roadmap</a><a href="status.html">Status</a></div>
+      <div><h3>Company</h3><a href="about.html">About</a><a href="contact.html">Contact</a><a href="support.html">Help and support</a></div>
+      <div><h3>Legal</h3><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="copyright.html">Copyright</a></div>
+      <div><h3>Open source</h3><a href="credits.html">Credits</a><a href="https://github.com/AryanVBW/MacShield">GitHub</a><a href="https://github.com/AryanVBW/MacShield/issues">Issues</a></div>
+    </div>
+    <div class="wrap copyright-line">&copy; 2026 Vivek W (AryanVBW). MacShield. All rights reserved except where open-source licenses apply.</div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

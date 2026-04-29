@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact - MacShield</title>
+  <meta name="description" content="Contact Vivek W (AryanVBW), the creator and maintainer of MacShield. GitHub Issues is the primary channel for bugs, questions, and feature requests.">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .contact-hero-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+    /* maintainer profile */
+    .maintainer-card {
+      display: flex; align-items: flex-start; gap: 24px;
+      border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+      border-radius: var(--radius); padding: 32px;
+      background: color-mix(in srgb, var(--surface) 90%, transparent);
+      position: relative; overflow: hidden; margin-bottom: 32px;
+    }
+    .maintainer-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 56%, transparent), transparent);
+    }
+    .m-avatar {
+      flex-shrink: 0; width: 80px; height: 80px; border-radius: 50%;
+      border: 1px solid var(--line); display: grid; place-items: center;
+      background: color-mix(in srgb, var(--surface-3) 80%, transparent);
+      font-family: var(--display-font); font-size: 34px; font-weight: 900;
+      color: color-mix(in srgb, var(--brand) 70%, var(--text));
+    }
+    .m-info h2 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 4px; }
+    .m-role { color: color-mix(in srgb, var(--brand) 62%, var(--muted)); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 14px; }
+    .m-info p { color: var(--muted); font-size: 16px; margin: 0 0 20px; line-height: 1.72; max-width: 680px; }
+    .m-links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .m-links a {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 9px 16px; color: var(--muted); font-size: 14px;
+      font-weight: 700; text-decoration: none;
+      background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+      transition: border-color .18s, color .18s;
+    }
+    .m-links a:hover { color: var(--text); border-color: color-mix(in srgb, var(--brand) 30%, var(--line)); }
+    .m-links a.cta { background: var(--text); color: var(--bg); border-color: transparent; }
+    .m-links a.cta:hover { opacity: .9; }
+
+    /* channel cards */
+    .channel-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .channel-card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 26px; background: color-mix(in srgb, var(--surface) 92%, transparent);
+      text-decoration: none; color: inherit;
+      transition: border-color .2s, background .2s;
+      display: flex; flex-direction: column;
+    }
+    .channel-card:hover { border-color: color-mix(in srgb, var(--brand) 32%, var(--line)); background: color-mix(in srgb, var(--surface-2) 80%, transparent); }
+    .channel-card.featured { border-color: color-mix(in srgb, var(--brand) 24%, var(--line)); grid-column: 1 / -1; flex-direction: row; align-items: flex-start; gap: 20px; }
+    .ch-icon { width: 48px; height: 48px; flex-shrink: 0; border: 1px solid var(--line); border-radius: var(--radius); background: color-mix(in srgb, var(--surface-3) 80%, transparent); display: grid; place-items: center; font-size: 22px; margin-bottom: 16px; }
+    .channel-card.featured .ch-icon { margin-bottom: 0; }
+    .ch-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 6px; }
+    .channel-card h3 { font-size: 18px; margin: 0 0 8px; }
+    .channel-card p { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.65; flex: 1; }
+    .ch-cta { display: inline-block; margin-top: 14px; color: color-mix(in srgb, var(--brand) 62%, var(--text)); font-size: 13px; font-weight: 800; }
+
+    /* etiquette list */
+    .etiquette-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 24px; }
+    .etiquette-item { border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; background: color-mix(in srgb, var(--surface) 92%, transparent); }
+    .etiquette-item h3 { font-size: 17px; margin: 0 0 10px; }
+    .etiquette-item ul { margin: 0; padding: 0; list-style: none; }
+    .etiquette-item li { position: relative; padding-left: 18px; margin-bottom: 8px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .etiquette-item li::before { content: ""; position: absolute; left: 0; top: .55em; width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--brand) 62%, var(--muted)); }
+    .etiquette-item.do-not li::before { background: #ff8b8b; }
+
+    @media (max-width: 980px) {
+      .maintainer-card { flex-direction: column; gap: 16px; }
+      .channel-card.featured { flex-direction: column; }
+      .etiquette-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .channel-grid { grid-template-columns: 1fr; }
+      .channel-card.featured { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img src="icon.png" alt="MacShield logo"><span>Mac<span>Shield</span></span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="support.html">Support</a></li>
+        <li><a href="credits.html">Credits</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light and dark theme">Theme</button>
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="Open menu" aria-expanded="false">Menu</button>
+        <a class="btn btn-primary btn-small" href="https://github.com/AryanVBW/MacShield/releases/latest">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header class="page-hero wrap">
+      <div class="eyebrow"><span class="dot"></span> Contact</div>
+      <h1>Get in touch with the MacShield team.</h1>
+      <p>MacShield is built and maintained by <strong>Vivek W (AryanVBW)</strong>. GitHub is the preferred channel for all project communication — it keeps discussions searchable and transparent for everyone.</p>
+      <div class="contact-hero-meta pill-row">
+        <span class="pill">Solo open-source project</span>
+        <span class="pill">GitHub-first communication</span>
+        <span class="pill">Best-effort response</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="wrap">
+
+        <!-- Maintainer profile -->
+        <div class="maintainer-card">
+          <div class="m-avatar">V</div>
+          <div class="m-info">
+            <h2>Vivek W &mdash; AryanVBW</h2>
+            <span class="m-role">Creator &amp; maintainer of MacShield</span>
+            <p>Vivek W is the sole developer behind MacShield — a native macOS app and Chrome extension for local-first privacy protection. All bug reports, feature requests, documentation updates, and releases are handled by Vivek. The best and most reliable way to reach him is through a GitHub Issue on the MacShield repository.</p>
+            <div class="m-links">
+              <a class="cta" href="https://github.com/AryanVBW/MacShield/issues/new" target="_blank" rel="noopener">Open a GitHub issue &rarr;</a>
+              <a href="https://github.com/AryanVBW" target="_blank" rel="noopener">&#128100; @AryanVBW on GitHub</a>
+              <a href="https://github.com/AryanVBW/MacShield" target="_blank" rel="noopener">&#128230; MacShield repository</a>
+              <a href="https://github.com/AryanVBW/MacShield/discussions" target="_blank" rel="noopener">&#128172; GitHub Discussions</a>
+              <a href="https://github.com/AryanVBW/MacShield/releases" target="_blank" rel="noopener">&#128640; Releases</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact channels -->
+        <div class="section-head" style="margin-bottom:20px">
+          <div>
+            <div class="section-kicker">Channels</div>
+            <h2 style="font-size:clamp(24px,3vw,38px); margin-top:6px">Choose the right channel</h2>
+          </div>
+        </div>
+        <div class="channel-grid">
+          <a class="channel-card featured" href="https://github.com/AryanVBW/MacShield/issues" target="_blank" rel="noopener">
+            <div class="ch-icon">&#128030;</div>
+            <div>
+              <div class="ch-label">Primary channel</div>
+              <h3>GitHub Issues</h3>
+              <p>The main contact channel for MacShield. Use this for bugs, crashes, permission problems, overlay issues, Touch ID / Apple Watch issues, browser blur regressions, and Website Lock problems. Public issues are searchable and help future users with the same problem.</p>
+              <span class="ch-cta">github.com/AryanVBW/MacShield/issues &rarr;</span>
+            </div>
+          </a>
+
+          <a class="channel-card" href="https://github.com/AryanVBW/MacShield/discussions" target="_blank" rel="noopener">
+            <div class="ch-icon">&#128172;</div>
+            <div class="ch-label">Questions &amp; ideas</div>
+            <h3>GitHub Discussions</h3>
+            <p>For general questions, feature ideas, feedback on the roadmap, and open-ended conversations about MacShield's direction. Not for reproducible bugs — use Issues for those.</p>
+            <span class="ch-cta">GitHub Discussions &rarr;</span>
+          </a>
+
+          <a class="channel-card" href="https://github.com/AryanVBW/MacShield/security/advisories/new" target="_blank" rel="noopener">
+            <div class="ch-icon">&#128274;</div>
+            <div class="ch-label">Vulnerabilities</div>
+            <h3>Private security advisory</h3>
+            <p>For sensitive security vulnerabilities or data exposure issues. Use GitHub's private advisory feature — do not post credentials, private data, or exploits in public issues.</p>
+            <span class="ch-cta">Open private advisory &rarr;</span>
+          </a>
+
+          <a class="channel-card" href="https://github.com/AryanVBW" target="_blank" rel="noopener">
+            <div class="ch-icon">&#128100;</div>
+            <div class="ch-label">Maintainer profile</div>
+            <h3>@AryanVBW on GitHub</h3>
+            <p>View Vivek's GitHub profile for other open-source projects, activity history, and any additional contact details listed publicly on the profile.</p>
+            <span class="ch-cta">github.com/AryanVBW &rarr;</span>
+          </a>
+
+          <a class="channel-card" href="https://github.com/AryanVBW/MacShield/pulls" target="_blank" rel="noopener">
+            <div class="ch-icon">&#128260;</div>
+            <div class="ch-label">Code contributions</div>
+            <h3>Pull requests</h3>
+            <p>Want to contribute a fix or feature? Open an Issue first to discuss the change, then submit a pull request. Read the contributing guidelines before starting.</p>
+            <span class="ch-cta">View pull requests &rarr;</span>
+          </a>
+
+          <a class="channel-card" href="https://github.com/AryanVBW/MacShield/issues/new?labels=documentation" target="_blank" rel="noopener">
+            <div class="ch-icon">&#128196;</div>
+            <div class="ch-label">Docs feedback</div>
+            <h3>Documentation improvements</h3>
+            <p>Found unclear, missing, or incorrect documentation? Open a GitHub issue with the docs label, link to the specific page, and describe what should change.</p>
+            <span class="ch-cta">Report a docs issue &rarr;</span>
+          </a>
+        </div>
+
+        <!-- Before contacting / etiquette -->
+        <div class="section-head" style="margin-top:72px; margin-bottom:20px">
+          <div>
+            <div class="section-kicker">Etiquette</div>
+            <h2 style="font-size:clamp(24px,3vw,38px); margin-top:6px">Before you reach out</h2>
+          </div>
+        </div>
+        <p style="color:var(--muted); font-size:17px; max-width:720px; margin:0 0 24px; line-height:1.72">Following these guidelines keeps the project history useful for everyone and gets your issue resolved faster.</p>
+        <div class="etiquette-grid">
+          <div class="etiquette-item">
+            <h3>Please do</h3>
+            <ul>
+              <li>Search open and closed issues before filing a new one</li>
+              <li>Read the <a href="docs.html#troubleshooting">troubleshooting guide</a> first</li>
+              <li>Include MacShield version, macOS version, and Mac model</li>
+              <li>Provide exact reproduction steps</li>
+              <li>Describe expected behavior vs. actual behavior</li>
+              <li>Attach redacted screenshots when relevant</li>
+              <li>Check you are on the latest release before reporting</li>
+            </ul>
+          </div>
+          <div class="etiquette-item do-not">
+            <h3>Please do not</h3>
+            <ul>
+              <li>Post passwords, access tokens, or API keys in issues</li>
+              <li>Share unredacted private messages or screenshots</li>
+              <li>File duplicate issues for already-reported bugs</li>
+              <li>Post security vulnerabilities in public issues</li>
+              <li>Open issues asking for non-privacy features (e.g. cloud sync)</li>
+              <li>Cross-post the same issue across multiple channels</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="section tight" style="border-top:none; padding:56px 0 0">
+          <div class="cta-band">
+            <div class="section-kicker">Ready to reach out?</div>
+            <h2>GitHub Issues is the fastest path to a fix.</h2>
+            <p>Search first, gather your version info, then open a clear issue. The maintainer reads every report.</p>
+            <div class="hero-actions" style="margin-top:24px">
+              <a class="btn btn-primary" href="https://github.com/AryanVBW/MacShield/issues/new" target="_blank" rel="noopener">Open an issue &rarr;</a>
+              <a class="btn btn-secondary" href="support.html">Read support guide</a>
+              <a class="btn btn-secondary" href="docs.html#troubleshooting">Troubleshooting</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="icon.png" alt="MacShield logo"><span>Mac<span>Shield</span></span></a>
+        <p>MacShield by Vivek W (AryanVBW). Open-source privacy for macOS and Chrome.</p>
+      </div>
+      <div><h3>Product</h3><a href="docs.html">Documentation</a><a href="roadmap.html">Roadmap</a><a href="status.html">Status</a></div>
+      <div><h3>Company</h3><a href="about.html">About</a><a href="contact.html">Contact</a><a href="support.html">Help and support</a></div>
+      <div><h3>Legal</h3><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="copyright.html">Copyright</a></div>
+      <div><h3>Open source</h3><a href="credits.html">Credits</a><a href="https://github.com/AryanVBW/MacShield">GitHub</a><a href="https://github.com/AryanVBW/MacShield/issues">Issues</a></div>
+    </div>
+    <div class="wrap copyright-line">&copy; 2026 Vivek W (AryanVBW). MacShield. All rights reserved except where open-source licenses apply.</div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>
