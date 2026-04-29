@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Credits and Attribution - MacShield</title>
+  <meta name="description" content="Credits for MacShield dependencies, frameworks, upstream projects, contributors, APIs, and open-source libraries.">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Credits page extras ─────────────────────────────── */
+    .credits-section { margin-bottom: 72px; scroll-margin-top: 96px; }
+    .credits-section h2 { font-size: clamp(26px, 3vw, 40px); margin-bottom: 4px; }
+    .credits-section .lead {
+      max-width: 720px; color: var(--muted);
+      font-size: 17px; margin: 10px 0 28px; line-height: 1.72;
+    }
+    .sidebar-label {
+      display: block; padding: 8px 10px 4px;
+      font-size: 11px; font-weight: 900;
+      text-transform: uppercase; letter-spacing: .07em; color: var(--faint);
+    }
+    /* owner card */
+    .owner-card {
+      display: flex; align-items: flex-start; gap: 22px;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 30px; background: color-mix(in srgb, var(--surface) 92%, transparent);
+    }
+    .owner-avatar {
+      flex-shrink: 0; width: 68px; height: 68px; border-radius: 50%;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface-3) 80%, transparent);
+      display: grid; place-items: center;
+      font-family: var(--display-font); font-size: 28px; font-weight: 900;
+      color: color-mix(in srgb, var(--brand) 70%, var(--text));
+    }
+    .owner-info h3 { margin: 0 0 8px; font-size: 22px; }
+    .owner-info p  { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+    .owner-links   { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .owner-links a {
+      display: inline-flex; align-items: center; gap: 5px;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 7px 13px; color: var(--muted);
+      font-size: 13px; font-weight: 700; text-decoration: none;
+      background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+    }
+    .owner-links a:hover { color: var(--text); border-color: color-mix(in srgb, var(--brand) 30%, var(--line)); }
+    /* inspiration highlight card */
+    .highlight-card {
+      position: relative; overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+      border-radius: var(--radius); padding: 32px;
+      background: color-mix(in srgb, var(--surface) 90%, transparent);
+    }
+    .highlight-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 56%, transparent), transparent);
+    }
+    .highlight-card h3 { font-size: 23px; margin-bottom: 12px; }
+    .highlight-card p  { color: var(--muted); font-size: 16px; line-height: 1.78; margin: 0 0 14px; }
+    .highlight-card .ext-link {
+      color: color-mix(in srgb, var(--brand) 62%, var(--text));
+      font-weight: 800; font-size: 15px; text-decoration: none;
+    }
+    .highlight-card .ext-link:hover { text-decoration: underline; }
+    /* dep table */
+    .dep-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      overflow: hidden; border: 1px solid var(--line);
+      border-radius: var(--radius); margin-top: 20px; font-size: 15px;
+    }
+    .dep-table th {
+      background: color-mix(in srgb, var(--surface-2) 90%, transparent);
+      color: var(--text); font-family: var(--display-font);
+      font-size: 12px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: .05em; padding: 13px 18px;
+      border-bottom: 1px solid var(--line); text-align: left;
+    }
+    .dep-table td {
+      padding: 15px 18px; border-bottom: 1px solid var(--line);
+      color: var(--muted); vertical-align: top; line-height: 1.65;
+    }
+    .dep-table tr:last-child td { border-bottom: 0; }
+    .dep-table tbody tr:hover td { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+    .dep-table td:first-child { color: var(--text); font-weight: 700; }
+    .dep-table td a { color: color-mix(in srgb, var(--brand) 58%, var(--text)); font-weight: 700; text-decoration: none; }
+    .dep-table td a:hover { text-decoration: underline; }
+    .badge {
+      display: inline-block; margin-top: 5px;
+      border: 1px solid var(--line); border-radius: 999px;
+      padding: 2px 9px; color: var(--faint);
+      font-size: 11px; font-weight: 700;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+    }
+    .badge-green {
+      border-color: color-mix(in srgb, var(--brand) 30%, var(--line));
+      color: color-mix(in srgb, var(--brand) 72%, var(--text));
+      background: color-mix(in srgb, var(--brand) 8%, transparent);
+    }
+    /* asset grid */
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px; margin-top: 22px;
+    }
+    .asset-card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 24px; background: color-mix(in srgb, var(--surface) 92%, transparent);
+    }
+    .asset-card .a-icon {
+      width: 44px; height: 44px; border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+      display: grid; place-items: center; margin-bottom: 16px; font-size: 20px;
+    }
+    .asset-card h3 { font-size: 18px; margin-bottom: 8px; }
+    .asset-card p  { color: var(--muted); font-size: 15px; margin: 0; line-height: 1.65; }
+    /* license list */
+    .license-item {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 22px 24px; margin-bottom: 14px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+    }
+    .license-item h3 { font-size: 18px; margin-bottom: 8px; }
+    .license-item p  { color: var(--muted); font-size: 15px; margin: 0; line-height: 1.7; }
+    .license-tag {
+      display: inline-block; margin-top: 12px;
+      border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
+      border-radius: 999px; padding: 3px 12px;
+      font-size: 12px; font-weight: 800;
+      color: color-mix(in srgb, var(--brand) 68%, var(--text));
+      background: color-mix(in srgb, var(--brand) 7%, transparent);
+    }
+    /* responsive */
+    @media (max-width: 980px) {
+      .asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .owner-card { flex-direction: column; gap: 14px; }
+    }
+    @media (max-width: 760px) {
+      .asset-grid { grid-template-columns: 1fr; }
+      .dep-table  { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img src="icon.png" alt="MacShield logo"><span>Mac<span>Shield</span></span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="support.html">Support</a></li>
+        <li><a aria-current="page" href="credits.html">Credits</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light and dark theme">Theme</button>
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="Open menu" aria-expanded="false">Menu</button>
+        <a class="btn btn-primary btn-small" href="https://github.com/AryanVBW/MacShield/releases/latest">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header class="page-hero wrap">
+      <div class="eyebrow"><span class="dot"></span> Open-source attribution</div>
+      <h1>Credits and Attribution</h1>
+      <p>MacShield is built on open-source libraries, Apple SDK frameworks, web platform standards, and community knowledge. Every dependency, framework, and inspiration behind MacShield is listed here with full credit to its owners and maintainers.</p>
+      <div class="pill-row" style="margin-top:24px">
+        <span class="pill">Open source</span>
+        <span class="pill">MIT-compatible stack</span>
+        <span class="pill">Apple SDK licensed</span>
+        <span class="pill">Last updated April 2026</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="wrap doc-layout">
+
+        <!-- ── Sidebar ────────────────────────────────────── -->
+        <aside class="doc-sidebar" aria-label="On this page">
+          <span class="sidebar-label">On this page</span>
+          <a href="#overview">Overview</a>
+          <a href="#owner">Project owner</a>
+          <a href="#inspiration">Special inspiration</a>
+          <a href="#macos-deps">macOS dependencies</a>
+          <a href="#apple-frameworks">Apple frameworks</a>
+          <a href="#browser-deps">Browser extension</a>
+          <a href="#web-standards">Web standards</a>
+          <a href="#assets">Assets and website</a>
+          <a href="#licenses">Licenses summary</a>
+          <a href="#contributors">Contributors</a>
+          <a href="#missing">Missing attribution</a>
+        </aside>
+
+        <!-- ── Main content ───────────────────────────────── -->
+        <div class="doc-content">
+
+          <!-- Overview -->
+          <section id="overview" class="credits-section">
+            <div class="section-kicker">Overview</div>
+            <h2>What this page covers</h2>
+            <p class="lead">MacShield is a native macOS app and Chrome browser extension. It is built on top of open-source Swift packages, Apple platform SDK frameworks, Google Chrome extension APIs, and W3C web standards. This page credits every dependency, its maintainer, its role in MacShield, and the applicable license.</p>
+            <div class="grid grid-2">
+              <article class="card">
+                <div class="icon">01</div>
+                <h3>Scope of attribution</h3>
+                <p>Attribution covers the macOS app (Swift, SwiftUI, AppKit), the Chrome browser extension (Manifest V3, Web APIs), the project website, and all design assets. It does not replace individual license files inside bundled packages.</p>
+              </article>
+              <article class="card">
+                <div class="icon">02</div>
+                <h3>License compliance</h3>
+                <p>If you are auditing MacShield for license compliance, use this page as the dependency map. For full license texts, refer to the <code>LICENSE</code> file in this repository and the upstream package repositories listed below.</p>
+              </article>
+            </div>
+          </section>
+
+          <!-- Project owner -->
+          <section id="owner" class="credits-section">
+            <div class="section-kicker">Authorship</div>
+            <h2>Project owner</h2>
+            <p class="lead">MacShield is designed, developed, and maintained by one individual as an open-source project.</p>
+            <div class="owner-card">
+              <div class="owner-avatar">V</div>
+              <div class="owner-info">
+                <h3>Vivek W &mdash; AryanVBW</h3>
+                <p>MacShield is owned and maintained by Vivek W (AryanVBW). All MacShield source code, design assets, documentation, and website content in this repository are authored by Vivek W unless specific files or bundled dependencies state otherwise through their own copyright notices or license headers.</p>
+                <div class="owner-links">
+                  <a href="https://github.com/AryanVBW" target="_blank" rel="noopener">GitHub profile &rarr;</a>
+                  <a href="https://github.com/AryanVBW/MacShield" target="_blank" rel="noopener">MacShield repository &rarr;</a>
+                  <a href="copyright.html">Copyright notice &rarr;</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Special inspiration -->
+          <section id="inspiration" class="credits-section">
+            <div class="section-kicker">Special credit</div>
+            <h2>Special inspiration credit</h2>
+            <p class="lead">MacShield respectfully credits MakLock as a key directional inspiration for native macOS app-locking design.</p>
+            <div class="highlight-card">
+              <h3>MakLock &mdash; by Maciej Dutkiewicz</h3>
+              <p>MakLock is an open-source macOS application that demonstrated a thoughtful, system-level approach to protecting macOS apps with native overlays and authentication. MacShield's native app-locking architecture builds upon and extends those ideas, adding Touch ID, Apple Watch proximity unlock, browser privacy blur, and Website Lock into a unified product.</p>
+              <p>MacShield gives special credit to MakLock and its author, Maciej Dutkiewicz, for proving that a clean, open-source approach to macOS app protection was achievable and valuable. No source code from MakLock is directly included in MacShield. MakLock is licensed under the MIT License.</p>
+              <a class="ext-link" href="https://github.com/dutkiewiczmaciej/MakLock" target="_blank" rel="noopener">github.com/dutkiewiczmaciej/MakLock &rarr;</a>
+            </div>
+          </section>
+
+          <!-- macOS third-party packages -->
+          <section id="macos-deps" class="credits-section">
+            <div class="section-kicker">macOS app &mdash; third-party</div>
+            <h2>macOS app dependencies</h2>
+            <p class="lead">The native MacShield macOS app includes two third-party open-source Swift packages managed through Swift Package Manager.</p>
+            <table class="dep-table">
+              <thead>
+                <tr>
+                  <th style="width:22%">Package</th>
+                  <th style="width:20%">Maintainer</th>
+                  <th>Role in MacShield</th>
+                  <th style="width:18%">License</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <a href="https://github.com/sparkle-project/Sparkle" target="_blank" rel="noopener">Sparkle 2</a><br>
+                    <span class="badge badge-green">Swift Package Manager</span>
+                  </td>
+                  <td>Sparkle Project contributors</td>
+                  <td>Delivers automatic update checks, update UI presentation, and delta update support for the MacShield macOS app. Users are notified of new releases without leaving the app.</td>
+                  <td>BSD-style Sparkle License<br><span class="badge">Open source</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/soffes/HotKey" target="_blank" rel="noopener">HotKey</a><br>
+                    <span class="badge badge-green">Swift Package Manager</span>
+                  </td>
+                  <td>Sam Soffes and contributors</td>
+                  <td>Registers and handles the global keyboard panic shortcut that instantly locks all protected apps with one keystroke, regardless of which app is in focus.</td>
+                  <td>MIT License<br><span class="badge">Open source</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/dutkiewiczmaciej/MakLock" target="_blank" rel="noopener">MakLock</a><br>
+                    <span class="badge">Inspiration only</span>
+                  </td>
+                  <td>Maciej Dutkiewicz</td>
+                  <td>Open-source inspiration for native macOS app-locking concepts, overlay behavior, and app-protection user experience. No code is directly copied; credited for directional influence.</td>
+                  <td>MIT License<br><span class="badge">Open source</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Apple frameworks -->
+          <section id="apple-frameworks" class="credits-section">
+            <div class="section-kicker">macOS app &mdash; Apple SDK</div>
+            <h2>Apple platform frameworks</h2>
+            <p class="lead">MacShield uses Apple SDK frameworks for all core native behavior. These ship with macOS and are governed by Apple's developer program terms, not open-source licenses.</p>
+            <table class="dep-table">
+              <thead>
+                <tr>
+                  <th style="width:22%">Framework</th>
+                  <th style="width:16%">Owner</th>
+                  <th>Role in MacShield</th>
+                  <th style="width:18%">Terms</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>SwiftUI</td>
+                  <td>Apple Inc.</td>
+                  <td>Declarative UI framework powering the onboarding flow, settings window, menu bar popover, and all native interface components of the macOS app.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>AppKit</td>
+                  <td>Apple Inc.</td>
+                  <td>Menu bar app lifecycle, NSPanel-based overlay windows, app launch detection, focus observation, and protected app switching behavior.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>LocalAuthentication</td>
+                  <td>Apple Inc.</td>
+                  <td>Touch ID and device biometric evaluation via <code>LAContext</code>. Provides the primary unlock pathway and falls back to device passcode where Touch ID is unavailable.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>Security / Keychain Services</td>
+                  <td>Apple Inc.</td>
+                  <td>Encrypted local storage for the backup password. Stored in the macOS Keychain under the MacShield bundle identifier. Never transmitted externally.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>CoreBluetooth</td>
+                  <td>Apple Inc.</td>
+                  <td>Apple Watch proximity detection. MacShield monitors Bluetooth RSSI from a paired Apple Watch and automatically locks or unlocks protected apps based on configured distance thresholds.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>IOKit</td>
+                  <td>Apple Inc.</td>
+                  <td>System idle-time detection for the auto-lock feature. MacShield reads HID idle time counters to trigger locking when the user has been inactive for the configured duration.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>ServiceManagement</td>
+                  <td>Apple Inc.</td>
+                  <td>Login item registration via the modern <code>SMAppService</code> API on macOS 13+, enabling MacShield to start at login without legacy Launch Agent plists.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+                <tr>
+                  <td>UserNotifications</td>
+                  <td>Apple Inc.</td>
+                  <td>Optional system notification delivery for lock events, failed authentication attempts, and Apple Watch disconnect alerts.</td>
+                  <td>Apple SDK Terms</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Browser extension APIs -->
+          <section id="browser-deps" class="credits-section">
+            <div class="section-kicker">Chrome extension</div>
+            <h2>Browser extension dependencies</h2>
+            <p class="lead">The MacShield Chrome extension uses Google's Manifest V3 extension platform and built-in Chrome APIs. No third-party JavaScript libraries are bundled with the extension.</p>
+            <table class="dep-table">
+              <thead>
+                <tr>
+                  <th style="width:25%">API or platform</th>
+                  <th style="width:20%">Owner</th>
+                  <th>Role in MacShield extension</th>
+                  <th style="width:18%">Terms</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Chrome Extension APIs (MV3)</td>
+                  <td>Google LLC / Chromium project</td>
+                  <td>Manifest V3 runtime, background service worker, content scripts, messaging, declarativeNetRequest, and extension lifecycle management.</td>
+                  <td>Chrome Web Store terms &amp; Chromium BSD</td>
+                </tr>
+                <tr>
+                  <td>chrome.storage.local</td>
+                  <td>Google LLC / Chromium project</td>
+                  <td>Local-only storage for the hashed extension password, protected domain list, blur settings, session unlock state, and user preferences. Data does not leave the device.</td>
+                  <td>Chrome Extension APIs Terms</td>
+                </tr>
+                <tr>
+                  <td>chrome.tabs</td>
+                  <td>Google LLC / Chromium project</td>
+                  <td>Tab query and navigation interception used by Website Lock to block page loads on protected domains before content renders.</td>
+                  <td>Chrome Extension APIs Terms</td>
+                </tr>
+                <tr>
+                  <td>content_scripts (CSS injection)</td>
+                  <td>Google LLC / Chromium project</td>
+                  <td>Content scripts inject per-site CSS blur rules onto supported messaging platforms (WhatsApp, Gmail, Slack, Discord, and others). No message content is read.</td>
+                  <td>Chrome Extension APIs Terms</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Web standards -->
+          <section id="web-standards" class="credits-section">
+            <div class="section-kicker">Web platform</div>
+            <h2>Web platform standards</h2>
+            <p class="lead">The browser extension uses two W3C web platform APIs that are implemented natively by Chrome, with no external library dependency.</p>
+            <table class="dep-table">
+              <thead>
+                <tr>
+                  <th style="width:22%">Standard</th>
+                  <th style="width:22%">Governing body</th>
+                  <th>Role in MacShield extension</th>
+                  <th style="width:16%">Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Web Crypto API</td>
+                  <td>W3C / browser implementers</td>
+                  <td>Password hashing via <code>SubtleCrypto.digest()</code> with SHA-256 and a random 16-byte salt. The resulting hash is stored locally. The plaintext password is never persisted anywhere.</td>
+                  <td>Open web standard</td>
+                </tr>
+                <tr>
+                  <td>WebAuthn (Web Authentication API)</td>
+                  <td>W3C / FIDO Alliance / browser vendors</td>
+                  <td>Platform biometric authentication (Touch ID, Windows Hello, Android biometric) for extension unlock where the browser and OS support it. Falls back to password-based unlock where unavailable.</td>
+                  <td>Open web standard</td>
+                </tr>
+                <tr>
+                  <td>CSS Blur / backdrop-filter</td>
+                  <td>W3C CSS Working Group</td>
+                  <td>CSS visual blur rules injected by content scripts to obscure chat message text on supported platforms. The extension only modifies CSS visual properties; it never reads message content.</td>
+                  <td>Open web standard</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Assets -->
+          <section id="assets" class="credits-section">
+            <div class="section-kicker">Design and content</div>
+            <h2>Assets and website</h2>
+            <p class="lead">All MacShield design assets, icon artwork, screenshots, and website code are created specifically for this project by the MacShield author.</p>
+            <div class="asset-grid">
+              <div class="asset-card">
+                <div class="a-icon">&#128241;</div>
+                <h3>App and extension icon</h3>
+                <p>The MacShield shield icon is designed for this project and used across the macOS app, Chrome extension, website, and all marketing materials. The icon is part of the MacShield project and is not available under an open-source license.</p>
+              </div>
+              <div class="asset-card">
+                <div class="a-icon">&#128247;</div>
+                <h3>Product screenshots</h3>
+                <p>Screenshots under <code>docs/</code> show actual MacShield UI. They are captured from the application and owned by the MacShield project unless otherwise stated in individual file headers.</p>
+              </div>
+              <div class="asset-card">
+                <div class="a-icon">&#65332;</div>
+                <h3>Typography</h3>
+                <p>The website uses <strong>Syne</strong> (700&ndash;800 weight) for headings and <strong>DM Sans</strong> (300&ndash;700 weight) for body text. Both are loaded via Google Fonts and fall back to system UI fonts. No font files are bundled in the repository.</p>
+              </div>
+              <div class="asset-card">
+                <div class="a-icon">&#127760;</div>
+                <h3>Website platform</h3>
+                <p>The MacShield website is hosted on GitHub Pages from the <code>docs/</code> directory. No JavaScript frameworks, CMS, or third-party analytics are used. All HTML, CSS, and JS is hand-authored.</p>
+              </div>
+              <div class="asset-card">
+                <div class="a-icon">&#9998;</div>
+                <h3>Google Fonts</h3>
+                <p>Syne and DM Sans typefaces are served by <strong>Google Fonts</strong> (fonts.googleapis.com). This is the only external network request made by the website. No user data is collected through this request beyond what Google Fonts logs per its own terms.</p>
+              </div>
+              <div class="asset-card">
+                <div class="a-icon">&#128279;</div>
+                <h3>GitHub Pages hosting</h3>
+                <p>The <code>aryanvbw.github.io/MacShield</code> site is served by GitHub Pages, a static site hosting service by GitHub Inc. (Microsoft). Content delivery is managed by GitHub's CDN infrastructure.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Licenses summary -->
+          <section id="licenses" class="credits-section">
+            <div class="section-kicker">License reference</div>
+            <h2>Licenses summary</h2>
+            <p class="lead">A quick-reference list of the licenses that apply to MacShield's components and dependencies.</p>
+
+            <div class="license-item">
+              <h3>MacShield (this project)</h3>
+              <p>MacShield source code, documentation, and website are released under the MIT License. Copyright 2026 Vivek W (AryanVBW). See the <code>LICENSE</code> file in the root of this repository for the full license text.</p>
+              <span class="license-tag">MIT License</span>
+            </div>
+
+            <div class="license-item">
+              <h3>Sparkle 2</h3>
+              <p>Sparkle is distributed under the BSD-style Sparkle License. See <a href="https://github.com/sparkle-project/Sparkle/blob/2.x/LICENSE" target="_blank" rel="noopener">github.com/sparkle-project/Sparkle &rarr;</a> for the full text. The license requires preservation of the copyright notice and disclaimer.</p>
+              <span class="license-tag">BSD-style Sparkle License</span>
+            </div>
+
+            <div class="license-item">
+              <h3>HotKey</h3>
+              <p>HotKey by Sam Soffes is released under the MIT License. See <a href="https://github.com/soffes/HotKey/blob/master/LICENSE" target="_blank" rel="noopener">github.com/soffes/HotKey &rarr;</a> for the full text.</p>
+              <span class="license-tag">MIT License</span>
+            </div>
+
+            <div class="license-item">
+              <h3>MakLock (inspiration)</h3>
+              <p>MakLock by Maciej Dutkiewicz is released under the MIT License. No MakLock source code is directly included in MacShield. See <a href="https://github.com/dutkiewiczmaciej/MakLock" target="_blank" rel="noopener">github.com/dutkiewiczmaciej/MakLock &rarr;</a>.</p>
+              <span class="license-tag">MIT License</span>
+            </div>
+
+            <div class="license-item">
+              <h3>Apple SDK frameworks</h3>
+              <p>SwiftUI, AppKit, LocalAuthentication, Security, CoreBluetooth, IOKit, ServiceManagement, and UserNotifications are Apple proprietary frameworks. Their use is governed by the Apple Developer Program License Agreement and the macOS SDK terms.</p>
+              <span class="license-tag">Apple SDK Terms</span>
+            </div>
+
+            <div class="license-item">
+              <h3>Chrome Extension APIs</h3>
+              <p>The Chrome Extension platform and APIs are provided by Google LLC under the Chrome Web Store Developer Program Policies. The Chromium source code underlying these APIs is available under a BSD-style license at <a href="https://chromium.googlesource.com/chromium/src/+/HEAD/LICENSE" target="_blank" rel="noopener">chromium.googlesource.com &rarr;</a>.</p>
+              <span class="license-tag">Chrome / Chromium Terms</span>
+            </div>
+
+            <div class="license-item">
+              <h3>Web Crypto API and WebAuthn</h3>
+              <p>These are open web platform standards defined by the W3C. They are implemented royalty-free by browser vendors including Google (Chrome). No separate license is required to use them.</p>
+              <span class="license-tag">Open Web Standard (W3C)</span>
+            </div>
+          </section>
+
+          <!-- Contributors -->
+          <section id="contributors" class="credits-section">
+            <div class="section-kicker">Community</div>
+            <h2>Contributors</h2>
+            <p class="lead">MacShield is a solo open-source project. Community contributions in the form of bug reports, feature suggestions, pull requests, and code review are welcomed and credited.</p>
+            <div class="grid grid-2">
+              <article class="card">
+                <h3>How contribution credit works</h3>
+                <p>All contributor credit lives in Git commit history, release notes, pull request descriptions, and changelogs. If you contributed a fix, feature, translation, or documentation improvement, your GitHub handle and contribution are recorded in the project history.</p>
+              </article>
+              <article class="card">
+                <h3>How to contribute</h3>
+                <p>Open an issue or pull request on the <a href="https://github.com/AryanVBW/MacShield" target="_blank" rel="noopener">MacShield GitHub repository</a>. Bug reports, reproducible test cases, documentation improvements, and code contributions are all valuable. Please read the contributing guidelines before opening a pull request.</p>
+              </article>
+            </div>
+          </section>
+
+          <!-- Missing attribution -->
+          <section id="missing" class="credits-section">
+            <div class="section-kicker">Corrections</div>
+            <h2>Missing or incorrect attribution</h2>
+            <p class="lead">If an attribution is missing, inaccurate, or needs updating, please open a GitHub issue with the correct details.</p>
+            <div class="note" style="font-size:16px; line-height:1.75; padding:20px 24px">
+              To report a missing or incorrect attribution, open a GitHub issue and include: <strong>(1)</strong> the project or asset name, <strong>(2)</strong> the correct owner or maintainer, <strong>(3)</strong> the applicable license, and <strong>(4)</strong> a link to where MacShield uses it. Attribution corrections are taken seriously and applied promptly.
+              <div style="margin-top:16px">
+                <a class="btn btn-secondary" style="min-height:38px; font-size:14px" href="https://github.com/AryanVBW/MacShield/issues/new" target="_blank" rel="noopener">Open a GitHub issue &rarr;</a>
+              </div>
+            </div>
+          </section>
+
+        </div><!-- /.doc-content -->
+      </div><!-- /.doc-layout -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="icon.png" alt="MacShield logo"><span>Mac<span>Shield</span></span></a>
+        <p>Thank you to the open-source maintainers and contributors who make MacShield possible.</p>
+      </div>
+      <div><h3>Product</h3><a href="docs.html">Documentation</a><a href="roadmap.html">Roadmap</a><a href="status.html">Status</a></div>
+      <div><h3>Company</h3><a href="about.html">About</a><a href="contact.html">Contact</a><a href="support.html">Help and support</a></div>
+      <div><h3>Legal</h3><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="copyright.html">Copyright</a></div>
+      <div><h3>Open source</h3><a href="credits.html">Credits</a><a href="https://github.com/AryanVBW/MacShield">GitHub</a><a href="https://github.com/AryanVBW/MacShield/issues">Issues</a></div>
+    </div>
+    <div class="wrap copyright-line">&copy; 2026 Vivek W (AryanVBW). MacShield. All rights reserved except where open-source licenses apply.</div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>
