@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		3C36B23C6F719E84D10ECE91 /* AppInactivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8AAF1355AD0ACA8137F01D /* AppInactivityService.swift */; };
+		3D85976A977E4A75B4588A85 /* WindowTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A51EC013B843FC9427AF46 /* WindowTracker.swift */; };
+		494DD162F508430D81CD793B /* BlurOverlayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2180C6B1E494AB381AC4DC8 /* BlurOverlayService.swift */; };
+		52AD74F455E74A3381483E73 /* BlurSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AA392716A04EA98D00DC45 /* BlurSettingsView.swift */; };
+		701A0124681A48D8A981345C /* BlurWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C179F14ABAA1432FBB97986D /* BlurWindowManager.swift */; };
 		A10000000000000000000001 /* MacShieldApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* MacShieldApp.swift */; };
 		A10000000000000000000002 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* Assets.xcassets */; };
 		A10000000000000000000101 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000111 /* Colors.swift */; };
@@ -54,19 +58,21 @@
 		A10000000000000000001001 /* SettingsAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000001011 /* SettingsAuthService.swift */; };
 		A10000000000000000001101 /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000001111 /* UpdateService.swift */; };
 		A10000000000000000001203 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000001202 /* Sparkle */; };
-		52AD74F455E74A3381483E73 /* BlurSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AA392716A04EA98D00DC45 /* BlurSettingsView.swift */; };
 		B4C2E538E5AA48A893605915 /* BrowserExtensionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6093E47F7B6645F992102F0D /* BrowserExtensionSettingsView.swift */; };
 		E27D2602482E4382AC28972E /* BlurContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5248A1A61D4B12957A13EF /* BlurContentView.swift */; };
-		494DD162F508430D81CD793B /* BlurOverlayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2180C6B1E494AB381AC4DC8 /* BlurOverlayService.swift */; };
-		3D85976A977E4A75B4588A85 /* WindowTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A51EC013B843FC9427AF46 /* WindowTracker.swift */; };
-		701A0124681A48D8A981345C /* BlurWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C179F14ABAA1432FBB97986D /* BlurWindowManager.swift */; };
 		E88C8154F85E451B8E8DA2A4 /* BlurredApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EFE6EB5B25A468D9E9E4D88 /* BlurredApp.swift */; };
 		MS0000000000000000000SVG /* macshield_icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = MS0000000000000000000SVR /* macshield_icon.svg */; };
+		MS00BUBBLE0000001 /* MessageBubbleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = MS00BUBBLE0000002 /* MessageBubbleScanner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		38A51EC013B843FC9427AF46 /* WindowTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowTracker.swift; sourceTree = "<group>"; };
+		49AA392716A04EA98D00DC45 /* BlurSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurSettingsView.swift; sourceTree = "<group>"; };
 		4D8AAF1355AD0ACA8137F01D /* AppInactivityService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppInactivityService.swift; sourceTree = "<group>"; };
-		A10000000000000000000010 /* MacShield.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacShield.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EFE6EB5B25A468D9E9E4D88 /* BlurredApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurredApp.swift; sourceTree = "<group>"; };
+		6093E47F7B6645F992102F0D /* BrowserExtensionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserExtensionSettingsView.swift; sourceTree = "<group>"; };
+		7A5248A1A61D4B12957A13EF /* BlurContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurContentView.swift; sourceTree = "<group>"; };
+		A10000000000000000000010 /* MacShieldPRO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacShieldPRO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000011 /* MacShieldApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacShieldApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -113,14 +119,10 @@
 		A10000000000000000000E11 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		A10000000000000000001011 /* SettingsAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAuthService.swift; sourceTree = "<group>"; };
 		A10000000000000000001111 /* UpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateService.swift; sourceTree = "<group>"; };
-		49AA392716A04EA98D00DC45 /* BlurSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurSettingsView.swift; sourceTree = "<group>"; };
-		6093E47F7B6645F992102F0D /* BrowserExtensionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserExtensionSettingsView.swift; sourceTree = "<group>"; };
-		7A5248A1A61D4B12957A13EF /* BlurContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurContentView.swift; sourceTree = "<group>"; };
-		E2180C6B1E494AB381AC4DC8 /* BlurOverlayService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurOverlayService.swift; sourceTree = "<group>"; };
-		38A51EC013B843FC9427AF46 /* WindowTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowTracker.swift; sourceTree = "<group>"; };
 		C179F14ABAA1432FBB97986D /* BlurWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurWindowManager.swift; sourceTree = "<group>"; };
-		4EFE6EB5B25A468D9E9E4D88 /* BlurredApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurredApp.swift; sourceTree = "<group>"; };
+		E2180C6B1E494AB381AC4DC8 /* BlurOverlayService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurOverlayService.swift; sourceTree = "<group>"; };
 		MS0000000000000000000SVR /* macshield_icon.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = macshield_icon.svg; sourceTree = "<group>"; };
+		MS00BUBBLE0000002 /* MessageBubbleScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleScanner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,7 +181,7 @@
 		A10000000000000000000034 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000010 /* MacShield.app */,
+				A10000000000000000000010 /* MacShieldPRO.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -206,6 +208,7 @@
 				A10000000000000000000A11 /* IdleMonitorService.swift */,
 				A10000000000000000000B11 /* SleepWakeService.swift */,
 				A10000000000000000000C11 /* WatchProximityService.swift */,
+				MS00BUBBLE0000002 /* MessageBubbleScanner.swift */,
 				4D8AAF1355AD0ACA8137F01D /* AppInactivityService.swift */,
 				A10000000000000000001011 /* SettingsAuthService.swift */,
 				A10000000000000000001111 /* UpdateService.swift */,
@@ -355,7 +358,7 @@
 				A10000000000000000001202 /* Sparkle */,
 			);
 			productName = MacShield;
-			productReference = A10000000000000000000010 /* MacShield.app */;
+			productReference = A10000000000000000000010 /* MacShieldPRO.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -366,7 +369,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					A10000000000000000000040 = {
 						CreatedOnToolsVersion = 15.0;
@@ -462,6 +465,7 @@
 				A10000000000000000000E01 /* AboutView.swift in Sources */,
 				3C36B23C6F719E84D10ECE91 /* AppInactivityService.swift in Sources */,
 				A10000000000000000001001 /* SettingsAuthService.swift in Sources */,
+				MS00BUBBLE0000001 /* MessageBubbleScanner.swift in Sources */,
 				A10000000000000000001101 /* UpdateService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -503,6 +507,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -526,6 +531,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -565,6 +571,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -581,6 +588,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -594,6 +602,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MacShield/Resources/Info.plist;
@@ -603,9 +612,9 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macshield.app;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = MacShieldPRO;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -621,6 +630,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MacShield/Resources/Info.plist;
@@ -630,10 +640,9 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macshield.app;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRIP_INSTALLED_PRODUCT = YES;
+				PRODUCT_NAME = MacShieldPRO;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
