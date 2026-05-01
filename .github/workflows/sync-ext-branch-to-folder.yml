@@ -1,0 +1,43 @@
+name: Sync chrome-extension branch → BrowserExtensions folder
+
+on:
+  push:
+    branches: [chrome-extension]
+
+jobs:
+  sync:
+    if: "!contains(github.event.head_commit.message, '[skip sync]')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout chrome-extension branch into temp dir
+        uses: actions/checkout@v4
+        with:
+          ref: chrome-extension
+          path: _ext_branch
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync files into BrowserExtensions/chrome-extension/
+        run: |
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='.DS_Store' \
+            _ext_branch/ BrowserExtensions/chrome-extension/
+          rm -rf _ext_branch
+
+      - name: Commit and push to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add BrowserExtensions/chrome-extension/
+          git diff --cached --quiet && echo "No changes to sync." || ( \
+            git commit -m "sync: chrome-extension branch → BrowserExtensions/chrome-extension/ [skip sync]" && \
+            git push origin main \
+          )
