@@ -17,6 +17,12 @@
   <a href="https://github.com/AryanVBW/MacShield/releases/latest"><img src="https://img.shields.io/github/v/release/AryanVBW/MacShield?style=flat-square&label=release" alt="Release"></a>
 </p>
 
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie">
+    <img src="https://img.shields.io/badge/Chrome%20Web%20Store-MacShield%20Extension-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store">
+  </a>
+</p>
+
 ---
 
 ## What is MacShield?
@@ -80,8 +86,9 @@ Unlike sandboxed App Store alternatives, MacShield is distributed directly, givi
 - Works alongside app locking or as a standalone privacy layer
 
 ### 🌐 Browser Extension
-- **Chrome extension** that blurs sensitive web content
-- Pairs with MacShield for comprehensive browser privacy
+- **Chrome extension** — lock and blur any website with Touch ID or password
+- Supports WhatsApp, Gmail, Discord, Slack, Telegram, Instagram, and more
+- **[Install from Chrome Web Store](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie)**
 
 ### 🚨 Safety Systems
 - **Panic key** — `Cmd+Option+Shift+Control+U` instantly dismisses all overlays
@@ -122,6 +129,24 @@ open MacShield.xcodeproj
 ```
 
 Press `Cmd+R` to build and run. Requires **Xcode 15+** and **macOS 13+**.
+
+---
+
+## Chrome Extension
+
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie">
+    <img src="https://img.shields.io/badge/Available%20on-Chrome%20Web%20Store-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Available on Chrome Web Store">
+  </a>
+</p>
+
+The MacShield Chrome extension brings browser-level privacy protection — lock any website behind a password and blur sensitive web content. Works independently or alongside the macOS app.
+
+**Supported sites (blur):** WhatsApp Web, Gmail, Discord, Slack, Telegram, Instagram, Messenger, X/Twitter, LinkedIn, Outlook, Teams
+
+**[→ Install MacShield Extension](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie)**
+
+Source: [`BrowserExtensions/chrome-extension/`](BrowserExtensions/chrome-extension/)
 
 ---
 
@@ -168,7 +193,7 @@ MacShield/
   Models/           AppSettings, ProtectedApp, BlurredApp, AuthMethod, LockSession
   Resources/        Assets, Info.plist, Entitlements
 BrowserExtensions/
-  Chrome/           Manifest, content script, blur CSS, popup UI
+  chrome-extension/ Chrome Web Store extension (v3.1.0)
 ```
 
 **Key frameworks:** SwiftUI, AppKit, LocalAuthentication, CoreBluetooth, IOKit, ServiceManagement, Sparkle 2
@@ -217,10 +242,6 @@ If MacShield is useful to you, a ⭐ star goes a long way — it helps others di
 
 ---
 
-<br>
-
----
-
 ## 🙏 Special Thanks & Credits
 
 <p align="center">
@@ -229,18 +250,9 @@ If MacShield is useful to you, a ⭐ star goes a long way — it helps others di
   </a>
 </p>
 
-MacShield stands on the shoulders of something exceptional.
+MacShield is built directly on the foundation of **[MakLock](https://github.com/dutkiewiczmaciej/MakLock)** by **[Maciej Dutkiewicz](https://github.com/dutkiewiczmaciej)** — an exceptional open-source project that solved true app locking on macOS without sandboxing limitations. The core services (app monitoring, authentication, overlay system, Watch proximity, sleep/wake, idle detection, safety systems) all originate from MakLock's architecture. MacShield extends this with the Chat Blur overlay and Chrome extension.
 
-**[MakLock](https://github.com/dutkiewiczmaciej/MakLock)** by **[Maciej Dutkiewicz](https://github.com/dutkiewiczmaciej)** is one of those rare open-source projects that makes you stop and think: *"Why didn't this exist before?"* Clean architecture. Thoughtful design. Every edge case considered — the NSPanel overlay that never steals focus, the Apple Watch wrist detection via Continuity packets, the panic key, the safety blacklist. These aren't afterthoughts; they're the product of someone who genuinely cares about getting the details right.
-
-MakLock solved a real problem that paid alternatives had fumbled for years: **true app locking on macOS**, without sandboxing limitations, without subscription paywalls, without compromising on reliability. It's the kind of codebase you read and feel grateful for — because it shows what free, open-source software can be when it's built with craftsmanship.
-
-MacShield is built directly on MakLock's foundation. The core services — app monitoring, authentication, overlay system, Watch proximity, sleep/wake handling, idle detection, safety systems — all originate from MakLock's elegant architecture. MacShield extends this with additional features like the Chat Blur overlay and Chrome extension, but the heart of this project beats because of Maciej's work.
-
-**MakLock is MIT licensed.** Full copyright notice and permission text are preserved in [LICENSE](LICENSE) as required.
-
-> *"If I have seen further, it is by standing on the shoulders of giants."*  
-> MacShield exists because MakLock was built with the kind of generosity that makes open source worth believing in.
+**MakLock is MIT licensed.** Full copyright notice is preserved in [LICENSE](LICENSE).
 
 **⭐ Please go star [MakLock](https://github.com/dutkiewiczmaciej/MakLock) — it deserves every one of them.**
 

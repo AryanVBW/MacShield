@@ -1,3 +1,4 @@
+#if !APP_STORE
 import Foundation
 import Sparkle
 import UserNotifications
@@ -62,3 +63,4 @@ final class UpdateService: NSObject, SPUStandardUserDriverDelegate {
         UNUserNotificationCenter.current().add(request)
     }
 }
+#endif

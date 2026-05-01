@@ -76,9 +76,11 @@ struct GeneralSettingsView: View {
             }
 
             Section {
+#if !APP_STORE
                 Button("Check for Updates…") {
                     UpdateService.shared.updater.checkForUpdates()
                 }
+#endif
 
                 HStack(spacing: 8) {
                     Text("MacShield \(version) (\(build))  ·  Open Source Privacy")

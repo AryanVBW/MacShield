@@ -129,7 +129,8 @@ final class BlurOverlayService: ObservableObject {
             // Re-check that the app is still frontmost after the delay
             guard NSWorkspace.shared.frontmostApplication?.processIdentifier == pid else { return }
             let settings = Defaults.shared.appSettings
-            _ = BlurWindowManager.shared.createOverlay(for: app, settings: settings, insets: insets)
+            let mode = config?.blurMode ?? .perMessageBubble
+            _ = BlurWindowManager.shared.createOverlay(for: app, settings: settings, insets: insets, blurMode: mode)
             self.activeBlurPID = pid
         }
 

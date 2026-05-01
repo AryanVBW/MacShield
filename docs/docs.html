@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MacShield Documentation</title>
+  <meta name="description" content="Install, configure, troubleshoot, and understand MacShield for macOS and the MacShield browser extension.">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img src="icon.png" alt=""><span>Mac<span>Shield</span></span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a aria-current="page" href="docs.html">Docs</a></li>
+        <li><a href="support.html">Support</a></li>
+        <li><a href="credits.html">Credits</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light and dark theme">Theme</button>
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="Open menu" aria-expanded="false">Menu</button>
+        <a class="btn btn-primary btn-small" href="https://github.com/AryanVBW/MacShield/releases/latest">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header class="page-hero wrap">
+      <div class="eyebrow"><span class="dot"></span> Complete product guide</div>
+      <h1>MacShield Documentation</h1>
+      <p>Everything needed to install, configure, audit, troubleshoot, and contribute to MacShield. The docs cover both the native macOS app and the browser privacy extension.</p>
+      <div class="pill-row">
+        <span class="pill">macOS 13+</span><span class="pill">SwiftUI</span><span class="pill">Chrome MV3</span><span class="pill">MIT licensed</span><span class="pill">Last updated April 28, 2026</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="wrap doc-layout">
+        <aside class="doc-sidebar" aria-label="Documentation sections">
+          <a href="#quick-start">Quick start</a>
+          <a href="#installation">Installation</a>
+          <a href="#setup">macOS setup</a>
+          <a href="#browser-extension">Browser extension</a>
+          <a href="#permissions">Permissions</a>
+          <a href="#examples">Examples</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#reference">Reference</a>
+          <a href="#troubleshooting">Troubleshooting</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contributing">Contributing</a>
+          <a href="#changelog">Changelog</a>
+        </aside>
+
+        <div class="doc-content">
+          <section id="quick-start" class="doc-section">
+            <h2>Quick Start</h2>
+            <p>MacShield is split into a native macOS menu bar app and an optional Chrome extension. Start with the app if you want to protect local macOS applications. Add the extension if you also want browser chat blur and website locks.</p>
+            <div class="note"><strong>Recommended path:</strong> Install the macOS app, grant permissions, choose one low-risk app to test, verify unlock behavior, then add more protected apps after the workflow feels reliable.</div>
+            <ol>
+              <li>Download the latest release from GitHub.</li>
+              <li>Move MacShield to Applications and launch it.</li>
+              <li>Complete onboarding and create a backup password.</li>
+              <li>Grant Accessibility permission so MacShield can detect protected app activations.</li>
+              <li>Add one app to the protected list and confirm the overlay appears before content is visible.</li>
+              <li>Optional: enable Touch ID, Apple Watch proximity, idle lock, sleep lock, and browser privacy.</li>
+            </ol>
+          </section>
+
+          <section id="installation" class="doc-section">
+            <h2>Installation</h2>
+            <h3>Download release</h3>
+            <p>Use the signed release when available. Open the DMG, drag MacShield into Applications, then launch from Applications or Spotlight.</p>
+            <p><a href="https://github.com/AryanVBW/MacShield/releases/latest">Download latest release</a></p>
+            <h3>Build from source</h3>
+            <pre><code>git clone https://github.com/AryanVBW/MacShield.git
+cd MacShield
+open MacShield.xcodeproj</code></pre>
+            <p>Build with Xcode 15 or newer on macOS 13 or newer. The app uses SwiftUI, AppKit, LocalAuthentication, CoreBluetooth, IOKit, ServiceManagement, Sparkle, and HotKey.</p>
+            <h3>Requirements</h3>
+            <table>
+              <tr><th>Requirement</th><th>Purpose</th></tr>
+              <tr><td>macOS 13 Ventura or newer</td><td>Base runtime target for the native app.</td></tr>
+              <tr><td>Xcode 15 or newer</td><td>Required when building from source.</td></tr>
+              <tr><td>Touch ID capable Mac</td><td>Recommended for fastest unlock. Password fallback is available.</td></tr>
+              <tr><td>Apple Watch</td><td>Optional proximity unlock and relock behavior.</td></tr>
+              <tr><td>Chrome or Chromium browser</td><td>Required only for the browser extension.</td></tr>
+            </table>
+          </section>
+
+          <section id="setup" class="doc-section">
+            <h2>macOS Setup</h2>
+            <h3>1. Create a backup password</h3>
+            <p>The backup password is stored in the macOS Keychain and is used when biometric authentication is unavailable or disabled.</p>
+            <h3>2. Grant Accessibility</h3>
+            <p>Open System Settings, then Privacy and Security, then Accessibility. Enable MacShield. Without this permission, MacShield cannot reliably detect app launches and switches.</p>
+            <h3>3. Choose protected apps</h3>
+            <p>Use the app picker to add apps that should require authentication. Start small: test with a non-critical app before protecting messaging, finance, or developer tools.</p>
+            <h3>4. Enable authentication methods</h3>
+            <ul>
+              <li><strong>Touch ID:</strong> handled by Apple's LocalAuthentication framework.</li>
+              <li><strong>Password:</strong> stored and verified through the macOS Keychain.</li>
+              <li><strong>Apple Watch:</strong> uses Bluetooth proximity signals and wrist detection where available.</li>
+            </ul>
+            <h3>5. Configure automation</h3>
+            <p>Auto-lock on idle, lock on sleep, lock when Apple Watch leaves range, and auto-close inactive protected apps are optional. Enable only the behaviors that match your workflow.</p>
+          </section>
+
+          <section id="browser-extension" class="doc-section">
+            <h2>Browser Extension</h2>
+            <p>The Chrome extension adds two browser-focused protections: privacy blur for supported web apps and a website lock for custom domains.</p>
+            <h3>Install unpacked extension</h3>
+            <ol>
+              <li>Open <code>chrome://extensions/</code>.</li>
+              <li>Enable Developer mode.</li>
+              <li>Select Load unpacked.</li>
+              <li>Choose <code>BrowserExtensions/chrome-extension</code>.</li>
+              <li>Pin MacShield from the Chrome toolbar.</li>
+            </ol>
+            <h3>Supported blur platforms</h3>
+            <p>WhatsApp, Instagram, Telegram, Messenger, Discord, Slack, X/Twitter, LinkedIn, Gmail, Outlook, Teams, Facebook, Signal, and Element are covered by the extension's content script and CSS rules.</p>
+            <h3>Website Lock</h3>
+            <p>Set a master password, then add any domain such as <code>github.com</code> or <code>notion.so</code>. The lock guard runs at <code>document_start</code> and hides the page until password or biometric verification succeeds.</p>
+            <h3>Storage model</h3>
+            <ul>
+              <li><code>chrome.storage.local</code> stores extension preferences, locked site configuration, password hash, password salt, and biometric credential references.</li>
+              <li><code>chrome.storage.session</code> stores unlocked hostnames for the current browser session and clears when Chrome closes.</li>
+              <li>Message content is not read or stored. Blur is applied with CSS filters.</li>
+            </ul>
+          </section>
+
+          <section id="permissions" class="doc-section">
+            <h2>Permissions</h2>
+            <table>
+              <tr><th>Permission</th><th>Used by</th><th>Why it is needed</th></tr>
+              <tr><td>Accessibility</td><td>macOS app</td><td>Detect app launches, activations, and switches for protected apps.</td></tr>
+              <tr><td>Screen Recording</td><td>macOS app</td><td>Support privacy blur overlays for visible chat content.</td></tr>
+              <tr><td>Bluetooth</td><td>macOS app</td><td>Detect Apple Watch proximity and wrist state signals.</td></tr>
+              <tr><td>Notifications</td><td>macOS app</td><td>Show update and unlock status messages.</td></tr>
+              <tr><td>Chrome storage</td><td>Extension</td><td>Persist local preferences, password hash, and locked site settings.</td></tr>
+              <tr><td>Chrome tabs</td><td>Extension</td><td>Coordinate lock state across tabs for the same hostname.</td></tr>
+              <tr><td>All URLs</td><td>Extension</td><td>Allow user-selected website locks on any domain before page content renders.</td></tr>
+            </table>
+          </section>
+
+          <section id="examples" class="doc-section">
+            <h2>Examples</h2>
+            <h3>Protect Messages and Mail</h3>
+            <ol>
+              <li>Add Messages and Mail in the protected app picker.</li>
+              <li>Enable Touch ID and password fallback.</li>
+              <li>Turn on lock on sleep and idle lock after 5 minutes.</li>
+              <li>Test by switching away, waiting, then returning to Messages.</li>
+            </ol>
+            <h3>Protect work browser tools</h3>
+            <ol>
+              <li>Install the extension.</li>
+              <li>Set a master password.</li>
+              <li>Add domains such as <code>github.com</code>, <code>linear.app</code>, or <code>notion.so</code>.</li>
+              <li>Enable auto-relock if you want a protected site to lock whenever you leave its tab.</li>
+            </ol>
+            <h3>Blur chat during screen sharing</h3>
+            <ol>
+              <li>Enable browser blur on Slack, Gmail, or WhatsApp Web.</li>
+              <li>Set blur intensity to Medium or Deep.</li>
+              <li>Use hover or selection reveal only when you are actively reading.</li>
+            </ol>
+          </section>
+
+          <section id="architecture" class="doc-section">
+            <h2>Architecture</h2>
+            <p>MacShield uses a focused service architecture so app monitoring, authentication, overlays, updates, watch proximity, and browser controls can evolve independently.</p>
+            <pre><code>MacShield/
+  App/              App entry, AppDelegate, lifecycle wiring
+  Core/
+    Managers/       ProtectedAppsManager, SafetyManager
+    Services/       App monitor, auth, overlays, blur, idle, sleep, watch, updates
+    Storage/        UserDefaults wrapper, Keychain manager
+  UI/               Menu bar, settings, onboarding, picker, overlay, components
+  Models/           App settings, protected apps, blur config, lock sessions
+BrowserExtensions/
+  chrome-extension/ Manifest V3 extension with lock, blur, popup, auth pages
+docs/               Static website, documentation, legal, support, status</code></pre>
+            <p>The native app is distributed outside the Mac App Store because sandboxing would prevent reliable app activation interception and multi-monitor overlay behavior.</p>
+          </section>
+
+          <section id="reference" class="doc-section">
+            <h2>Reference</h2>
+            <h3>Important macOS services</h3>
+            <table>
+              <tr><th>Service</th><th>Responsibility</th></tr>
+              <tr><td><code>AppMonitorService</code></td><td>Observes protected app launches, activations, deactivations, and terminations.</td></tr>
+              <tr><td><code>OverlayWindowService</code></td><td>Creates lock overlays across displays.</td></tr>
+              <tr><td><code>AuthenticationService</code></td><td>Coordinates Touch ID and password authentication.</td></tr>
+              <tr><td><code>WatchProximityService</code></td><td>Tracks Apple Watch proximity and lock state.</td></tr>
+              <tr><td><code>BlurOverlayService</code></td><td>Manages native chat blur behavior.</td></tr>
+              <tr><td><code>UpdateService</code></td><td>Handles Sparkle update checks and notifications.</td></tr>
+            </table>
+            <h3>Extension storage keys</h3>
+            <table>
+              <tr><th>Key</th><th>Purpose</th></tr>
+              <tr><td><code>ms_password_hash</code></td><td>Salted SHA-256 password hash.</td></tr>
+              <tr><td><code>ms_password_salt</code></td><td>Random salt used for password verification.</td></tr>
+              <tr><td><code>ms_locked_sites</code></td><td>Object of hostnames selected for Website Lock.</td></tr>
+              <tr><td><code>ms_blur_level</code></td><td>Blur strength preference.</td></tr>
+              <tr><td><code>ms_hide_mode</code></td><td>Hide content instead of applying blur.</td></tr>
+              <tr><td><code>unlockedSites</code></td><td>Session-only list of unlocked hostnames.</td></tr>
+            </table>
+          </section>
+
+          <section id="troubleshooting" class="doc-section">
+            <h2>Troubleshooting</h2>
+            <h3>Protected app does not lock</h3>
+            <ul>
+              <li>Confirm MacShield is running in the menu bar.</li>
+              <li>Re-enable Accessibility permission in System Settings.</li>
+              <li>Remove and re-add the app from the protected list.</li>
+              <li>Quit and relaunch the protected app to test launch detection.</li>
+            </ul>
+            <h3>Touch ID is unavailable</h3>
+            <ul>
+              <li>Confirm Touch ID works in macOS System Settings.</li>
+              <li>Use the backup password to unlock.</li>
+              <li>Restart MacShield if the LocalAuthentication prompt does not appear.</li>
+            </ul>
+            <h3>Apple Watch unlock feels inconsistent</h3>
+            <ul>
+              <li>Confirm Bluetooth is enabled and permission is granted.</li>
+              <li>Wear the watch unlocked on your wrist.</li>
+              <li>Adjust the RSSI threshold so unlock distance matches your desk setup.</li>
+            </ul>
+            <h3>Extension blur does not apply</h3>
+            <ul>
+              <li>Reload the supported website after enabling blur.</li>
+              <li>Confirm the site appears in the supported platform list.</li>
+              <li>Disable other extensions temporarily to rule out CSS conflicts.</li>
+              <li>Use Alt + X to confirm the content script is responding.</li>
+            </ul>
+          </section>
+
+          <section id="faq" class="doc-section">
+            <h2>FAQ</h2>
+            <div class="faq">
+              <details><summary>Can MacShield recover my browser extension password?</summary><p>No. The extension stores only a salted hash. If the password is lost, remove and reinstall the extension to reset local state.</p></details>
+              <details><summary>Does the native app upload protected app names?</summary><p>No. MacShield does not include telemetry or a backend account system. Protected app choices remain local.</p></details>
+              <details><summary>Can I protect Terminal or Activity Monitor?</summary><p>Critical system tools may be blocked by the safety system to prevent lockouts and recovery problems.</p></details>
+              <details><summary>Does the extension work in Incognito?</summary><p>Only if you explicitly enable the extension in Incognito from Chrome extension settings.</p></details>
+            </div>
+          </section>
+
+          <section id="contributing" class="doc-section">
+            <h2>Contributing</h2>
+            <p>Open an issue before large changes. Small fixes, documentation improvements, selector updates for supported websites, and accessibility improvements are welcome.</p>
+            <ul>
+              <li>Keep changes scoped and explain the user-visible behavior.</li>
+              <li>Do not weaken privacy guarantees or add analytics.</li>
+              <li>Document any new permission, dependency, network request, or third-party service.</li>
+              <li>Credit upstream projects and preserve license notices.</li>
+            </ul>
+            <p><a href="https://github.com/AryanVBW/MacShield/issues">Open a GitHub issue</a></p>
+          </section>
+
+          <section id="changelog" class="doc-section">
+            <h2>Changelog</h2>
+            <div class="timeline">
+              <article class="card"><h3>April 28, 2026 - Website and docs refresh</h3><p>Rebuilt the static website, landing page, documentation, support, legal, credits, roadmap, and status pages.</p></article>
+              <article class="card"><h3>Version 3.1 - Browser lock and blur docs</h3><p>Documented browser extension behavior, Touch ID via WebAuthn, website lock, storage keys, and permission rationale.</p></article>
+              <article class="card"><h3>Version 1.0.2 - macOS app release feed</h3><p>Appcast lists the latest native app update package for Sparkle-based updates.</p></article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div><a class="brand" href="index.html"><img src="icon.png" alt=""><span>Mac<span>Shield</span></span></a><p>Documentation for the macOS app and browser privacy extension.</p></div>
+      <div><h3>Product</h3><a href="docs.html">Documentation</a><a href="roadmap.html">Roadmap</a><a href="status.html">Status</a></div>
+      <div><h3>Company</h3><a href="about.html">About</a><a href="contact.html">Contact</a><a href="support.html">Help and support</a></div>
+      <div><h3>Legal</h3><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="copyright.html">Copyright</a></div>
+      <div><h3>Open source</h3><a href="credits.html">Credits</a><a href="https://github.com/AryanVBW/MacShield">GitHub</a><a href="https://github.com/AryanVBW/MacShield/issues">Issues</a></div>
+    </div>
+    <div class="wrap copyright-line">&copy; 2026 Vivek W (AryanVBW). MacShield. All rights reserved except where open-source licenses apply.</div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

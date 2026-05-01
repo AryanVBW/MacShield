@@ -1,5 +1,23 @@
 import Foundation
 
+// MARK: - Blur Mode
+
+/// Controls whether MacShield blurs the whole chat content area or only individual message bubbles.
+enum BlurMode: String, Codable, Hashable, CaseIterable {
+    /// Blur the entire chat pane (original behaviour).
+    case fullChatArea
+    /// Walk the Accessibility tree and blur only individual message-row elements.
+    /// Falls back to `fullChatArea` if no elements are found.
+    case perMessageBubble
+
+    var displayName: String {
+        switch self {
+        case .fullChatArea:   return "Full Chat Area"
+        case .perMessageBubble: return "Message Bubbles Only"
+        }
+    }
+}
+
 /// An application that the user has chosen to blur with MacShield's Chat Blur.
 struct BlurredApp: Codable, Identifiable, Hashable {
     /// Unique identifier for this entry.
@@ -19,18 +37,23 @@ struct BlurredApp: Codable, Identifiable, Hashable {
     /// Values in points; 0 = blur starts at the window edge.
     var contentInsets: ContentInsets
 
+    /// Whether to blur the full chat pane or only per-message-bubble elements (via AX scan).
+    var blurMode: BlurMode
+
     init(
         id: UUID = UUID(),
         bundleIdentifier: String,
         name: String,
         isEnabled: Bool = true,
-        contentInsets: ContentInsets = .none
+        contentInsets: ContentInsets = .none,
+        blurMode: BlurMode = .perMessageBubble
     ) {
         self.id = id
         self.bundleIdentifier = bundleIdentifier
         self.name = name
         self.isEnabled = isEnabled
         self.contentInsets = contentInsets
+        self.blurMode = blurMode
     }
 
     /// Default chat apps that can be blurred, with per-app content insets.
@@ -38,45 +61,55 @@ struct BlurredApp: Codable, Identifiable, Hashable {
     /// Insets are tuned so only the chat/content area is blurred.
     /// The sidebar, server list, toolbar, and title bar stay unblurred.
     static let defaultApps: [BlurredApp] = [
-        // Discord: 72px server icon rail + 240px channels sidebar = 312 left; 48px top toolbar
+        // Discord — bubble mode; fallback insets guard sidebar area
         BlurredApp(bundleIdentifier: "com.hnc.Discord", name: "Discord",
-                   contentInsets: ContentInsets(top: 48, left: 72, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 48, left: 72, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Slack: ~260px sidebar; ~38px top toolbar
+        // Slack — bubble mode
         BlurredApp(bundleIdentifier: "com.tinyspeck.slackmacgap", name: "Slack",
-                   contentInsets: ContentInsets(top: 38, left: 260, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 38, left: 260, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // WhatsApp: ~320px sidebar; ~56px top toolbar
+        // WhatsApp — bubble mode
         BlurredApp(bundleIdentifier: "net.whatsapp.WhatsApp", name: "WhatsApp",
-                   contentInsets: ContentInsets(top: 56, left: 320, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 56, left: 320, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Telegram: ~310px sidebar; ~56px top toolbar
+        // Telegram — bubble mode
         BlurredApp(bundleIdentifier: "ru.keepcoder.Telegram", name: "Telegram",
-                   contentInsets: ContentInsets(top: 56, left: 310, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 56, left: 310, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Messages: ~280px sidebar; ~52px top toolbar
+        // Messages — bubble mode
         BlurredApp(bundleIdentifier: "com.apple.MobileSMS", name: "Messages",
-                   contentInsets: ContentInsets(top: 52, left: 280, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 52, left: 280, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Messenger: ~280px sidebar; ~56px top toolbar
+        // Messenger — bubble mode
         BlurredApp(bundleIdentifier: "com.facebook.archon", name: "Messenger",
-                   contentInsets: ContentInsets(top: 56, left: 280, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 56, left: 280, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Teams: ~260px sidebar; ~48px top toolbar
+        // Teams — bubble mode
         BlurredApp(bundleIdentifier: "com.microsoft.teams2", name: "Teams",
-                   contentInsets: ContentInsets(top: 48, left: 260, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 48, left: 260, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Zoom: full blur (chat is mixed with video UI)
+        // Zoom — full area blur (chat is mixed with video UI)
         BlurredApp(bundleIdentifier: "us.zoom.xos", name: "Zoom",
-                   contentInsets: .none),
+                   contentInsets: .none,
+                   blurMode: .fullChatArea),
 
-        // Skype: ~260px sidebar; ~52px top toolbar
+        // Skype — bubble mode
         BlurredApp(bundleIdentifier: "com.skype.skype", name: "Skype",
-                   contentInsets: ContentInsets(top: 52, left: 260, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 52, left: 260, bottom: 0, right: 0),
+                   blurMode: .perMessageBubble),
 
-        // Spark Mail: ~240px sidebar; ~44px top toolbar
+        // Spark Mail — full area blur (email layout)
         BlurredApp(bundleIdentifier: "com.readdle.smartemail-macos", name: "Spark Mail",
-                   contentInsets: ContentInsets(top: 44, left: 240, bottom: 0, right: 0)),
+                   contentInsets: ContentInsets(top: 44, left: 240, bottom: 0, right: 0),
+                   blurMode: .fullChatArea),
     ]
 }
 

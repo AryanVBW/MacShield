@@ -1,34 +1,48 @@
 import AppKit
 
-/// Manages blur overlay windows — one per blurred app window.
+/// Manages blur overlay windows for MacShield.
 ///
-/// Each overlay is a borderless, transparent NSPanel positioned over the
-/// target app's **content area** (inset from sidebar, toolbar, etc.).
-/// Clicks pass through to the app beneath (ignoresMouseEvents = true).
+/// Supports two blur modes:
 ///
-/// Content-area blurring:
-/// - Each BlurredApp carries ContentInsets (top, left, bottom, right).
-/// - The overlay panel is sized to cover only the region INSIDE those insets,
-///   so the sidebar, toolbar, and window chrome remain fully visible.
+/// **Full Chat Area (`.fullChatArea`):**
+///   One `NSPanel` overlay per target app, covering the inset content area.
+///   (Original behaviour — always active as fallback.)
 ///
-/// Background blur prevention:
-/// - Overlays are removed on app deactivation via BlurOverlayService.
-/// - As a safety net, the refresh timer also removes overlays whose
-///   owner app is no longer frontmost.
+/// **Per-Message Bubble (`.perMessageBubble`):**
+///   Uses `MessageBubbleScanner` to find individual message row frames via the
+///   Accessibility API, then creates one small `NSPanel` per bubble.
+///   Falls back to full-area mode if the scanner returns 0 frames.
+///
+/// Clicks always pass through to the app beneath (`ignoresMouseEvents = true`).
 final class BlurWindowManager {
     static let shared = BlurWindowManager()
 
-    /// Active overlay windows keyed by target app PID.
+    // MARK: - State
+
+    /// Active full-area overlay windows keyed by target app PID.
     private(set) var overlayWindows: [pid_t: NSPanel] = [:]
 
-    /// Active blur content views keyed by target app PID.
+    /// Blur content views for full-area overlays.
     private(set) var blurViews: [pid_t: BlurContentView] = [:]
+
+    /// Per-bubble overlay pool keyed by target app PID.
+    /// Each PID maps to an array of (panel, blurView) pairs.
+    private var bubblePanels: [pid_t: [(NSPanel, BlurContentView)]] = [:]
 
     /// Cached running app references for position polling.
     private var trackedApps: [pid_t: NSRunningApplication] = [:]
 
     /// Stored content insets per PID, used on every reposition.
     private var contentInsets: [pid_t: BlurredApp.ContentInsets] = [:]
+
+    /// Blur mode per PID.
+    private var blurModes: [pid_t: BlurMode] = [:]
+
+    /// Bundle ID per PID (needed for the scanner).
+    private var bundleIDs: [pid_t: String] = [:]
+
+    /// Latest app settings (blur radius, reveal, etc.)
+    private var latestSettings: AppSettings?
 
     /// Refresh timer for continuous overlay position + reveal updates.
     private var refreshTimer: Timer?
@@ -45,6 +59,9 @@ final class BlurWindowManager {
     /// Minimum cursor displacement (points) before the event monitor fires an extra update.
     private let cursorMoveThreshold: CGFloat = 2.0
 
+    /// Counter used to throttle AX scans (scan every 4th timer tick ≈ 7 fps).
+    private var timerTickCount: Int = 0
+
     /// Window level: one below .screenSaver (1000) — above all normal apps and floating panels.
     private let overlayWindowLevel = NSWindow.Level(rawValue: 999)
 
@@ -52,38 +69,181 @@ final class BlurWindowManager {
 
     // MARK: - Create / Update Overlays
 
-    /// Create a blur overlay for the given app's content area.
-    ///
-    /// - Parameters:
-    ///   - app: The running application to blur.
-    ///   - settings: Global blur settings (intensity, reveal, feather, etc.).
-    ///   - insets: Content insets that restrict the blur to the chat area only.
+    /// Create a blur overlay (full-area or per-bubble) for the given app.
     func createOverlay(
         for app: NSRunningApplication,
         settings: AppSettings,
-        insets: BlurredApp.ContentInsets = .none
+        insets: BlurredApp.ContentInsets = .none,
+        blurMode: BlurMode = .perMessageBubble
     ) -> NSPanel? {
         let pid = app.processIdentifier
 
         // Don't create duplicate overlays
-        if overlayWindows[pid] != nil {
+        if overlayWindows[pid] != nil || bubblePanels[pid] != nil {
             updateOverlayPosition(for: app)
             return overlayWindows[pid]
         }
 
-        // Get the full window frame first
+        latestSettings = settings
+        trackedApps[pid] = app
+        contentInsets[pid] = insets
+        blurModes[pid] = blurMode
+        bundleIDs[pid] = app.bundleIdentifier ?? ""
+
+        if blurMode == .perMessageBubble {
+            // Attempt bubble scan; fall back to full-area if empty
+            let frames = MessageBubbleScanner.shared.scan(pid: pid, bundleID: app.bundleIdentifier ?? "")
+            if !frames.isEmpty {
+                applyBubbleOverlays(pid: pid, frames: frames, settings: settings, animate: true)
+                NSLog("[MacShield] Bubble overlay created for %@ (pid %d) — %d bubbles",
+                      app.localizedName ?? "?", pid, frames.count)
+            } else {
+                NSLog("[MacShield] Bubble scan returned 0 frames for %@ — falling back to full-area", app.localizedName ?? "?")
+                return createFullAreaOverlay(for: app, settings: settings, insets: insets)
+            }
+        } else {
+            return createFullAreaOverlay(for: app, settings: settings, insets: insets)
+        }
+
+        // Observe AX window move/resize to trigger a re-scan
+        WindowTracker.shared.observeWindowChanges(for: app) { [weak self] _ in
+            self?.syncBubbleOverlays(pid: pid)
+        }
+
+        startMouseMonitoring()
+        startRefreshTimer()
+
+        return nil
+    }
+
+    // MARK: - Full-Area Overlay (Private)
+
+    @discardableResult
+    private func createFullAreaOverlay(
+        for app: NSRunningApplication,
+        settings: AppSettings,
+        insets: BlurredApp.ContentInsets
+    ) -> NSPanel? {
+        let pid = app.processIdentifier
+
         guard let fullFrame = WindowTracker.shared.getBoundingFrame(for: app)
                 ?? WindowTracker.shared.getWindowFrame(for: app) else {
             NSLog("[MacShield] Cannot get window frame for %@", app.bundleIdentifier ?? "unknown")
             return nil
         }
 
-        // Apply content insets to only blur the chat area
         let contentFrame = applyInsets(insets, to: fullFrame)
-        let appKitFrame = convertToAppKitCoordinates(contentFrame)
+        let panel = makeBlurPanel(frame: convertToAppKitCoordinates(contentFrame), settings: settings)
+        let blurView = panel.contentView as! BlurContentView
 
+        showPanel(panel, animated: settings.blurAnimatesIn)
+
+        overlayWindows[pid] = panel
+        blurViews[pid] = blurView
+
+        WindowTracker.shared.observeWindowChanges(for: app) { [weak self] newFrame in
+            guard let self else { return }
+            let insetFrame = self.applyInsets(insets, to: newFrame)
+            self.repositionOverlay(pid: pid, to: insetFrame)
+        }
+
+        startMouseMonitoring()
+        startRefreshTimer()
+
+        // Delayed re-query for Catalyst apps
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in self?.syncOverlayPosition(pid: pid) }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6)  { [weak self] in self?.syncOverlayPosition(pid: pid) }
+
+        NSLog("[MacShield] Full-area overlay created for %@ (pid %d)", app.localizedName ?? "?", pid)
+        return panel
+    }
+
+    // MARK: - Bubble Panel Pool
+
+    /// Reconcile the bubble panel pool for `pid` to match `frames`.
+    ///  - New frames → new panels created.
+    ///  - Existing frames → panels repositioned.
+    ///  - Extra panels → removed.
+    private func applyBubbleOverlays(pid: pid_t, frames: [CGRect], settings: AppSettings, animate: Bool = false) {
+        var existing = bubblePanels[pid] ?? []
+
+        // Grow pool if we need more panels
+        while existing.count < frames.count {
+            let panel = makeBlurPanel(frame: .zero, settings: settings)
+            let view = panel.contentView as! BlurContentView
+            // In bubble mode, reveal = hide the entire panel (no partial reveal)
+            view.revealCenter = nil
+            existing.append((panel, view))
+        }
+
+        // Shrink pool if we have too many
+        while existing.count > frames.count {
+            let (panel, _) = existing.removeLast()
+            panel.close()
+        }
+
+        // Position and show each panel
+        for (index, frame) in frames.enumerated() {
+            let (panel, _) = existing[index]
+            let appKitFrame = convertToAppKitCoordinates(frame)
+
+            if panel.frame != appKitFrame {
+                panel.setFrame(appKitFrame, display: false)
+            }
+            if !panel.isVisible {
+                if animate && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+                    panel.alphaValue = 0
+                    panel.orderFront(nil)
+                    NSAnimationContext.runAnimationGroup { ctx in
+                        ctx.duration = 0.15
+                        panel.animator().alphaValue = 1
+                    }
+                } else {
+                    panel.orderFront(nil)
+                }
+            }
+        }
+
+        bubblePanels[pid] = existing
+    }
+
+    /// Re-scan message bubbles for `pid` and reconcile the panel pool.
+    private func syncBubbleOverlays(pid: pid_t) {
+        guard let app = trackedApps[pid],
+              blurModes[pid] == .perMessageBubble,
+              let settings = latestSettings else { return }
+
+        let bundleID = bundleIDs[pid] ?? ""
+        let frames = MessageBubbleScanner.shared.scan(pid: pid, bundleID: bundleID)
+
+        if frames.isEmpty {
+            // Fall back to full-area if scan is empty (conversation switched / app updated)
+            removeAllBubblePanels(pid: pid)
+            if overlayWindows[pid] == nil {
+                createFullAreaOverlay(for: app, settings: settings, insets: contentInsets[pid] ?? .none)
+            }
+        } else {
+            // Remove full-area fallback if it was created
+            if let panel = overlayWindows[pid] {
+                panel.close()
+                overlayWindows.removeValue(forKey: pid)
+                blurViews.removeValue(forKey: pid)
+            }
+            applyBubbleOverlays(pid: pid, frames: frames, settings: settings)
+        }
+    }
+
+    private func removeAllBubblePanels(pid: pid_t) {
+        guard let panels = bubblePanels.removeValue(forKey: pid) else { return }
+        for (panel, _) in panels { panel.close() }
+    }
+
+    // MARK: - Shared Panel Factory
+
+    /// Creates a borderless, click-through `NSPanel` with a `BlurContentView` as content.
+    private func makeBlurPanel(frame: NSRect, settings: AppSettings) -> NSPanel {
         let panel = NSPanel(
-            contentRect: appKitFrame,
+            contentRect: frame,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -97,20 +257,21 @@ final class BlurWindowManager {
         panel.animationBehavior = .none
         panel.hidesOnDeactivate = false
         panel.becomesKeyOnlyIfNeeded = true
-        // CRITICAL: click-through so the user can interact with the app beneath
         panel.ignoresMouseEvents = true
 
-        let blurView = BlurContentView(frame: NSRect(origin: .zero, size: appKitFrame.size))
+        let blurView = BlurContentView(frame: NSRect(origin: .zero, size: frame.size))
         blurView.blurRadius    = CGFloat(settings.blurIntensity)
         blurView.revealRadius  = CGFloat(settings.revealRadius)
         blurView.revealOnHover = settings.revealOnHover
         blurView.featherWidth  = CGFloat(settings.blurFeatherWidth)
         blurView.autoresizingMask = [.width, .height]
-
         panel.contentView = blurView
 
-        // Fade in (skip animation when Reduce Motion is on)
-        if settings.blurAnimatesIn && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+        return panel
+    }
+
+    private func showPanel(_ panel: NSPanel, animated: Bool) {
+        if animated && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
             panel.alphaValue = 0
             panel.orderFront(nil)
             NSAnimationContext.runAnimationGroup { ctx in
@@ -121,112 +282,37 @@ final class BlurWindowManager {
         } else {
             panel.orderFront(nil)
         }
-
-        overlayWindows[pid] = panel
-        blurViews[pid] = blurView
-        trackedApps[pid] = app
-        self.contentInsets[pid] = insets
-
-        // Observe AX window move/resize
-        WindowTracker.shared.observeWindowChanges(for: app) { [weak self] newFrame in
-            guard let self else { return }
-            let insetFrame = self.applyInsets(insets, to: newFrame)
-            self.repositionOverlay(pid: pid, to: insetFrame)
-        }
-
-        startMouseMonitoring()
-        startRefreshTimer()
-
-        // Delayed re-query for Catalyst apps
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
-            self?.syncOverlayPosition(pid: pid)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.syncOverlayPosition(pid: pid)
-        }
-
-        NSLog("[MacShield] Blur overlay created for %@ (pid %d) insets=L%.0f/T%.0f/R%.0f/B%.0f",
-              app.localizedName ?? "unknown", pid,
-              insets.left, insets.top, insets.right, insets.bottom)
-        return panel
     }
 
-    /// Update blur settings on all active overlays.
+    // MARK: - Settings Update
+
+    /// Update blur settings on all active overlays (full-area and bubble panels).
     func updateSettings(_ settings: AppSettings) {
+        latestSettings = settings
+
         for (_, blurView) in blurViews {
-            blurView.blurRadius    = CGFloat(settings.blurIntensity)
-            blurView.revealRadius  = CGFloat(settings.revealRadius)
-            blurView.revealOnHover = settings.revealOnHover
-            blurView.featherWidth  = CGFloat(settings.blurFeatherWidth)
+            applySettings(settings, to: blurView)
+        }
+        for (_, pairs) in bubblePanels {
+            for (_, blurView) in pairs {
+                applySettings(settings, to: blurView)
+            }
         }
     }
 
-    /// Update overlay position to match target window.
+    private func applySettings(_ settings: AppSettings, to view: BlurContentView) {
+        view.blurRadius    = CGFloat(settings.blurIntensity)
+        view.revealRadius  = CGFloat(settings.revealRadius)
+        view.revealOnHover = settings.revealOnHover
+        view.featherWidth  = CGFloat(settings.blurFeatherWidth)
+    }
+
+    // MARK: - Position Updates (Full-Area)
+
     func updateOverlayPosition(for app: NSRunningApplication) {
-        let pid = app.processIdentifier
-        syncOverlayPosition(pid: pid)
+        syncOverlayPosition(pid: app.processIdentifier)
     }
 
-    /// Remove the overlay for a specific app, with a fade-out.
-    func removeOverlay(for pid: pid_t) {
-        guard let panel = overlayWindows[pid] else { return }
-
-        overlayWindows.removeValue(forKey: pid)
-        blurViews.removeValue(forKey: pid)
-        trackedApps.removeValue(forKey: pid)
-        contentInsets.removeValue(forKey: pid)
-        WindowTracker.shared.stopObserving(pid: pid)
-        NSLog("[MacShield] Blur overlay removed for pid %d", pid)
-
-        // Fade out then close
-        if !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
-            NSAnimationContext.runAnimationGroup({ ctx in
-                ctx.duration = 0.14
-                ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
-                panel.animator().alphaValue = 0
-            }, completionHandler: {
-                panel.close()
-            })
-        } else {
-            panel.close()
-        }
-
-        if overlayWindows.isEmpty {
-            stopRefreshTimer()
-            stopMouseMonitoring()
-        }
-    }
-
-    /// Remove all blur overlays.
-    func removeAll() {
-        let pids = Array(overlayWindows.keys)
-        for pid in pids {
-            removeOverlay(for: pid)
-        }
-        WindowTracker.shared.stopAll()
-        stopRefreshTimer()
-        stopMouseMonitoring()
-        NSLog("[MacShield] All blur overlays removed")
-    }
-
-    /// Whether any blur overlay is currently shown.
-    var isShowingAny: Bool { !overlayWindows.isEmpty }
-
-    // MARK: - Content Insets
-
-    /// Shrink a window frame by the given insets to get the content-only area.
-    /// Coordinates are in Accessibility space (top-left origin).
-    private func applyInsets(_ insets: BlurredApp.ContentInsets, to frame: CGRect) -> CGRect {
-        let x = frame.origin.x + insets.left
-        let y = frame.origin.y + insets.top
-        let w = max(0, frame.width - insets.left - insets.right)
-        let h = max(0, frame.height - insets.top - insets.bottom)
-        return CGRect(x: x, y: y, width: w, height: h)
-    }
-
-    // MARK: - Private Repositioning
-
-    /// Re-query the current frame for a tracked app and reposition the overlay.
     private func syncOverlayPosition(pid: pid_t) {
         guard let panel = overlayWindows[pid],
               let app = trackedApps[pid] else { return }
@@ -237,22 +323,82 @@ final class BlurWindowManager {
         let insets = contentInsets[pid] ?? .none
         let contentFrame = applyInsets(insets, to: fullFrame)
         let appKitFrame = convertToAppKitCoordinates(contentFrame)
-        if panel.frame != appKitFrame {
-            panel.setFrame(appKitFrame, display: false)
-        }
+        if panel.frame != appKitFrame { panel.setFrame(appKitFrame, display: false) }
     }
 
     private func repositionOverlay(pid: pid_t, to accessibilityFrame: CGRect) {
         guard let panel = overlayWindows[pid] else { return }
-        let appKitFrame = convertToAppKitCoordinates(accessibilityFrame)
-        panel.setFrame(appKitFrame, display: false)
+        panel.setFrame(convertToAppKitCoordinates(accessibilityFrame), display: false)
     }
 
+    // MARK: - Remove Overlays
+
+    /// Remove all overlays (full-area + bubble) for a specific app.
+    func removeOverlay(for pid: pid_t) {
+        // Remove full-area overlay
+        if let panel = overlayWindows.removeValue(forKey: pid) {
+            blurViews.removeValue(forKey: pid)
+            fadeAndClose(panel)
+        }
+        // Remove bubble panels
+        removeAllBubblePanels(pid: pid)
+
+        trackedApps.removeValue(forKey: pid)
+        contentInsets.removeValue(forKey: pid)
+        blurModes.removeValue(forKey: pid)
+        bundleIDs.removeValue(forKey: pid)
+        WindowTracker.shared.stopObserving(pid: pid)
+        NSLog("[MacShield] Overlay removed for pid %d", pid)
+
+        if overlayWindows.isEmpty && bubblePanels.isEmpty {
+            stopRefreshTimer()
+            stopMouseMonitoring()
+        }
+    }
+
+    private func fadeAndClose(_ panel: NSPanel) {
+        if !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            NSAnimationContext.runAnimationGroup({ ctx in
+                ctx.duration = 0.14
+                ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
+                panel.animator().alphaValue = 0
+            }, completionHandler: { panel.close() })
+        } else {
+            panel.close()
+        }
+    }
+
+    /// Remove all overlays for all apps.
+    func removeAll() {
+        let pids = Array(trackedApps.keys)
+        pids.forEach { removeOverlay(for: $0) }
+        WindowTracker.shared.stopAll()
+        stopRefreshTimer()
+        stopMouseMonitoring()
+        NSLog("[MacShield] All overlays removed")
+    }
+
+    var isShowingAny: Bool {
+        !overlayWindows.isEmpty || !bubblePanels.isEmpty
+    }
+
+    // MARK: - Content Insets
+
+    private func applyInsets(_ insets: BlurredApp.ContentInsets, to frame: CGRect) -> CGRect {
+        CGRect(
+            x: frame.origin.x + insets.left,
+            y: frame.origin.y + insets.top,
+            width: max(0, frame.width  - insets.left - insets.right),
+            height: max(0, frame.height - insets.top  - insets.bottom)
+        )
+    }
+
+    // MARK: - Coordinate Conversion
+
     /// Convert from Accessibility (top-left origin) to AppKit (bottom-left origin) coordinates.
-    private func convertToAppKitCoordinates(_ rect: CGRect) -> NSRect {
+    func convertToAppKitCoordinates(_ rect: CGRect) -> NSRect {
         guard let screen = NSScreen.screens.first else { return NSRect(origin: .zero, size: rect.size) }
-        let screenHeight = screen.frame.height
-        let flippedY = screenHeight - rect.origin.y - rect.size.height
+        let flippedY = screen.frame.height - rect.origin.y - rect.size.height
         return NSRect(x: rect.origin.x, y: flippedY, width: rect.size.width, height: rect.size.height)
     }
 
@@ -261,33 +407,24 @@ final class BlurWindowManager {
     private func startMouseMonitoring() {
         guard mouseMonitor == nil else { return }
 
-        let eventMask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .leftMouseDown, .leftMouseUp]
-
-        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: eventMask) { [weak self] event in
+        let mask: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .leftMouseDown, .leftMouseUp]
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] event in
             self?.handleMouseEvent(event)
         }
-        
-        localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: eventMask) { [weak self] event in
+        localMouseMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
             self?.handleMouseEvent(event)
             return event
         }
     }
 
     private func stopMouseMonitoring() {
-        if let monitor = mouseMonitor {
-            NSEvent.removeMonitor(monitor)
-            mouseMonitor = nil
-        }
-        if let monitor = localMouseMonitor {
-            NSEvent.removeMonitor(monitor)
-            localMouseMonitor = nil
-        }
+        if let m = mouseMonitor  { NSEvent.removeMonitor(m); mouseMonitor = nil }
+        if let m = localMouseMonitor { NSEvent.removeMonitor(m); localMouseMonitor = nil }
     }
 
-    /// Event-driven mouse handler with 2pt threshold for continuous moves, instant for clicks.
     private func handleMouseEvent(_ event: NSEvent) {
         let current = NSEvent.mouseLocation
-        
+
         if event.type == .leftMouseDown || event.type == .leftMouseUp {
             lastMouseLocation = current
             updateRevealPositions(mouseLocation: current)
@@ -301,19 +438,38 @@ final class BlurWindowManager {
         updateRevealPositions(mouseLocation: current)
     }
 
-    /// Push current mouse location into every active blur view.
+    /// Push the current mouse reveal position to all full-area blur views.
+    /// Bubble panels reveal by toggling the panel's alpha (handled in the timer).
     private func updateRevealPositions(mouseLocation: NSPoint? = nil) {
         let location = mouseLocation ?? NSEvent.mouseLocation
-        let isLeftMouseDown = (NSEvent.pressedMouseButtons & 1) != 0
-        
+        let isLeftDown = (NSEvent.pressedMouseButtons & 1) != 0
+
+        // Full-area views — radial reveal
         for (_, blurView) in blurViews {
             if blurView.revealOnHover {
                 blurView.updateRevealFromScreenPoint(location)
             } else {
-                if isLeftMouseDown {
+                blurView.revealCenter = isLeftDown ? {
                     blurView.updateRevealFromScreenPoint(location)
+                    return blurView.revealCenter
+                }() : nil
+            }
+        }
+
+        // Bubble panels — hide the panel whose frame contains the cursor
+        for (_, pairs) in bubblePanels {
+            for (panel, blurView) in pairs {
+                let panelContainsCursor = panel.frame.contains(location)
+                let shouldReveal: Bool
+                if blurView.revealOnHover {
+                    shouldReveal = panelContainsCursor
                 } else {
-                    blurView.revealCenter = nil
+                    shouldReveal = panelContainsCursor && isLeftDown
+                }
+                // Reveal = make panel invisible (show the real message underneath)
+                let targetAlpha: CGFloat = shouldReveal ? 0.0 : 1.0
+                if panel.alphaValue != targetAlpha {
+                    panel.alphaValue = targetAlpha
                 }
             }
         }
@@ -321,31 +477,35 @@ final class BlurWindowManager {
 
     // MARK: - Refresh Timer
 
-    /// Position-sync + reveal-update timer at 30fps.
-    ///
-    /// Also acts as a safety net: removes overlays whose owner app
-    /// is no longer frontmost (fixes background blur sticking).
+    /// 30 fps position-sync timer.
+    /// Every 4th tick (~7 fps) also re-scans message bubbles.
     private func startRefreshTimer() {
         guard refreshTimer == nil else { return }
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
             guard let self else { return }
 
+            self.timerTickCount &+= 1
             let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
 
-            // 1. Sync overlay positions & remove stale overlays
-            for pid in Array(self.overlayWindows.keys) {
+            for pid in Array(self.trackedApps.keys) {
                 // Safety net: if the app is no longer frontmost, remove its overlay.
-                // This catches cases where the deactivation notification was missed
-                // (common with Catalyst/Electron apps).
                 if pid != frontmostPID {
-                    NSLog("[MacShield] Timer safety: removing overlay for non-frontmost pid %d", pid)
+                    NSLog("[MacShield] Timer safety: removing stale overlay for pid %d", pid)
                     self.removeOverlay(for: pid)
                     continue
                 }
+
+                // Sync full-area overlay position
                 self.syncOverlayPosition(pid: pid)
+
+                // Re-scan bubble positions every 4th tick
+                if self.timerTickCount % 4 == 0,
+                   self.blurModes[pid] == .perMessageBubble {
+                    self.syncBubbleOverlays(pid: pid)
+                }
             }
 
-            // 2. Update reveal positions
+            // Update reveal zones
             self.updateRevealPositions()
         }
         RunLoop.main.add(refreshTimer!, forMode: .common)
