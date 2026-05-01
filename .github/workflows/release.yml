@@ -1,9 +1,22 @@
-name: Release
+name: Release (Manual)
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g. 1.0.4) — a git tag v<version> will be created'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release?'
+        required: true
+        default: false
+        type: boolean
+      draft:
+        description: 'Save as draft release?'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -13,13 +26,20 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Extract version from tag
+      - name: Set version
         id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "VERSION=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ inputs.version }}"
+          git push origin "v${{ inputs.version }}"
 
       - name: Build Release archive
         run: |
@@ -136,6 +156,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
           name: MacShield v${{ steps.version.outputs.VERSION }}
           body: |
             ## MacShield v${{ steps.version.outputs.VERSION }}
@@ -147,5 +168,5 @@ jobs:
 
             **Requires macOS 13.0+**
           files: build/MacShield.dmg
-          draft: false
-          prerelease: false
+          draft: ${{ inputs.draft }}
+          prerelease: ${{ inputs.prerelease }}

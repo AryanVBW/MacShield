@@ -1,17 +1,21 @@
-name: Build
+name: Build (Manual)
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Debug
+          - Release
+          - Both
 
 jobs:
   build:
     runs-on: macos-14
-    strategy:
-      matrix:
-        destination: ['platform=macOS']
 
     steps:
       - uses: actions/checkout@v4
@@ -19,22 +23,24 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Build
+      - name: Build Debug
+        if: ${{ inputs.configuration == 'Debug' || inputs.configuration == 'Both' }}
         run: |
           xcodebuild build \
             -project MacShield.xcodeproj \
             -scheme MacShield \
-            -destination "${{ matrix.destination }}" \
+            -destination 'platform=macOS' \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             | xcpretty || true
 
       - name: Build Release
+        if: ${{ inputs.configuration == 'Release' || inputs.configuration == 'Both' }}
         run: |
           xcodebuild build \
             -project MacShield.xcodeproj \
             -scheme MacShield \
-            -destination "${{ matrix.destination }}" \
+            -destination 'platform=macOS' \
             -configuration Release \
             CODE_SIGNING_ALLOWED=NO \
             | xcpretty || true
