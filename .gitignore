@@ -1,4 +1,4 @@
-# Xcode
+# ─── Xcode ────────────────────────────────────────────────────────────────────
 build/
 DerivedData/
 *.xcodeproj/xcuserdata/
@@ -6,33 +6,101 @@ DerivedData/
 *.xcuserstate
 *.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 
-# Swift Package Manager
+# ─── Swift Package Manager ────────────────────────────────────────────────────
 .build/
 Package.resolved
 
-# macOS
+# ─── macOS ────────────────────────────────────────────────────────────────────
 .DS_Store
 **/.DS_Store
 *.swp
 *~
 
-# Local development config
+# ─── Local development config ─────────────────────────────────────────────────
 CLAUDE.md
 .claude/
 .mcp.json
-
-# Temp design files
+.playwright-mcp/
 icon-proposals.html
 icon-render.html
-.playwright-mcp/
 
-# Secrets — NEVER commit
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🔒 SECRETS — NEVER COMMIT ANY OF THE FOLLOWING
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Secret directories
 .secrets/
-*.pem
-*.p12
-sparkle_private_key*
+.env/
+secrets/
+private/
 
-# Archives and distribution
+# Environment / config files with credentials
+.env
+.env.*
+.env.local
+.env.*.local
+.envrc
+*.env
+
+# Private keys (all formats)
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.der
+*.csr
+
+# Apple-specific signing & provisioning
+*.mobileprovision
+*.provisionprofile
+ExportOptions.plist
+AuthKey_*.p8
+
+# Sparkle update signing
+sparkle_private_key*
+sparkle_key*
+
+# API keys / tokens (common naming patterns)
+*_api_key*
+*_secret*
+*_token*
+*_credentials*
+api_keys.*
+credentials.*
+secrets.*
+tokens.*
+auth_token*
+access_token*
+
+# App Store Connect / Apple Connect API
+AuthKey*.p8
+*.appstoreconnect.p8
+connect_api_key*
+
+# Keychain exports
+*.keychain
+*.keychain-db
+
+# Google / Firebase
+google-services.json
+GoogleService-Info.plist
+firebase*.json
+service-account*.json
+service_account*.json
+
+# AWS
+.aws/
+aws_credentials*
+
+# Generic patterns that commonly hold secrets
+*password*
+*passwd*
+*.secret
+*.secrets
+*_private.*
+
+# ─── Archives and distribution ────────────────────────────────────────────────
 *.dmg
 *.zip
 *.app
