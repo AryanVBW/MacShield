@@ -224,6 +224,22 @@ MacShield never reads app content, never connects to the internet (except for Sp
 
 ---
 
+## Branches
+
+| Branch | Purpose |
+|--------|---------|
+| [`main`](https://github.com/AryanVBW/MacShield/tree/main) | Stable, production-ready code — all PRs merge here |
+| [`chrome-extension`](https://github.com/AryanVBW/MacShield/tree/chrome-extension) | Chrome extension development (Touch ID, site locking, blur) |
+| `feature/idle-monitor` | Auto-lock on idle timeout |
+| `feature/watch-proximity` | Apple Watch BLE proximity unlock |
+| `feature/sleep-wake` | Lock on sleep / unlock on wake |
+| `feature/polish` | UI/UX polish and visual improvements |
+| `fix/*` | Bug fix branches (`auto-touchid-onboarding`, `testing-bugs`, `watch-bluetooth-permissions`, `watch-reconnect`) |
+| `release/v1.0.0` | v1.0.0 release snapshot |
+| `setup/repo-foundation` | Initial project scaffolding |
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please open an issue before submitting a PR for significant changes.
@@ -231,6 +247,38 @@ Contributions are welcome! Please open an issue before submitting a PR for signi
 - **Bug reports:** use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md)
 - **Feature requests:** use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md)
 - **Pull requests:** follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md)
+- **Target branch:** always open PRs against `main`
+
+### 🌐 Contributing to the Chrome Extension
+
+The Chrome extension lives in two places:
+
+| Location | Purpose |
+|----------|---------|
+| [`BrowserExtensions/chrome-extension/`](BrowserExtensions/chrome-extension/) | Source code (this repo, `main` branch) |
+| [`chrome-extension` branch](https://github.com/AryanVBW/MacShield/tree/chrome-extension) | Extension-specific development branch |
+| [Chrome Web Store](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie) | Published extension (v3.1.0) |
+
+**To contribute to the extension:**
+
+```bash
+git clone https://github.com/AryanVBW/MacShield.git
+git checkout chrome-extension        # extension dev branch
+# make changes in BrowserExtensions/chrome-extension/
+# load unpacked in chrome://extensions for local testing
+git push origin chrome-extension
+# open a PR from chrome-extension → main
+```
+
+**Extension files:**
+- `manifest.json` — permissions and content script config
+- `background.js` — service worker, site-lock state management
+- `lock-guard.js` — content script injected on all URLs (lock overlay)
+- `content.js` — chat blur content script
+- `popup.html` / `popup.js` — extension popup UI
+- `auth.html` — Touch ID / password authentication screen
+
+> ⚠️ **Never commit API keys, passwords, or private keys.** The `.secrets/` directory and all `*.pem` / `*.p12` / `sparkle_private_key*` files are git-ignored. Keep them local only.
 
 If MacShield is useful to you, a ⭐ star goes a long way — it helps others discover the project.
 
