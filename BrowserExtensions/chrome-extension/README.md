@@ -2,6 +2,13 @@
 
 **Free, open-source Chrome extension that blurs all chat messages across every major platform. Only the chat you hover over becomes readable.**
 
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb">
+    <img src="https://img.icons8.com/?id=GsBZ74FbIf7a&format=png&size=48" alt="Chrome Web Store" width="48" height="48" /><br/>
+    <strong>Install from Chrome Web Store</strong>
+  </a>
+</p>
+
 ## Supported Platforms
 
 | Platform | Web URL | Status |
@@ -28,9 +35,15 @@
 4. **Press `Alt + X`** to toggle blur on/off instantly
 5. **Adjust blur intensity** from the popup (2px to 20px)
 
-## Installation (3 minutes)
+## Installation
 
-### Option A: Load as Unpacked Extension (Recommended)
+### Option A: Chrome Web Store (Easiest)
+
+[![Install on Chrome](https://img.icons8.com/?id=GsBZ74FbIf7a&format=png&size=20) **Add to Chrome — Chrome Web Store**](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb)
+
+Click the link above → **"Add to Chrome"** → Done!
+
+### Option B: Load as Unpacked Extension (Developer)
 
 1. Open Chrome and go to `chrome://extensions/`
 2. Enable **Developer mode** (toggle in top-right corner)
@@ -38,7 +51,7 @@
 4. Select the `privyblur-extension` folder
 5. Done! The extension icon appears in your toolbar
 
-### Option B: From ZIP
+### Option C: From ZIP
 
 1. Unzip the `privyblur-extension.zip` file
 2. Follow steps 1-5 above
