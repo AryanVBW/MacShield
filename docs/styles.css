@@ -354,9 +354,19 @@ h2 strong {
   align-items: center;
   text-decoration: none;
   border-radius: 12px;
-  overflow: hidden;
   transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
   flex-shrink: 0;
+}
+
+.store-badge-full-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid rgba(242,245,247,0.22);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 2px;
 }
 
 .store-badge-full:hover {
