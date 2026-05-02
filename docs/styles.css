@@ -350,8 +350,8 @@ h2 strong {
 }
 
 .store-badge-icon {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
   color: var(--text);
 }
