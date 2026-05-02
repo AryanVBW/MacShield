@@ -342,6 +342,12 @@ h2 strong {
   box-shadow: 0 8px 28px rgba(0,0,0,0.45);
 }
 
+.store-badge-icon-only {
+  min-width: unset;
+  padding: 8px;
+  justify-content: center;
+}
+
 .store-badge-icon {
   width: 28px;
   height: 28px;
