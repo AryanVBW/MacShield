@@ -18,8 +18,16 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.apple.com/app/macshield/id6744642557">
+    <img src="https://img.shields.io/badge/Mac%20App%20Store-Download-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download on the Mac App Store" height="32">
+  </a>
+  &nbsp;
   <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb">
-    <img src="https://github.com/AryanVBW/RDPtown/releases/download/S%24/mediumCrome-withouborder.png" alt="Chrome" width="24" height="24" style="vertical-align:middle;">&nbsp;<img src="https://github.com/AryanVBW/RDPtown/releases/download/l1/appstore.png" alt="Available in the Chrome Web Store" height="28" style="vertical-align:middle;">
+    <img src="https://github.com/AryanVBW/RDPtown/releases/download/S%24/mediumCrome-withouborder.png" alt="" width="22" height="22" style="vertical-align:middle;">&nbsp;<img src="https://github.com/AryanVBW/RDPtown/releases/download/l1/appstore.png" alt="Available in the Chrome Web Store" height="32" style="vertical-align:middle;">
+  </a>
+  &nbsp;
+  <a href="https://github.com/AryanVBW/MacShield/releases/latest">
+    <img src="https://img.shields.io/badge/GitHub-Download%20Release-24292e?style=for-the-badge&logo=github&logoColor=white" alt="Download on GitHub Releases" height="32">
   </a>
 </p>
 

@@ -313,6 +313,70 @@ h2 strong {
   margin-top: 30px;
 }
 
+/* ── Store Badges ── */
+.store-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  min-width: 178px;
+}
+
+.store-badge:hover {
+  background: var(--surface-3);
+  border-color: rgba(242,245,247,0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+}
+
+.store-badge-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: var(--text);
+}
+
+.store-badge-img {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.store-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.store-badge-sub {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.store-badge-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
 .proof-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
