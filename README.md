@@ -18,8 +18,8 @@
 </p>
 
 <p align="center">
-  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie">
-    <img src="https://img.shields.io/badge/Chrome%20Web%20Store-MacShield%20Extension-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store">
+  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb">
+    <img src="https://img.icons8.com/?id=63785&format=png&size=20" alt="" width="20" height="20" style="vertical-align:middle;">&nbsp;<img src="https://img.shields.io/badge/Chrome%20Web%20Store-Add%20to%20Chrome-4285F4?style=flat-square&logoColor=white" alt="Add to Chrome – Chrome Web Store">
   </a>
 </p>
 
@@ -88,7 +88,7 @@ Unlike sandboxed App Store alternatives, MacShield is distributed directly, givi
 ### 🌐 Browser Extension
 - **Chrome extension** — lock and blur any website with Touch ID or password
 - Supports WhatsApp, Gmail, Discord, Slack, Telegram, Instagram, and more
-- **[Install from Chrome Web Store](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie)**
+- **[Install from Chrome Web Store](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb)**
 
 ### 🚨 Safety Systems
 - **Panic key** — `Cmd+Option+Shift+Control+U` instantly dismisses all overlays
@@ -135,8 +135,9 @@ Press `Cmd+R` to build and run. Requires **Xcode 15+** and **macOS 13+**.
 ## Chrome Extension
 
 <p align="center">
-  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie">
-    <img src="https://img.shields.io/badge/Available%20on-Chrome%20Web%20Store-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Available on Chrome Web Store">
+  <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb">
+    <img src="https://img.icons8.com/?id=63785&format=png&size=48" alt="Chrome" width="48" height="48"><br>
+    <img src="https://img.shields.io/badge/Available%20on-Chrome%20Web%20Store-4285F4?style=for-the-badge&logoColor=white" alt="Available on Chrome Web Store">
   </a>
 </p>
 
@@ -144,7 +145,7 @@ The MacShield Chrome extension brings browser-level privacy protection — lock 
 
 **Supported sites (blur):** WhatsApp Web, Gmail, Discord, Slack, Telegram, Instagram, Messenger, X/Twitter, LinkedIn, Outlook, Teams
 
-**[→ Install MacShield Extension](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie)**
+**[→ Install MacShield Extension](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb)**
 
 Source: [`BrowserExtensions/chrome-extension/`](BrowserExtensions/chrome-extension/)
 
@@ -257,7 +258,7 @@ The Chrome extension lives in two places:
 |----------|---------|
 | [`BrowserExtensions/chrome-extension/`](BrowserExtensions/chrome-extension/) | Source code (this repo, `main` branch) |
 | [`chrome-extension` branch](https://github.com/AryanVBW/MacShield/tree/chrome-extension) | Extension-specific development branch |
-| [Chrome Web Store](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie) | Published extension (v3.1.0) |
+| [Chrome Web Store](https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb) | Published extension (v3.1.0) |
 
 **To contribute to the extension:**
 
