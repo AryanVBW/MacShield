@@ -185,31 +185,86 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return false;
   }
 
-  // -- Touch ID auth / enroll window --
+  // -- Touch ID enroll / master-popup unlock --
+  // Content-script page-lock now uses an inline iframe (lock-guard.js) so this
+  // path is only hit for enrollment and popup-master-unlock. Those flows open
+  // as a browser TAB (integrated inside the browser) rather than a detached
+  // popup window, per user UX feedback.
   if (msg.action === "ms_openTouchID") {
     const mode = msg.mode || "auth";
     const authUrl = chrome.runtime.getURL("auth.html") +
       "?host=" + encodeURIComponent(msg.hostname || "") +
       "&mode=" + mode +
       "&tabId=" + (sender.tab ? sender.tab.id : "");
-    chrome.windows.create({
-      url: authUrl,
-      type: "popup",
-      width: 420,
-      height: 360,
-      focused: true,
+
+    // Reuse an existing MacShield auth tab if one is already open \u2014 prevents
+    // duplicate tabs when the user clicks Enroll twice in quick succession.
+    chrome.tabs.query({ url: chrome.runtime.getURL("auth.html") + "*" }, (tabs) => {
+      if (tabs && tabs.length > 0) {
+        chrome.tabs.update(tabs[0].id, { url: authUrl, active: true });
+        if (tabs[0].windowId) {
+          chrome.windows.update(tabs[0].windowId, { focused: true });
+        }
+      } else {
+        chrome.tabs.create({ url: authUrl, active: true });
+      }
     });
+
     sendResponse({ ok: true });
     return false;
   }
 
   // -- Touch ID success callback (from auth.html) --
+  // 1) mark the host unlocked + broadcast to content scripts
+  // 2) switch focus back to the tab that originally requested auth
+  // 3) close the auth tab (this one)
   if (msg.action === "ms_touchIDSuccess") {
+    const authTabId     = sender.tab ? sender.tab.id : null;
+    const originalTabId = (typeof msg.originalTabId === "number") ? msg.originalTabId : null;
+
+    const finalize = () => {
+      const cleanup = () => {
+        if (authTabId != null) {
+          chrome.tabs.remove(authTabId).catch(() => {});
+        }
+      };
+
+      if (originalTabId != null) {
+        // Focus original tab + its window, then close the auth tab.
+        chrome.tabs.get(originalTabId, (tab) => {
+          if (chrome.runtime.lastError || !tab) {
+            // Original tab is gone — just close auth tab and let Chrome pick.
+            cleanup();
+            return;
+          }
+          chrome.tabs.update(originalTabId, { active: true }, () => {
+            void chrome.runtime.lastError;
+            if (tab.windowId != null) {
+              chrome.windows.update(tab.windowId, { focused: true }, () => {
+                void chrome.runtime.lastError;
+                cleanup();
+              });
+            } else {
+              cleanup();
+            }
+          });
+        });
+      } else {
+        cleanup();
+      }
+    };
+
     if (msg.hostname) {
       addUnlockedSite(msg.hostname).then(() => {
         broadcastLockState(msg.hostname, "ms_unlocked");
+        // Small delay so the content script has time to receive ms_unlocked
+        // and start its dismiss animation before we yank the focus back.
+        setTimeout(finalize, 120);
       });
+    } else {
+      finalize();
     }
+
     sendResponse({ ok: true });
     return false;
   }

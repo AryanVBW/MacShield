@@ -11,6 +11,32 @@
   const mode      = params.get("mode") || "auth";
   const isEnroll  = mode === "enroll";
   const isMaster  = hostname === "_master"; // unlock popup master overlay
+  const isEmbedded = params.get("embedded") === "1"; // iframed into a page overlay
+
+  if (isEmbedded) document.body.classList.add("embedded");
+
+  // Notify parent window when we finish. Used only in embedded mode where
+  // we can't call window.close() on ourselves.
+  function notifyParent(type, extra) {
+    if (!isEmbedded) return;
+    try {
+      window.parent.postMessage(
+        Object.assign({ type: "macshield-auth-" + type, hostname }, extra || {}),
+        "*"
+      );
+    } catch (_) { /* parent gone — ignore */ }
+  }
+
+  // Close helper: in a standalone tab/window, use window.close(); in an iframe,
+  // tell the parent to tear us down.
+  function finish(type, extra, delay) {
+    delay = delay == null ? 600 : delay;
+    if (isEmbedded) {
+      setTimeout(() => notifyParent(type, extra), delay);
+    } else {
+      setTimeout(() => window.close(), delay);
+    }
+  }
 
   const statusEl  = document.getElementById("statusMsg");
   const actionBtn = document.getElementById("actionBtn");
@@ -19,6 +45,13 @@
   const authSub   = document.getElementById("authSub");
 
   const MS_CRED_KEY = "ms_webauthn_cred_id";
+
+  // Cached credential ID. Critical: navigator.credentials.get() MUST run in the
+  // same synchronous task as the user click to preserve transient user
+  // activation — especially on retries after a NotAllowedError, where Chrome
+  // strictly enforces same-task activation. So we prefetch instead of doing
+  // chrome.storage.local.get() inside the click handler.
+  let cachedCredId = null;
 
   // ── base64url decode — credential.id from WebAuthn is already base64url,
   //    so we only need a decoder (backward-compat with legacy std base64 too) ──
@@ -73,7 +106,8 @@
     start();
   });
 
-  // Spec gate: isUserVerifyingPlatformAuthenticatorAvailable before passkey UI
+  // Spec gate: isUserVerifyingPlatformAuthenticatorAvailable before passkey UI.
+  // Also prefetch the credential ID so the click handler is fully synchronous.
   (async () => {
     if (!window.PublicKeyCredential ||
         !PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
@@ -94,37 +128,53 @@
       return;
     }
 
+    // Prefetch cached credential ID for auth mode (skip for enroll/master).
+    if (!isEnroll) {
+      cachedCredId = await new Promise((resolve) =>
+        chrome.storage.local.get([MS_CRED_KEY], (r) => resolve(r[MS_CRED_KEY] || null))
+      );
+      if (!cachedCredId && !isMaster) {
+        statusEl.textContent = "No passkey found \u2014 enroll first in MacShield Settings";
+        statusEl.className   = "status-msg error";
+        return;
+      }
+    }
+
     statusEl.textContent = isEnroll
       ? "Click below to create your passkey"
       : "Click below to authenticate with Touch ID";
     actionBtn.style.display = "inline-block";
     actionBtn.disabled      = false;
     actionBtn.focus();
-    console.log("[MacShield/auth] ready, mode:", mode, "host:", hostname);
+    console.log("[MacShield/auth] ready, mode:", mode, "host:", hostname,
+                "credId:", cachedCredId ? "loaded" : "none");
   })();
 
   function start() {
+    // CRITICAL: this function MUST stay fully synchronous up to the
+    // navigator.credentials.* call. Any async hop (await, chrome.storage,
+    // setTimeout, etc.) between the user click and the WebAuthn call will
+    // consume user activation — Chrome silently rejects subsequent calls
+    // with NotAllowedError, especially after a prior cancellation.
     actionBtn.style.display = "none";
-    actionBtn.disabled = true;
-    statusEl.className = "status-msg";
+    actionBtn.disabled      = true;
+    actionBtn.classList.remove("secondary");
+    statusEl.className      = "status-msg";
 
     if (isEnroll) {
       statusEl.textContent = "Follow the system prompt\u2026";
-      // NOTE: do NOT await before navigator.credentials.create() —
-      // user activation is preserved through synchronous task only.
       register();
-    } else {
-      statusEl.textContent = "Checking credential\u2026";
-      chrome.storage.local.get([MS_CRED_KEY], (result) => {
-        if (result[MS_CRED_KEY]) {
-          authenticate(result[MS_CRED_KEY]);
-        } else {
-          statusEl.textContent = "No passkey found — enroll first in MacShield Settings";
-          statusEl.className   = "status-msg error";
-          setTimeout(() => window.close(), 2500);
-        }
-      });
+      return;
     }
+
+    if (!cachedCredId) {
+      statusEl.textContent = "No passkey found \u2014 enroll first in MacShield Settings";
+      statusEl.className   = "status-msg error";
+      return;
+    }
+
+    statusEl.textContent = "Touch ID prompt opening\u2026";
+    authenticate(cachedCredId); // synchronous — preserves user activation
   }
 
   // ── Register: create new platform credential ──
@@ -161,9 +211,9 @@
       console.log("[MacShield/auth] credential created:", credential.id);
       // credential.id is already base64url per spec — store it directly
       chrome.storage.local.set({ [MS_CRED_KEY]: credential.id }, () => {
-        statusEl.textContent = "Passkey enrolled — you're all set!";
+        statusEl.textContent = "Passkey enrolled \u2014 you're all set!";
         statusEl.className   = "status-msg success";
-        setTimeout(() => window.close(), 1200);
+        finish("enrolled", null, 1200);
       });
     })
     .catch((err) => {
@@ -195,15 +245,25 @@
       signal: freshSignal(),
     })
     .then(() => {
-      statusEl.textContent = "Verified — unlocking\u2026";
+      statusEl.textContent = "Verified \u2014 returning to page\u2026";
       statusEl.className   = "status-msg success";
+
+      // Pass the original tab id so background can switch focus back to the
+      // page that triggered auth and then close this auth tab cleanly.
+      const originalTabId = parseInt(params.get("tabId"), 10);
 
       if (isMaster) {
         chrome.runtime.sendMessage({ action: "ms_masterUnlocked" });
+        finish("verified", null, 500);
       } else {
-        chrome.runtime.sendMessage({ action: "ms_touchIDSuccess", hostname });
+        chrome.runtime.sendMessage({
+          action: "ms_touchIDSuccess",
+          hostname,
+          originalTabId: Number.isFinite(originalTabId) ? originalTabId : null,
+        });
+        // Background will switch to the original tab and close this one.
+        // Skip finish() so we don't race with background's chrome.tabs.remove.
       }
-      setTimeout(() => window.close(), 500);
     })
     .catch((err) => {
       console.error("[MacShield/auth] get() failed:", err.name, err.message);
@@ -219,11 +279,11 @@
       // Spec: passkey already exists on device — not an error
       chrome.storage.local.get([MS_CRED_KEY], (r) => {
         if (r[MS_CRED_KEY]) {
-          statusEl.textContent = "Already enrolled — Touch ID is ready to use";
+          statusEl.textContent = "Already enrolled \u2014 Touch ID is ready to use";
           statusEl.className   = "status-msg success";
-          setTimeout(() => window.close(), 1500);
+          finish("enrolled", null, 1500);
         } else {
-          statusEl.textContent = "Passkey exists on device but not in MacShield — reset from Settings and re-enroll";
+          statusEl.textContent = "Passkey exists on device but not in MacShield \u2014 reset from Settings and re-enroll";
           statusEl.className   = "status-msg error";
         }
       });

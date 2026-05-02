@@ -84,6 +84,12 @@
     }
   }
 
+  // Touch ID SVG icon
+  const TOUCH_ID_SVG = `
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+    </svg>`;
+
   function buildOverlay(os, hasTouchID) {
     const showTouchID = os === "mac" && !!hasTouchID;
     show(); // page is invisible behind the overlay
@@ -91,6 +97,33 @@
     overlayEl = document.createElement("div");
     overlayEl.id = "macshield-lock-overlay";
     overlayEl.setAttribute("data-macshield", "true");
+
+    // Touch ID flow uses a TAB (opened by background) rather than an inline
+    // iframe. Cross-origin iframe WebAuthn for chrome-extension:// origins is
+    // blocked by Chrome (rpId resolution treats it as a third-party context
+    // and credentials don't match). Tab-based flow runs the extension as the
+    // top-level origin, where WebAuthn works correctly.
+    const touchIdSection = showTouchID ? `
+      <button id="msTouchIDBtn" class="ms-lock-btn ms-lock-btn-biometric-primary">
+        ${TOUCH_ID_SVG}
+        <span>Authenticate with Touch ID</span>
+      </button>
+      <p class="ms-lock-bio-hint" id="msBioHint">Opens a Touch ID prompt</p>
+      <button type="button" class="ms-lock-link" id="msUsePwLink">Use password instead</button>
+    ` : "";
+
+    const pwSectionHidden = showTouchID; // collapsed by default when Touch ID is primary
+    const pwSection = `
+      <div class="ms-lock-pw-section" id="msPwSection" ${pwSectionHidden ? 'style="display:none;"' : ''}>
+        <div class="ms-lock-input-wrap">
+          <input type="password" id="msPasswordInput" class="ms-lock-input"
+                 placeholder="Password or PIN" autocomplete="off" spellcheck="false">
+          <button id="msUnlockBtn" class="ms-lock-btn ms-lock-btn-primary">Unlock</button>
+        </div>
+        <div class="ms-lock-error" id="msLockError">Incorrect password \u2014 try again.</div>
+        ${showTouchID ? `<button type="button" class="ms-lock-link" id="msUseTouchLink">\u2190 Back to Touch ID</button>` : ""}
+      </div>
+    `;
 
     overlayEl.innerHTML = `
       <div class="ms-lock-card">
@@ -103,23 +136,10 @@
         <p class="ms-lock-subtitle">This page is locked</p>
         <div class="ms-lock-host">${HOST}</div>
 
-        <div class="ms-lock-input-wrap">
-          <input type="password" id="msPasswordInput" class="ms-lock-input"
-                 placeholder="Password or PIN" autocomplete="off" spellcheck="false">
-          <button id="msUnlockBtn" class="ms-lock-btn ms-lock-btn-primary">Unlock</button>
-        </div>
+        ${touchIdSection}
+        ${pwSection}
 
-        <div class="ms-lock-error" id="msLockError">Incorrect password — try again.</div>
-
-        <div class="ms-lock-divider" ${!showTouchID ? 'style="display:none;"' : ''}><span>or</span></div>
-
-        <button id="msTouchIDBtn" class="ms-lock-btn ms-lock-btn-biometric" ${!showTouchID ? 'style="display:none;"' : ''}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
-          </svg>
-          Use Touch ID
-        </button>
-        ${os !== 'mac' ? '<div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 10px;">Touch ID / Windows Hello coming soon</div>' : ''}
+        ${(os !== 'mac' && !showTouchID) ? '<div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 10px;">Touch ID / Windows Hello coming soon</div>' : ''}
 
         <p class="ms-lock-hint">Protected by MacShield</p>
       </div>
@@ -136,23 +156,28 @@
     });
     bodyObserver.observe(document.body, { childList: true });
 
-    const pwInput   = document.getElementById("msPasswordInput");
-    const unlockBtn = document.getElementById("msUnlockBtn");
-    const errorEl   = document.getElementById("msLockError");
-    const touchBtn  = document.getElementById("msTouchIDBtn");
+    const pwInput      = document.getElementById("msPasswordInput");
+    const unlockBtn    = document.getElementById("msUnlockBtn");
+    const errorEl      = document.getElementById("msLockError");
+    const touchBtn     = document.getElementById("msTouchIDBtn");
+    const bioHint      = document.getElementById("msBioHint");
+    const usePwLink    = document.getElementById("msUsePwLink");
+    const useTouchLink = document.getElementById("msUseTouchLink");
+    const pwSectionEl  = document.getElementById("msPwSection");
 
-    setTimeout(() => pwInput && pwInput.focus(), 80);
+    // Initial focus: Touch ID button if primary, else password input.
+    setTimeout(() => {
+      if (showTouchID && touchBtn) touchBtn.focus();
+      else if (pwInput) pwInput.focus();
+    }, 80);
 
     // ── Password unlock ──
     function attemptUnlock() {
       const pw = pwInput.value;
-      if (!pw) {
-        shake(pwInput);
-        return;
-      }
+      if (!pw) { shake(pwInput); return; }
 
       unlockBtn.disabled = true;
-      unlockBtn.textContent = "Checking…";
+      unlockBtn.textContent = "Checking\u2026";
 
       chrome.runtime.sendMessage(
         { action: "ms_verifyPassword", password: pw, hostname: HOST },
@@ -171,44 +196,70 @@
       );
     }
 
-    unlockBtn.addEventListener("click", attemptUnlock);
-    pwInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") { e.preventDefault(); attemptUnlock(); }
-      if (errorEl.style.display !== "none") errorEl.style.display = "none";
-    });
-
-    // ── Touch ID ──
-    touchBtn.addEventListener("click", () => {
-      touchBtn.disabled = true;
-      touchBtn.textContent = "Waiting for Touch ID…";
-      chrome.runtime.sendMessage({ action: "ms_openTouchID", hostname: HOST }, () => {
-        setTimeout(() => {
-          touchBtn.disabled = false;
-          touchBtn.innerHTML = `
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
-            </svg>
-            Use Touch ID`;
-        }, 3000);
+    if (unlockBtn) unlockBtn.addEventListener("click", attemptUnlock);
+    if (pwInput) {
+      pwInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); attemptUnlock(); }
+        if (errorEl && errorEl.style.display !== "none") errorEl.style.display = "none";
       });
-    });
+    }
+
+    // ── Touch ID button → ask background to open auth.html in a tab ──
+    if (touchBtn) {
+      touchBtn.addEventListener("click", () => {
+        touchBtn.disabled = true;
+        const span = touchBtn.querySelector("span");
+        if (span) span.textContent = "Opening Touch ID\u2026";
+        if (bioHint) bioHint.textContent = "Authenticate in the new tab";
+        chrome.runtime.sendMessage({ action: "ms_openTouchID", hostname: HOST }, () => {
+          // Re-enable after a delay so user can retry if they close the auth tab
+          setTimeout(() => {
+            if (!touchBtn) return;
+            touchBtn.disabled = false;
+            if (span) span.textContent = "Authenticate with Touch ID";
+            if (bioHint) bioHint.textContent = "Click to retry, or use password below";
+          }, 4000);
+        });
+      });
+    }
+
+    // ── "Use password instead" / "Back to Touch ID" toggles ──
+    if (usePwLink && pwSectionEl) {
+      usePwLink.addEventListener("click", () => {
+        pwSectionEl.style.display = "block";
+        usePwLink.style.display   = "none";
+        if (touchBtn) touchBtn.style.display = "none";
+        if (bioHint) bioHint.style.display = "none";
+        setTimeout(() => pwInput && pwInput.focus(), 50);
+      });
+    }
+    if (useTouchLink && pwSectionEl && usePwLink) {
+      useTouchLink.addEventListener("click", () => {
+        pwSectionEl.style.display = "none";
+        usePwLink.style.display   = "inline-block";
+        if (touchBtn) touchBtn.style.display = "";
+        if (bioHint) bioHint.style.display = "";
+        if (touchBtn) touchBtn.focus();
+      });
+    }
 
     // Block keyboard events from reaching the page behind
-    overlayEl.addEventListener("keydown", (e) => e.stopPropagation(), true);
-    overlayEl.addEventListener("keyup",   (e) => e.stopPropagation(), true);
-    overlayEl.addEventListener("keypress",(e) => e.stopPropagation(), true);
+    overlayEl.addEventListener("keydown",  (e) => e.stopPropagation(), true);
+    overlayEl.addEventListener("keyup",    (e) => e.stopPropagation(), true);
+    overlayEl.addEventListener("keypress", (e) => e.stopPropagation(), true);
 
-    // Trap focus inside overlay
     document.addEventListener("focusin", trapFocus, true);
   }
 
   function trapFocus(e) {
-    if (overlayEl && !overlayEl.contains(e.target)) {
-      e.preventDefault();
-      e.stopPropagation();
-      const pwInput = document.getElementById("msPasswordInput");
-      if (pwInput) pwInput.focus();
-    }
+    if (!overlayEl) return;
+    if (overlayEl.contains(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const touchBtn = document.getElementById("msTouchIDBtn");
+    const pwInput  = document.getElementById("msPasswordInput");
+    if (touchBtn && touchBtn.offsetParent !== null) touchBtn.focus();
+    else if (pwInput) pwInput.focus();
   }
 
   function shake(el) {

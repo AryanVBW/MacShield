@@ -163,6 +163,101 @@
   color: #FFFFFF !important;
 }
 
+/* ── Biometric PRIMARY button (used when Touch ID is the default action) ── */
+.ms-lock-btn-biometric-primary {
+  width: 100% !important;
+  height: 56px !important;
+  padding: 0 18px !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0F0F0 100%) !important;
+  color: #000000 !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  box-shadow:
+    0 4px 18px rgba(255, 255, 255, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset !important;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s !important;
+  margin-bottom: 8px !important;
+}
+.ms-lock-btn-biometric-primary:hover {
+  opacity: 0.92 !important;
+  box-shadow:
+    0 6px 22px rgba(255, 255, 255, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset !important;
+}
+.ms-lock-btn-biometric-primary:active { transform: scale(0.98) !important; }
+.ms-lock-btn-biometric-primary:disabled {
+  opacity: 0.5 !important;
+  cursor: default !important;
+}
+.ms-lock-btn-biometric-primary svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* ── Subtle hint under the biometric button ── */
+.ms-lock-bio-hint {
+  font-size: 11.5px !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin-bottom: 14px !important;
+  letter-spacing: 0.2px !important;
+}
+
+/* ── Inline auth iframe (embedded mode of auth.html) ──
+   Hosts the full Touch ID UI inside the lock overlay \u2014 no separate window. */
+.ms-lock-auth-frame {
+  width: 100% !important;
+  height: 240px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color-scheme: dark !important;
+  display: block !important;
+  margin: 4px 0 8px !important;
+}
+
+/* ── Text-link style buttons (e.g. "Use password instead") ── */
+.ms-lock-link {
+  display: inline-block !important;
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  font-size: 12px !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  padding: 6px 10px !important;
+  margin: 4px 0 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  text-decoration-color: rgba(255, 255, 255, 0.2) !important;
+  transition: color 0.15s !important;
+}
+.ms-lock-link:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-decoration-color: rgba(255, 255, 255, 0.5) !important;
+}
+.ms-lock-link:focus {
+  outline: none !important;
+  color: #FFFFFF !important;
+}
+
+/* ── Collapsible password section ── */
+.ms-lock-pw-section {
+  margin-top: 8px !important;
+  animation: ms-slidedown 0.25s ease-out !important;
+}
+@keyframes ms-slidedown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Error message ── */
 .ms-lock-error {
   font-size: 12px !important;

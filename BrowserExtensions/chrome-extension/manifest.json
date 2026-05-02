@@ -53,7 +53,14 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icons/logo.svg"],
+      "resources": [
+        "icons/logo.svg",
+        "icons/icon16.png",
+        "icons/icon48.png",
+        "icons/icon128.png",
+        "auth.html",
+        "auth.js"
+      ],
       "matches": ["<all_urls>"]
     }
   ]
