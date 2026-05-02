@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MacShield — Privacy Lock & Blur",
-  "version": "3.1.0",
-  "description": "Lock and blur any website with Touch ID or a Password. Blocks unauthorized access to WhatsApp, Gmail, Discord, and more.",
+  "version": "4.0.0",
+  "description": "Lock and blur any website with multiple passkeys (Touch ID, phone, security keys) or a password. Blocks unauthorized access to WhatsApp, Gmail, Discord, and more.",
   "permissions": ["storage", "activeTab", "tabs", "background"],
   "host_permissions": ["<all_urls>"],
   "icons": {
@@ -51,6 +51,9 @@
       "run_at": "document_idle"
     }
   ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; img-src 'self' https://img.icons8.com; script-src 'self'; style-src 'self' 'unsafe-inline';"
+  },
   "web_accessible_resources": [
     {
       "resources": [

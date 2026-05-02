@@ -3,19 +3,19 @@
 
   // ═══ Predefined site registry ═══
   const SITES = [
-    { name: "WhatsApp",    host: "web.whatsapp.com",    abbr: "Wa", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "Instagram",   host: "www.instagram.com",   abbr: "Ig", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "Telegram",    host: "web.telegram.org",    abbr: "Tg", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "Messenger",   host: "www.messenger.com",   abbr: "Me", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"   },
-    { name: "Discord",     host: "discord.com",         abbr: "Dc", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)" },
-    { name: "Slack",       host: "app.slack.com",       abbr: "Sl", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "X / Twitter", host: "x.com",               abbr: "X",  color: "#FFFFFF", bg: "rgba(255,255,255,0.08)" },
-    { name: "Facebook",    host: "www.facebook.com",    abbr: "Fb", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "LinkedIn",    host: "www.linkedin.com",    abbr: "Li", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "Gmail",       host: "mail.google.com",     abbr: "Gm", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"   },
-    { name: "Outlook",     host: "outlook.live.com",    abbr: "Ol", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"   },
-    { name: "Teams",       host: "teams.microsoft.com", abbr: "Te", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
-    { name: "Element",     host: "app.element.io",      abbr: "El", color: "#FFFFFF", bg: "rgba(255,255,255,0.08)"  },
+    { name: "WhatsApp",    host: "web.whatsapp.com",    icon: "https://img.icons8.com/color/48/whatsapp--v2.png"         },
+    { name: "Instagram",   host: "www.instagram.com",   icon: "https://img.icons8.com/color/48/instagram-new--v2.png"    },
+    { name: "Telegram",    host: "web.telegram.org",    icon: "https://img.icons8.com/color/48/telegram-app--v2.png"     },
+    { name: "Messenger",   host: "www.messenger.com",   icon: "https://img.icons8.com/color/48/facebook-messenger--v5.png" },
+    { name: "Discord",     host: "discord.com",         icon: "https://img.icons8.com/color/48/discord-logo.png"         },
+    { name: "Slack",       host: "app.slack.com",       icon: "https://img.icons8.com/color/48/slack-new.png"            },
+    { name: "X / Twitter", host: "x.com",               icon: "https://img.icons8.com/color/48/twitterx.png"            },
+    { name: "Facebook",    host: "www.facebook.com",    icon: "https://img.icons8.com/color/48/facebook-new.png"         },
+    { name: "LinkedIn",    host: "www.linkedin.com",    icon: "https://img.icons8.com/color/48/linkedin.png"             },
+    { name: "Gmail",       host: "mail.google.com",     icon: "https://img.icons8.com/color/48/gmail-new.png"            },
+    { name: "Outlook",     host: "outlook.live.com",    icon: "https://img.icons8.com/color/48/ms-outlook.png"           },
+    { name: "Teams",       host: "teams.microsoft.com", icon: "https://img.icons8.com/color/48/microsoft-teams.png"      },
+    { name: "Element",     host: "app.element.io",      icon: "https://img.icons8.com/color/48/matrix-architect.png"     },
   ];
   const PREDEFINED_HOSTS = new Set(SITES.map(s => s.host));
 
@@ -55,10 +55,35 @@
   const customSitesList   = document.getElementById("customSitesList");
   const customLockCount   = document.getElementById("customLockCount");
 
-  const bioDot            = document.getElementById("bioDot");
-  const bioStatusText     = document.getElementById("bioStatusText");
-  const bioActionBtn      = document.getElementById("bioActionBtn");
   const autoRelockToggle  = document.getElementById("autoRelockToggle");
+
+  // ─── Multi-passkey DOM refs ───
+  const passkeyList          = document.getElementById("passkeyList");
+  const passkeyEmpty         = document.getElementById("passkeyEmpty");
+  const addPasskeyBtn        = document.getElementById("addPasskeyBtn");
+  const addPasskeyModal      = document.getElementById("addPasskeyModal");
+  const addPasskeyCancelBtn  = document.getElementById("addPasskeyCancelBtn");
+  const pkLabelInput         = document.getElementById("pkLabelInput");
+  const kindPlatformBtn      = document.getElementById("kindPlatformBtn");
+  const kindPlatformDesc     = document.getElementById("kindPlatformDesc");
+  const renamePasskeyModal   = document.getElementById("renamePasskeyModal");
+  const renamePasskeyInput   = document.getElementById("renamePasskeyInput");
+  const renamePasskeySaveBtn = document.getElementById("renamePasskeySaveBtn");
+  const renamePasskeyCancelBtn = document.getElementById("renamePasskeyCancelBtn");
+
+  const genRecoveryBtn       = document.getElementById("genRecoveryBtn");
+  const recoveryCountBadge   = document.getElementById("recoveryCountBadge");
+  const recoveryModal        = document.getElementById("recoveryModal");
+  const recoveryCodesGrid    = document.getElementById("recoveryCodesGrid");
+  const recoveryCopyBtn      = document.getElementById("recoveryCopyBtn");
+  const recoveryDownloadBtn  = document.getElementById("recoveryDownloadBtn");
+  const recoveryDoneBtn      = document.getElementById("recoveryDoneBtn");
+
+  const mRecoveryBtn         = document.getElementById("mRecoveryBtn");
+  const mRecoveryForm        = document.getElementById("mRecoveryForm");
+  const mRecoveryInput       = document.getElementById("mRecoveryInput");
+  const mRecoverySubmitBtn   = document.getElementById("mRecoverySubmitBtn");
+  const mRecoveryMsg         = document.getElementById("mRecoveryMsg");
 
   // ═══ Master Lock DOM refs ═══
   const masterOverlay = document.getElementById("masterOverlay");
@@ -86,11 +111,19 @@
         masterSetup.style.display = "none";
         masterLogin.style.display = "block";
         mLoginPw.focus();
-        if (resp.os === 'mac') {
-          chrome.storage.local.get(["ms_webauthn_cred_id"], (r) => {
-            if (r.ms_webauthn_cred_id) mTouchIDBtn.style.display = "flex";
-          });
-        }
+
+        // Show "Sign in with passkey" whenever any passkey exists — not just
+        // on macOS. Cross-device + roaming credentials work on every platform.
+        chrome.runtime.sendMessage({ action: "ms_listPasskeys" }, (r) => {
+          if (r && Array.isArray(r.passkeys) && r.passkeys.length > 0) {
+            if (mTouchIDBtn) mTouchIDBtn.style.display = "flex";
+          }
+        });
+
+        // Show "Use recovery code" link if any unused codes exist.
+        chrome.runtime.sendMessage({ action: "ms_hasRecoveryCodes" }, (r) => {
+          if (r && r.unused > 0 && mRecoveryBtn) mRecoveryBtn.style.display = "block";
+        });
       }
     });
   }
@@ -490,7 +523,9 @@
       const isLocked = !!lockedSites[site.host];
       return `
         <div class="lock-site-row">
-          <div class="site-icon" style="${LOCK_ICON_STYLE}">${LOCK_ICON_SVG}</div>
+          <div class="site-icon" style="background:transparent;border:none;overflow:hidden;">
+            <img src="${site.icon}" width="28" height="28" style="border-radius:7px;display:block;" alt="${site.name}">
+          </div>
           <div class="lock-site-name">
             <strong>${site.name}</strong>
             <small>${site.host}</small>
@@ -508,8 +543,8 @@
           if (!resp || !resp.hasPassword) {
             cb.checked = false;
             document.querySelector('[data-tab="lock"]').click();
-            pwMsg.textContent = "Set a password first to enable App Lock";
-            pwMsg.className = "pw-msg err";
+            pwChangeMsg.textContent = "Set a password first to enable App Lock";
+            pwChangeMsg.className = "pw-msg err";
             return;
           }
           if (cb.checked) lockedSites[cb.dataset.host] = true;
@@ -525,87 +560,380 @@
   loadLockSites();
 
   // ═══════════════════════════════════════
-  // TOUCH ID
+  // MULTI-PASSKEY MANAGEMENT
   // ═══════════════════════════════════════
 
-  let bioEnrolled = false;
+  const KIND_META = {
+    "platform": {
+      title: "Platform",
+      sub:   (os) => os === "mac" ? "Touch ID on this Mac"
+                  : os === "win" ? "Windows Hello on this PC"
+                  : os === "android" ? "Biometric on this device"
+                  : "This device",
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>',
+    },
+    "cross-device": {
+      title: "Phone or tablet",
+      sub:   () => "Cross-device (QR / hybrid)",
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>',
+    },
+    "roaming": {
+      title: "Security key",
+      sub:   () => "USB / NFC / Bluetooth key",
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="20" height="6" rx="2"/><circle cx="6" cy="12" r="0.6" fill="currentColor"/><circle cx="10" cy="12" r="0.6" fill="currentColor"/></svg>',
+    },
+  };
 
-  function loadBioState() {
-    chrome.runtime.getPlatformInfo((info) => {
-      if (info.os !== 'mac') {
-        const bioLabel = document.querySelector(".bio-label");
-        if (bioLabel) bioLabel.textContent = "Windows Hello / Touch ID";
-        bioDot.classList.remove("enrolled");
-        bioStatusText.textContent = "Coming Soon";
-        bioActionBtn.textContent = "Coming Soon";
-        bioActionBtn.className = "btn btn-ghost";
-        bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;opacity:0.5;";
-        bioActionBtn.disabled = true;
-        return;
-      }
-      // Spec gate: check isUserVerifyingPlatformAuthenticatorAvailable before any passkey UI
-      const supported = window.PublicKeyCredential &&
-        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable;
-      const availabilityCheck = supported
-        ? PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-        : Promise.resolve(false);
+  let currentPasskeys = [];
+  let pendingAddPoll = null;
+  let platformOS = "";
 
-      availabilityCheck.then((available) => {
-        if (!available) {
-          bioDot.classList.remove("enrolled");
-          bioStatusText.textContent = "Not available on this device";
-          bioActionBtn.textContent  = "Not Available";
-          bioActionBtn.className    = "btn btn-ghost";
-          bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;opacity:0.5;";
-          bioActionBtn.disabled = true;
-          return;
-        }
+  function formatRelative(ts) {
+    if (!ts) return "Never used";
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return "Just now";
+    if (m < 60) return m + "m ago";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + "h ago";
+    const d = Math.floor(h / 24);
+    if (d < 30) return d + "d ago";
+    return new Date(ts).toLocaleDateString();
+  }
 
-        chrome.storage.local.get(["ms_webauthn_cred_id"], (r) => {
-          bioEnrolled = !!r.ms_webauthn_cred_id;
-          if (bioEnrolled) {
-            bioDot.classList.add("enrolled");
-            bioStatusText.textContent = "Enrolled and ready";
-            bioActionBtn.textContent = "Reset";
-            bioActionBtn.className = "btn btn-danger";
-            bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;";
-          } else {
-            bioDot.classList.remove("enrolled");
-            bioStatusText.textContent = "Not enrolled";
-            bioActionBtn.textContent = "Enroll";
-            bioActionBtn.className = "btn btn-ghost";
-            bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;";
-          }
-          bioActionBtn.disabled = false;
-        });
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+  }
+
+  function renderPasskeys(list) {
+    // Clear any menu popups that were reparented to <body> on a previous
+    // render — otherwise they'd accumulate as orphans.
+    document.querySelectorAll("body > .pk-menu-pop").forEach((el) => el.remove());
+
+    currentPasskeys = list || [];
+    if (currentPasskeys.length === 0) {
+      passkeyList.innerHTML = '<div class="pk-empty">No passkeys yet. Add one to unlock with biometrics, a phone, or a security key.</div>';
+      return;
+    }
+    passkeyList.innerHTML = currentPasskeys.map((p, i) => {
+      const meta = KIND_META[p.kind] || KIND_META.platform;
+      const subParts = [ meta.sub(platformOS) ];
+      subParts.push(formatRelative(p.lastUsedAt));
+      return `
+        <div class="pk-row" data-idx="${i}">
+          <div class="pk-icon">${meta.svg}</div>
+          <div class="pk-info">
+            <div class="pk-label">${escapeHtml(p.label || meta.title)}</div>
+            <div class="pk-sub">${subParts.map(escapeHtml).join(" · ")}</div>
+          </div>
+          <div class="pk-menu">
+            <button class="pk-menu-btn" data-menu-idx="${i}" aria-label="Menu">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>
+              </svg>
+            </button>
+            <div class="pk-menu-pop" id="pk-pop-${i}">
+              <button class="pk-menu-item"        data-action="rename" data-idx="${i}">Rename</button>
+              <button class="pk-menu-item danger" data-action="remove" data-idx="${i}">Remove</button>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+
+    // Wire menu buttons.
+    // Popups are moved to <body> on open so they escape the section's
+    // overflow:hidden clip, and positioned via the button's bounding rect.
+    passkeyList.querySelectorAll(".pk-menu-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = btn.dataset.menuIdx;
+        const wasOpen = document.getElementById("pk-pop-" + idx)
+          ?.classList.contains("open");
+        closeAllMenus();
+        if (wasOpen) return; // toggle off
+        const pop = document.getElementById("pk-pop-" + idx);
+        if (!pop) return;
+        // Reparent to body so position:fixed coordinates are viewport-based
+        // and nothing clips it.
+        if (pop.parentElement !== document.body) document.body.appendChild(pop);
+        const r = btn.getBoundingClientRect();
+        const popWidth = 140; // matches min-width + padding
+        pop.style.top  = (r.bottom + 4) + "px";
+        pop.style.left = Math.max(8, Math.min(
+          window.innerWidth - popWidth - 8,
+          r.right - popWidth
+        )) + "px";
+        pop.classList.add("open");
+      });
+    });
+    passkeyList.querySelectorAll(".pk-menu-item").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = parseInt(item.dataset.idx, 10);
+        const action = item.dataset.action;
+        closeAllMenus();
+        const p = currentPasskeys[idx];
+        if (!p) return;
+        if (action === "rename") openRenameModal(p);
+        else if (action === "remove") confirmRemovePasskey(p);
       });
     });
   }
-  loadBioState();
 
-  bioActionBtn.addEventListener("click", () => {
-    if (bioEnrolled) {
-      if (bioActionBtn.textContent === "Reset") {
-        bioActionBtn.textContent = "Confirm Reset";
-        setTimeout(() => { if (bioEnrolled) bioActionBtn.textContent = "Reset"; }, 3000);
-        return;
+  function closeAllMenus() {
+    document.querySelectorAll(".pk-menu-pop.open").forEach((el) => el.classList.remove("open"));
+  }
+  document.addEventListener("click", closeAllMenus);
+
+  function loadPasskeys() {
+    chrome.runtime.sendMessage({ action: "ms_listPasskeys" }, (r) => {
+      renderPasskeys((r && r.passkeys) || []);
+    });
+  }
+
+  // Detect platform + gate the "This device" modal row
+  chrome.runtime.getPlatformInfo((info) => {
+    platformOS = info.os || "";
+    const supported = window.PublicKeyCredential &&
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable;
+    const check = supported
+      ? PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+      : Promise.resolve(false);
+    check.then((avail) => {
+      if (!avail) {
+        kindPlatformBtn.disabled = true;
+        if (kindPlatformDesc) kindPlatformDesc.textContent = "Not available on this device";
+      } else if (kindPlatformDesc) {
+        kindPlatformDesc.textContent =
+          platformOS === "mac" ? "Touch ID on this Mac"
+          : platformOS === "win" ? "Windows Hello on this PC"
+          : "Built-in biometric on this device";
       }
-      bioActionBtn.textContent = "Resetting…";
-      chrome.storage.local.remove(["ms_webauthn_cred_id"], () => loadBioState());
-    } else {
-      bioActionBtn.disabled = true;
-      bioActionBtn.textContent = "Opening…";
-      chrome.runtime.sendMessage({ action: "ms_openTouchID", hostname: "_setup", mode: "enroll" }, () => {
-        let attempts = 0;
-        const poll = setInterval(() => {
-          attempts++;
-          chrome.storage.local.get(["ms_webauthn_cred_id"], (r) => {
-            if (r.ms_webauthn_cred_id || attempts > 30) { clearInterval(poll); loadBioState(); }
-          });
-        }, 1000);
-      });
-    }
+      loadPasskeys();
+    });
   });
+
+  // ─── Add-passkey modal ───
+  function openAddModal() {
+    pkLabelInput.value = "";
+    addPasskeyModal.classList.add("open");
+  }
+  function closeAddModal() { addPasskeyModal.classList.remove("open"); }
+
+  addPasskeyBtn.addEventListener("click", openAddModal);
+  addPasskeyCancelBtn.addEventListener("click", closeAddModal);
+  addPasskeyModal.addEventListener("click", (e) => {
+    if (e.target === addPasskeyModal) closeAddModal();
+  });
+
+  document.querySelectorAll(".pk-kind-row").forEach((row) => {
+    row.addEventListener("click", () => {
+      const kind = row.dataset.kind;
+      const label = (pkLabelInput.value || "").trim();
+      closeAddModal();
+      startEnrollment(kind, label);
+    });
+  });
+
+  function startEnrollment(kind, label) {
+    // Opens auth.html in a tab (same pattern as the original enroll flow).
+    chrome.runtime.sendMessage({
+      action:   "ms_openTouchID",
+      hostname: "_setup",
+      mode:     "enroll",
+      kind,
+      label,
+    }, () => {
+      // Poll for registry changes so the list refreshes after success.
+      if (pendingAddPoll) clearInterval(pendingAddPoll);
+      const startCount = currentPasskeys.length;
+      let attempts = 0;
+      pendingAddPoll = setInterval(() => {
+        attempts++;
+        chrome.runtime.sendMessage({ action: "ms_listPasskeys" }, (r) => {
+          const list = (r && r.passkeys) || [];
+          if (list.length !== startCount || attempts > 60) {
+            clearInterval(pendingAddPoll); pendingAddPoll = null;
+            renderPasskeys(list);
+          }
+        });
+      }, 1000);
+    });
+  }
+
+  // ─── Rename modal ───
+  let renameTarget = null;
+  function openRenameModal(passkey) {
+    renameTarget = passkey;
+    renamePasskeyInput.value = passkey.label || "";
+    renamePasskeyModal.classList.add("open");
+    setTimeout(() => renamePasskeyInput.focus(), 40);
+  }
+  function closeRenameModal() {
+    renameTarget = null;
+    renamePasskeyModal.classList.remove("open");
+  }
+  renamePasskeyCancelBtn.addEventListener("click", closeRenameModal);
+  renamePasskeyModal.addEventListener("click", (e) => {
+    if (e.target === renamePasskeyModal) closeRenameModal();
+  });
+  renamePasskeyInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") renamePasskeySaveBtn.click();
+    if (e.key === "Escape") closeRenameModal();
+  });
+  renamePasskeySaveBtn.addEventListener("click", () => {
+    if (!renameTarget) return;
+    const label = (renamePasskeyInput.value || "").trim();
+    if (!label) return;
+    chrome.runtime.sendMessage({
+      action: "ms_renamePasskey",
+      id:     renameTarget.id,
+      label,
+    }, () => {
+      closeRenameModal();
+      loadPasskeys();
+    });
+  });
+
+  // ─── Remove passkey (two-click confirm inline) ───
+  function confirmRemovePasskey(passkey) {
+    const label = passkey.label || "this passkey";
+    // If this is the last passkey, warn loudly — password becomes the only
+    // way back in (plus recovery codes).
+    if (currentPasskeys.length === 1) {
+      if (!confirm("Remove \"" + label + "\"?\n\nThis is your LAST passkey. You'll need your master password (or a recovery code) to sign in again.")) return;
+    } else {
+      if (!confirm("Remove \"" + label + "\"?")) return;
+    }
+    chrome.runtime.sendMessage({ action: "ms_removePasskey", id: passkey.id }, () => {
+      loadPasskeys();
+    });
+  }
+
+  // ═══════════════════════════════════════
+  // RECOVERY CODES
+  // ═══════════════════════════════════════
+
+  function refreshRecoveryBadge() {
+    chrome.runtime.sendMessage({ action: "ms_hasRecoveryCodes" }, (r) => {
+      if (!r) return;
+      if (r.unused > 0) {
+        recoveryCountBadge.textContent = r.unused + " / " + r.total + " unused";
+        genRecoveryBtn.textContent = "Regenerate";
+      } else if (r.total > 0) {
+        recoveryCountBadge.textContent = "All used";
+        genRecoveryBtn.textContent = "Generate";
+      } else {
+        recoveryCountBadge.textContent = "";
+        genRecoveryBtn.textContent = "Generate";
+      }
+    });
+  }
+  refreshRecoveryBadge();
+
+  genRecoveryBtn.addEventListener("click", () => {
+    if (genRecoveryBtn.dataset.armed !== "1") {
+      const prev = genRecoveryBtn.textContent;
+      genRecoveryBtn.textContent = "Confirm";
+      genRecoveryBtn.dataset.armed = "1";
+      setTimeout(() => {
+        if (genRecoveryBtn.dataset.armed === "1") {
+          genRecoveryBtn.textContent = prev;
+          genRecoveryBtn.dataset.armed = "";
+        }
+      }, 3000);
+      return;
+    }
+    genRecoveryBtn.dataset.armed = "";
+    genRecoveryBtn.disabled = true;
+    genRecoveryBtn.textContent = "Generating…";
+    chrome.runtime.sendMessage({ action: "ms_generateRecoveryCodes" }, (r) => {
+      genRecoveryBtn.disabled = false;
+      if (r && r.ok && Array.isArray(r.codes)) {
+        showRecoveryCodes(r.codes);
+      } else {
+        alert("Failed to generate recovery codes");
+      }
+      refreshRecoveryBadge();
+    });
+  });
+
+  function showRecoveryCodes(codes) {
+    recoveryCodesGrid.innerHTML = codes
+      .map((c) => `<div class="recovery-code">${escapeHtml(c)}</div>`)
+      .join("");
+    recoveryModal.classList.add("open");
+
+    recoveryCopyBtn.textContent = "Copy all";
+    recoveryCopyBtn.onclick = () => {
+      navigator.clipboard.writeText(codes.join("\n")).then(() => {
+        recoveryCopyBtn.textContent = "Copied ✓";
+        setTimeout(() => { recoveryCopyBtn.textContent = "Copy all"; }, 1500);
+      });
+    };
+
+    recoveryDownloadBtn.onclick = () => {
+      const blob = new Blob(
+        ["MacShield recovery codes\nGenerated: " + new Date().toISOString() + "\n\n" + codes.join("\n") + "\n"],
+        { type: "text/plain" }
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "macshield-recovery-codes.txt";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    recoveryDoneBtn.onclick = () => recoveryModal.classList.remove("open");
+  }
+
+  // ─── Recovery code on master-login overlay ───
+  if (mRecoveryBtn) {
+    mRecoveryBtn.addEventListener("click", () => {
+      mRecoveryForm.style.display = "block";
+      mRecoveryBtn.style.display  = "none";
+      setTimeout(() => mRecoveryInput.focus(), 40);
+    });
+  }
+  function submitRecovery() {
+    const code = (mRecoveryInput.value || "").trim();
+    if (!code) return;
+    mRecoveryMsg.className = "pw-msg";
+    mRecoverySubmitBtn.disabled = true;
+    mRecoverySubmitBtn.textContent = "Checking…";
+    chrome.runtime.sendMessage({ action: "ms_consumeRecoveryCode", code }, (r) => {
+      mRecoverySubmitBtn.disabled = false;
+      mRecoverySubmitBtn.textContent = "Recover";
+      if (r && r.ok) {
+        mRecoveryMsg.textContent = "Recovered — all passkeys have been revoked. Unlocking…";
+        mRecoveryMsg.className   = "pw-msg ok";
+        setTimeout(() => {
+          masterOverlay.style.display = "none";
+          document.body.classList.remove("locked");
+          if (typeof loadPwState === "function") loadPwState();
+          loadPasskeys();
+          refreshRecoveryBadge();
+        }, 800);
+      } else {
+        mRecoveryMsg.textContent = "Invalid code";
+        mRecoveryMsg.className   = "pw-msg err";
+        mRecoveryInput.value = "";
+        mRecoveryInput.focus();
+      }
+    });
+  }
+  if (mRecoverySubmitBtn) mRecoverySubmitBtn.addEventListener("click", submitRecovery);
+  if (mRecoveryInput) {
+    mRecoveryInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitRecovery();
+      if (mRecoveryMsg.textContent) mRecoveryMsg.textContent = "";
+    });
+  }
 
   // ═══ Auto-relock ═══
   chrome.storage.local.get(["ms_auto_relock"], (r) => {

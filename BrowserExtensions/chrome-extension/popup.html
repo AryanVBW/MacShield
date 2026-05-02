@@ -378,6 +378,140 @@ kbd {
 }
 body.locked > :not(#masterOverlay) { display: none !important; }
 
+/* ── Passkeys list ── */
+.pk-list { padding: 4px 0; }
+.pk-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border);
+}
+.pk-row:last-child { border-bottom: none; }
+.pk-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--accent-bg); border: 1px solid var(--accent-brd);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--accent);
+}
+.pk-icon svg { width: 15px; height: 15px; }
+.pk-info { flex: 1; min-width: 0; }
+.pk-label { font-size: 12.5px; font-weight: 600; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-sub   { font-size: 10.5px; color: var(--text-3); margin-top: 1px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-menu {
+  flex-shrink: 0; position: relative;
+}
+.pk-menu-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  color: var(--text-2); cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.pk-menu-btn:hover { background: var(--surface-3); color: var(--text); }
+.pk-menu-pop {
+  display: none;
+  /* position: fixed so the menu escapes the section's overflow:hidden clip.
+     Coordinates are set in JS from the button's bounding rect. */
+  position: fixed;
+  background: var(--surface); border: 1px solid var(--border-2);
+  border-radius: 9px; padding: 4px; min-width: 132px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+  z-index: 9998;
+}
+.pk-menu-pop.open { display: block; }
+.pk-menu-item {
+  display: block; width: 100%;
+  padding: 7px 10px; font-size: 12px;
+  background: none; border: none; color: var(--text-2);
+  text-align: left; cursor: pointer; border-radius: 6px;
+  font-family: inherit;
+}
+.pk-menu-item:hover { background: var(--surface-3); color: var(--text); }
+.pk-menu-item.danger { color: var(--red); }
+.pk-menu-item.danger:hover { background: var(--red-bg); }
+
+.pk-empty {
+  padding: 14px 13px;
+  font-size: 11.5px; color: var(--text-3); text-align: center;
+}
+
+/* ── Modal overlay ── */
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.68);
+  z-index: 9999;
+  align-items: flex-start; justify-content: center;
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  width: 100%; max-width: 340px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.modal-header {
+  padding: 14px 15px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.modal-sub   { font-size: 11px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
+.modal-body  { padding: 10px 12px 14px; }
+
+.pk-kind-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 12px; margin-bottom: 6px;
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit; width: 100%; text-align: left;
+  color: var(--text);
+}
+.pk-kind-row:hover { background: var(--surface-3); border-color: var(--accent-brd); }
+.pk-kind-row:disabled { opacity: 0.35; pointer-events: none; }
+.pk-kind-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent-bg); border: 1px solid var(--accent-brd);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--accent);
+}
+.pk-kind-icon svg { width: 17px; height: 17px; }
+.pk-kind-text { flex: 1; min-width: 0; }
+.pk-kind-title { font-size: 12.5px; font-weight: 600; }
+.pk-kind-desc  { font-size: 10.5px; color: var(--text-3); margin-top: 2px; line-height: 1.4; }
+
+.modal-actions { display: flex; gap: 6px; margin-top: 4px; }
+.modal-actions .btn { flex: 1; height: 34px; }
+
+.recovery-codes-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  margin: 8px 0 10px;
+}
+.recovery-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px; letter-spacing: 0.5px;
+  padding: 7px 9px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  color: var(--text);
+  text-align: center;
+}
+.warn-note {
+  font-size: 10.5px; line-height: 1.5;
+  color: var(--amber);
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-brd);
+  padding: 8px 10px; border-radius: 8px;
+  margin-bottom: 10px;
+}
+
 /* ── Master Lock Overlay ── */
 #masterOverlay {
   position: relative; width: 100%; height: 480px;
@@ -424,9 +558,15 @@ body.locked > :not(#masterOverlay) { display: none !important; }
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
           </svg>
-          <span style="margin-left:4px;">Use Touch ID</span>
+          <span style="margin-left:4px;">Sign in with passkey</span>
         </button>
         <div id="mLoginMsg" class="pw-msg err" style="margin-top:8px;"></div>
+        <button class="btn btn-ghost btn-full" id="mRecoveryBtn" style="margin-top:6px; height:36px; font-size:11.5px; display:none;">Use recovery code</button>
+        <div id="mRecoveryForm" style="display:none; margin-top:8px;">
+          <input type="text" id="mRecoveryInput" class="pw-input" placeholder="xxxx-xxxx-xxxx" autocomplete="off" spellcheck="false" style="font-family:ui-monospace,Menlo,monospace;letter-spacing:1px;">
+          <button class="btn btn-primary btn-full" id="mRecoverySubmitBtn" style="height:38px;">Recover</button>
+          <div id="mRecoveryMsg" class="pw-msg" style="margin-top:6px;"></div>
+        </div>
       </div>
     </div>
 </div>
@@ -625,21 +765,28 @@ body.locked > :not(#masterOverlay) { display: none !important; }
 <div class="tab-panel" id="panel-settings">
 
   <div class="section">
-    <div class="section-header">Biometric Authentication</div>
-    <div class="bio-card">
-      <div class="bio-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
-        </svg>
+    <div class="section-header">
+      Passkeys
+      <button class="btn btn-ghost" id="addPasskeyBtn"
+              style="font-size:10.5px;height:22px;padding:0 8px;letter-spacing:0;">+ Add</button>
+    </div>
+    <div class="pk-list" id="passkeyList">
+      <div class="pk-empty" id="passkeyEmpty">No passkeys yet. Add one to unlock with biometrics, a phone, or a security key.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      Recovery Codes
+      <span id="recoveryCountBadge" style="font-size:10px;color:var(--text-3);"></span>
+    </div>
+    <div class="opt-row" style="cursor:default;">
+      <div class="opt-info">
+        <span class="opt-label">Backup recovery codes</span>
+        <span class="opt-desc">One-time codes that revoke all passkeys and restore access</span>
       </div>
-      <div class="bio-info">
-        <div class="bio-label">Touch ID</div>
-        <div class="bio-sub">
-          <span class="bio-dot" id="bioDot"></span>
-          <span id="bioStatusText">Not enrolled</span>
-        </div>
-      </div>
-      <button class="btn btn-ghost" id="bioActionBtn" style="font-size:11.5px;height:32px;padding:0 12px;">Enroll</button>
+      <button class="btn btn-ghost" id="genRecoveryBtn"
+              style="font-size:11.5px;height:30px;padding:0 12px;flex-shrink:0;">Generate</button>
     </div>
   </div>
 
@@ -677,6 +824,99 @@ body.locked > :not(#masterOverlay) { display: none !important; }
 <div class="footer">
   <span>Toggle blur: <kbd>Alt</kbd> <kbd>X</kbd></span>
   <span style="color:var(--text-3);">&copy; 2025 AryanVBW</span>
+</div>
+
+<!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
+
+<!-- Add-passkey chooser -->
+<div class="modal-backdrop" id="addPasskeyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add a passkey</div>
+      <div class="modal-sub">Choose how to create your new passkey. Chrome shows the right prompt automatically.</div>
+    </div>
+    <div class="modal-body">
+      <button class="pk-kind-row" data-kind="platform" id="kindPlatformBtn">
+        <span class="pk-kind-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+          </svg>
+        </span>
+        <span class="pk-kind-text">
+          <div class="pk-kind-title">This device</div>
+          <div class="pk-kind-desc" id="kindPlatformDesc">Touch ID, Windows Hello, or Android biometric</div>
+        </span>
+      </button>
+
+      <button class="pk-kind-row" data-kind="cross-device">
+        <span class="pk-kind-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/>
+          </svg>
+        </span>
+        <span class="pk-kind-text">
+          <div class="pk-kind-title">Phone or tablet</div>
+          <div class="pk-kind-desc">Scan a QR code with your phone (Google, iCloud, Samsung)</div>
+        </span>
+      </button>
+
+      <button class="pk-kind-row" data-kind="roaming">
+        <span class="pk-kind-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="9" width="20" height="6" rx="2"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="10" y2="12"/>
+          </svg>
+        </span>
+        <span class="pk-kind-text">
+          <div class="pk-kind-title">Security key</div>
+          <div class="pk-kind-desc">USB, NFC, or Bluetooth hardware key (e.g. YubiKey)</div>
+        </span>
+      </button>
+
+      <div style="margin-top:10px;">
+        <input type="text" id="pkLabelInput" class="pw-input" placeholder="Label (optional) — e.g. iPhone 15" autocomplete="off" style="font-size:12px;height:34px;">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="addPasskeyCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rename passkey -->
+<div class="modal-backdrop" id="renamePasskeyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Rename passkey</div>
+      <div class="modal-sub" id="renamePasskeySub">Give this passkey a memorable name.</div>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="renamePasskeyInput" class="pw-input" placeholder="Label" autocomplete="off" style="font-size:12.5px;">
+      <div class="modal-actions">
+        <button class="btn btn-ghost"   id="renamePasskeyCancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="renamePasskeySaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recovery codes display (post-generation) -->
+<div class="modal-backdrop" id="recoveryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Your recovery codes</div>
+      <div class="modal-sub">Store these somewhere safe. Each code works once. Using a code revokes all your passkeys.</div>
+    </div>
+    <div class="modal-body">
+      <div class="warn-note">These codes are shown <strong>only once</strong>. Copy or download them now — they can't be retrieved later.</div>
+      <div class="recovery-codes-grid" id="recoveryCodesGrid"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost"   id="recoveryCopyBtn">Copy all</button>
+        <button class="btn btn-ghost"   id="recoveryDownloadBtn">Download .txt</button>
+        <button class="btn btn-primary" id="recoveryDoneBtn">I saved them</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="popup.js"></script>

@@ -91,7 +91,10 @@
     </svg>`;
 
   function buildOverlay(os, hasTouchID) {
-    const showTouchID = os === "mac" && !!hasTouchID;
+    // Show the passkey button whenever any passkey is registered, regardless
+    // of platform — cross-device (QR) and roaming (security-key) passkeys
+    // work on Windows, Linux, and ChromeOS too.
+    const showTouchID = !!hasTouchID;
     show(); // page is invisible behind the overlay
 
     overlayEl = document.createElement("div");
