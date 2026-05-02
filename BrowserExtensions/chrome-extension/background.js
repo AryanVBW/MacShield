@@ -163,7 +163,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // -- Get full lock state for a hostname --
   if (msg.action === "ms_getLockState") {
     (async () => {
-      const result = await chrome.storage.local.get(["ms_locked_sites", "ms_password_hash"]);
+      const result = await chrome.storage.local.get(["ms_locked_sites", "ms_password_hash", "ms_webauthn_cred_id"]);
       const unlockedSites = await getUnlockedSites();
       const sites = result.ms_locked_sites || {};
       const host = msg.hostname || "";
@@ -172,10 +172,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         isLocked:    !!sites[host],
         isUnlocked:  unlockedSites.has(host),
         hasPassword: !!result.ms_password_hash,
+        hasTouchID:  !!result.ms_webauthn_cred_id,
         os:          platformInfo.os,
       });
     })();
     return true; // async
+  }
+
+  // -- Passthrough for popup master-unlock broadcast (auth.html -> popup.js) --
+  if (msg.action === "ms_masterUnlocked") {
+    sendResponse({ ok: true });
+    return false;
   }
 
   // -- Touch ID auth / enroll window --
@@ -253,8 +260,8 @@ async function updateBadge(tab) {
   const sites = result.ms_locked_sites || {};
   const unlockedSites = await getUnlockedSites();
   if (sites[host] && !unlockedSites.has(host)) {
-    chrome.action.setBadgeText({ text: "🔒", tabId: tab.id });
-    chrome.action.setBadgeBackgroundColor({ color: "#222222", tabId: tab.id });
+    chrome.action.setBadgeText({ text: "ON", tabId: tab.id });
+    chrome.action.setBadgeBackgroundColor({ color: "#FF3B30", tabId: tab.id });
   } else {
     chrome.action.setBadgeText({ text: "", tabId: tab.id });
   }

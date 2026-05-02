@@ -53,7 +53,7 @@
     }
 
     // ─── Locked and not authenticated → inject overlay ───
-    injectLockScreen(resp.os);
+    injectLockScreen(resp.os, resp.hasTouchID);
   });
 
   // ─── Reveal the page ───
@@ -76,15 +76,16 @@
   }
 
   // ─── Inject lock screen ───
-  function injectLockScreen(os) {
+  function injectLockScreen(os, hasTouchID) {
     if (document.body) {
-      buildOverlay(os);
+      buildOverlay(os, hasTouchID);
     } else {
-      document.addEventListener("DOMContentLoaded", () => buildOverlay(os), { once: true });
+      document.addEventListener("DOMContentLoaded", () => buildOverlay(os, hasTouchID), { once: true });
     }
   }
 
-  function buildOverlay(os) {
+  function buildOverlay(os, hasTouchID) {
+    const showTouchID = os === "mac" && !!hasTouchID;
     show(); // page is invisible behind the overlay
 
     overlayEl = document.createElement("div");
@@ -110,9 +111,9 @@
 
         <div class="ms-lock-error" id="msLockError">Incorrect password — try again.</div>
 
-        <div class="ms-lock-divider" ${os !== 'mac' ? 'style="display:none;"' : ''}><span>or</span></div>
+        <div class="ms-lock-divider" ${!showTouchID ? 'style="display:none;"' : ''}><span>or</span></div>
 
-        <button id="msTouchIDBtn" class="ms-lock-btn ms-lock-btn-biometric" ${os !== 'mac' ? 'style="display:none;"' : ''}>
+        <button id="msTouchIDBtn" class="ms-lock-btn ms-lock-btn-biometric" ${!showTouchID ? 'style="display:none;"' : ''}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3-.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
           </svg>

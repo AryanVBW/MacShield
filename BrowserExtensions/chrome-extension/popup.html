@@ -43,7 +43,7 @@ body {
 }
 
 /* ── Scroll ── */
-.popup-scroll { max-height: 560px; overflow-y: auto; }
+.popup-scroll { max-height: 582px; overflow-y: auto; }
 .popup-scroll::-webkit-scrollbar { width: 3px; }
 .popup-scroll::-webkit-scrollbar-track { background: transparent; }
 .popup-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
@@ -107,7 +107,7 @@ body {
 
 /* ── Sections ── */
 .section {
-  margin: 8px 12px;
+  margin: 9px 13px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -163,7 +163,7 @@ body {
 
 /* ── Status card ── */
 .status-card {
-  margin: 8px 12px;
+  margin: 9px 13px;
   padding: 12px 13px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
@@ -197,7 +197,7 @@ body {
 }
 .val-pill.dim { opacity: 0.25; }
 input[type="range"] {
-  -webkit-appearance: none; width: 100%; height: 4px;
+  -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
   border-radius: 2px; background: var(--surface-2); outline: none;
   transition: opacity 0.2s;
 }
@@ -666,6 +666,7 @@ body.locked > :not(#masterOverlay) { display: none !important; }
       <strong>MacShield v3.1</strong> — Privacy Lock &amp; Blur<br>
       Lock any website with a full-screen auth screen. Blur private content on popular apps.
       <small>All data stored locally. Nothing is sent externally.</small>
+      <small style="margin-top:8px;">&copy; 2025 <strong style="color:var(--text-2);">AryanVBW</strong>. All rights reserved.</small>
     </div>
   </div>
 
@@ -675,7 +676,7 @@ body.locked > :not(#masterOverlay) { display: none !important; }
 
 <div class="footer">
   <span>Toggle blur: <kbd>Alt</kbd> <kbd>X</kbd></span>
-  <span style="color:var(--text-3);">MacShield</span>
+  <span style="color:var(--text-3);">&copy; 2025 AryanVBW</span>
 </div>
 
 <script src="popup.js"></script>

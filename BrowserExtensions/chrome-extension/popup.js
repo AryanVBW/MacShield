@@ -19,6 +19,9 @@
   ];
   const PREDEFINED_HOSTS = new Set(SITES.map(s => s.host));
 
+  const LOCK_ICON_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  const LOCK_ICON_STYLE = 'background:rgba(48,209,88,0.10);border:1px solid rgba(48,209,88,0.22);';
+
   // ═══ DOM refs ═══
   const blurStatusCard    = document.getElementById("blurStatusCard");
   const blurStatusLabel   = document.getElementById("blurStatusLabel");
@@ -143,6 +146,34 @@
     if (e.key === "Enter") mSetupBtn.click();
     if (mSetupMsg.textContent) mSetupMsg.textContent = "";
   }));
+
+  // ═══ Touch ID button in master login ═══
+  if (mTouchIDBtn) {
+    mTouchIDBtn.addEventListener("click", () => {
+      mTouchIDBtn.disabled = true;
+      mLoginMsg.textContent = "";
+      mLoginMsg.className   = "pw-msg";
+      chrome.runtime.sendMessage(
+        { action: "ms_openTouchID", hostname: "_master", mode: "auth" },
+        () => {
+          if (chrome.runtime.lastError) {
+            mTouchIDBtn.disabled  = false;
+            mLoginMsg.textContent = "Touch ID unavailable";
+            mLoginMsg.className   = "pw-msg err";
+          }
+        }
+      );
+    });
+  }
+
+  // Listen for Touch ID success from auth.html popup (ms_masterUnlocked broadcast)
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.action === "ms_masterUnlocked") {
+      masterOverlay.style.display = "none";
+      document.body.classList.remove("locked");
+      if (typeof loadPwState === "function") loadPwState();
+    }
+  });
 
   // ═══ Tab switching ═══
   document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -385,7 +416,7 @@
     }
     customSitesList.innerHTML = keys.map(host => `
       <div class="custom-site-row">
-        <div class="site-icon" style="background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-brd);width:28px;height:28px;border-radius:7px;font-size:9.5px;font-weight:800;flex-shrink:0;display:flex;align-items:center;justify-content:center;">${host[0].toUpperCase()}</div>
+        <div class="site-icon" style="${LOCK_ICON_STYLE}">${LOCK_ICON_SVG}</div>
         <span class="custom-site-name">${host}</span>
         <button class="remove-site-btn" data-host="${host}">Remove</button>
       </div>`).join("");
@@ -459,7 +490,7 @@
       const isLocked = !!lockedSites[site.host];
       return `
         <div class="lock-site-row">
-          <div class="site-icon" style="background:${site.bg};color:${site.color};">${site.abbr}</div>
+          <div class="site-icon" style="${LOCK_ICON_STYLE}">${LOCK_ICON_SVG}</div>
           <div class="lock-site-name">
             <strong>${site.name}</strong>
             <small>${site.host}</small>
@@ -512,22 +543,41 @@
         bioActionBtn.disabled = true;
         return;
       }
-      chrome.storage.local.get(["ms_webauthn_cred_id"], (r) => {
-        bioEnrolled = !!r.ms_webauthn_cred_id;
-        if (bioEnrolled) {
-          bioDot.classList.add("enrolled");
-          bioStatusText.textContent = "Enrolled and ready";
-          bioActionBtn.textContent = "Reset";
-          bioActionBtn.className = "btn btn-danger";
-          bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;";
-        } else {
+      // Spec gate: check isUserVerifyingPlatformAuthenticatorAvailable before any passkey UI
+      const supported = window.PublicKeyCredential &&
+        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable;
+      const availabilityCheck = supported
+        ? PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+        : Promise.resolve(false);
+
+      availabilityCheck.then((available) => {
+        if (!available) {
           bioDot.classList.remove("enrolled");
-          bioStatusText.textContent = "Not enrolled";
-          bioActionBtn.textContent = "Enroll";
-          bioActionBtn.className = "btn btn-ghost";
-          bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;";
+          bioStatusText.textContent = "Not available on this device";
+          bioActionBtn.textContent  = "Not Available";
+          bioActionBtn.className    = "btn btn-ghost";
+          bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;opacity:0.5;";
+          bioActionBtn.disabled = true;
+          return;
         }
-        bioActionBtn.disabled = false;
+
+        chrome.storage.local.get(["ms_webauthn_cred_id"], (r) => {
+          bioEnrolled = !!r.ms_webauthn_cred_id;
+          if (bioEnrolled) {
+            bioDot.classList.add("enrolled");
+            bioStatusText.textContent = "Enrolled and ready";
+            bioActionBtn.textContent = "Reset";
+            bioActionBtn.className = "btn btn-danger";
+            bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;";
+          } else {
+            bioDot.classList.remove("enrolled");
+            bioStatusText.textContent = "Not enrolled";
+            bioActionBtn.textContent = "Enroll";
+            bioActionBtn.className = "btn btn-ghost";
+            bioActionBtn.style.cssText = "font-size:11.5px;height:32px;padding:0 12px;";
+          }
+          bioActionBtn.disabled = false;
+        });
       });
     });
   }
