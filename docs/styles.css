@@ -344,8 +344,9 @@ h2 strong {
 
 .store-badge-icon-only {
   min-width: unset;
-  padding: 8px;
+  padding: 10px 14px;
   justify-content: center;
+  align-items: center;
 }
 
 .store-badge-icon {
