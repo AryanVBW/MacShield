@@ -31,7 +31,7 @@ jobs:
           rsync -av --delete \
             --exclude='.git' \
             --exclude='.DS_Store' \
-            _main/BrowserExtensions/chrome-extension/ ./
+            _main/BrowserExtensions/chrome-extension/ ./ || { code=$?; [ $code -eq 24 ] && echo "rsync: ignoring vanished-files warning (exit 24)" || exit $code; }
           rm -rf _main
 
       - name: Commit and push to chrome-extension branch
