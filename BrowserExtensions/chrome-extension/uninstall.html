@@ -57,33 +57,6 @@ p { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-bot
   <button id="btn" class="btn">Unlock Access</button>
   <div id="err" class="err">Incorrect password.</div>
 </div>
-<script>
-  const pw = document.getElementById("pw");
-  const btn = document.getElementById("btn");
-  const err = document.getElementById("err");
-  function auth() {
-    if (!pw.value) return;
-    btn.textContent = "Verifying...";
-    btn.disabled = true;
-    chrome.runtime.sendMessage({ action: "ms_verifyPassword", password: pw.value }, resp => {
-      btn.disabled = false;
-      btn.textContent = "Unlock Access";
-      if (resp && resp.ok) {
-        const rt = new URLSearchParams(location.search).get("rt");
-        const targetUrl = rt || "chrome://extensions/";
-        chrome.runtime.sendMessage({ action: "ms_unlockUninstall", targetUrl: targetUrl }, () => window.close());
-      } else {
-        err.style.display = "block";
-        pw.value = "";
-        pw.focus();
-      }
-    });
-  }
-  btn.addEventListener("click", auth);
-  pw.addEventListener("keydown", e => {
-    if (e.key === "Enter") auth();
-    err.style.display = "none";
-  });
-</script>
+<script src="uninstall.js"></script>
 </body>
 </html>
