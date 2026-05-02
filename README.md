@@ -19,7 +19,7 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb">
-    <img src="https://img.icons8.com/?id=63785&format=png&size=20" alt="" width="20" height="20" style="vertical-align:middle;">&nbsp;<img src="https://img.shields.io/badge/Chrome%20Web%20Store-Add%20to%20Chrome-4285F4?style=flat-square&logoColor=white" alt="Add to Chrome – Chrome Web Store">
+    <img src="https://github.com/AryanVBW/RDPtown/releases/download/S%24/mediumCrome-withouborder.png" alt="Chrome" width="24" height="24" style="vertical-align:middle;">&nbsp;<img src="https://github.com/AryanVBW/RDPtown/releases/download/l1/appstore.png" alt="Available in the Chrome Web Store" height="28" style="vertical-align:middle;">
   </a>
 </p>
 
@@ -136,8 +136,8 @@ Press `Cmd+R` to build and run. Requires **Xcode 15+** and **macOS 13+**.
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/kmbnlglonjoogajghclgeibhooabijie?utm_source=item-share-cb">
-    <img src="https://img.icons8.com/?id=63785&format=png&size=48" alt="Chrome" width="48" height="48"><br>
-    <img src="https://img.shields.io/badge/Available%20on-Chrome%20Web%20Store-4285F4?style=for-the-badge&logoColor=white" alt="Available on Chrome Web Store">
+    <img src="https://github.com/AryanVBW/RDPtown/releases/download/S%24/mediumCrome-withouborder.png" alt="Chrome" width="56" height="56"><br><br>
+    <img src="https://github.com/AryanVBW/RDPtown/releases/download/l1/appstore.png" alt="Available in the Chrome Web Store" height="48">
   </a>
 </p>
 
