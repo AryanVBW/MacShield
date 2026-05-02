@@ -349,6 +349,28 @@ h2 strong {
   align-items: center;
 }
 
+.store-badge-full {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+
+.store-badge-full:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+}
+
+.store-badge-full-img {
+  display: block;
+  height: 58px;
+  width: auto;
+}
+
 .store-badge-icon {
   width: 36px;
   height: 36px;
