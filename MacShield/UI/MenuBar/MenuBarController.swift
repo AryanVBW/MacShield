@@ -74,7 +74,9 @@ final class MenuBarController {
         Defaults.shared.appSettings = settings
 
         if !settings.isProtectionEnabled {
-            OverlayWindowService.shared.dismissAll()
+            // Protection was just disabled by an authenticated user (popover is gated):
+            // reveal the currently-locked app rather than concealing it.
+            OverlayWindowService.shared.unlock()
             iconState = .idle
         } else {
             iconState = .active

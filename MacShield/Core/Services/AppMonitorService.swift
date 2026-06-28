@@ -31,7 +31,7 @@ final class AppMonitorService: ObservableObject {
         workspace.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)
             .compactMap { $0.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication }
             .sink { [weak self] app in
-                self?.handleAppEvent(app)
+                self?.handleAppEvent(app, isActivation: false)
             }
             .store(in: &cancellables)
 
@@ -39,7 +39,7 @@ final class AppMonitorService: ObservableObject {
         workspace.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
             .compactMap { $0.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication }
             .sink { [weak self] app in
-                self?.handleAppEvent(app)
+                self?.handleAppEvent(app, isActivation: true)
             }
             .store(in: &cancellables)
 
@@ -138,9 +138,13 @@ final class AppMonitorService: ObservableObject {
         NSLog("[MacShield] All app sessions cleared")
     }
 
-    /// Clear authentication for a specific app.
+    /// Clear authentication for a specific app, fully resetting its lock state so the
+    /// next launch/activation re-locks it. Clearing the pending flag too is essential:
+    /// a fail-closed overlay dismissal (timeout/panic) calls this, and without it the
+    /// bundle would stay "pending" and never re-prompt.
     func clearAuthentication(for bundleIdentifier: String) {
         authenticatedApps.remove(bundleIdentifier)
+        pendingLockBundleIDs.remove(bundleIdentifier)
     }
 
     /// Check if an app is currently authenticated.
@@ -167,7 +171,7 @@ final class AppMonitorService: ObservableObject {
         }
     }
 
-    private func handleAppEvent(_ runningApp: NSRunningApplication) {
+    private func handleAppEvent(_ runningApp: NSRunningApplication, isActivation: Bool) {
         guard let bundleID = runningApp.bundleIdentifier else { return }
 
         // Skip blacklisted system apps
@@ -182,6 +186,13 @@ final class AppMonitorService: ObservableObject {
         // Check if global protection is enabled
         let settings = Defaults.shared.appSettings
         guard settings.isProtectionEnabled else { return }
+
+        // Respect the per-event auth requirements (Security settings).
+        if isActivation {
+            guard settings.requireAuthOnActivate else { return }
+        } else {
+            guard settings.requireAuthOnLaunch else { return }
+        }
 
         // Skip if app is already authenticated in this session
         guard !authenticatedApps.contains(bundleID) else { return }

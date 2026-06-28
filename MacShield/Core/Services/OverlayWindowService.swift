@@ -40,37 +40,56 @@ final class OverlayWindowService {
         NSLog("[MacShield] Overlay shown for: %@", app.name)
     }
 
-    /// Hide all overlay windows.
-    func hide() {
+    /// Unlock: dismiss overlays AFTER successful authentication. Marks the app
+    /// authenticated for this session and brings it forward.
+    func unlock() {
+        dismiss(authenticated: true)
+    }
+
+    /// Dismiss all overlays WITHOUT authentication (panic key, timeout failsafe).
+    /// Fails closed: the protected app is concealed and stays locked — never revealed.
+    func dismissAll() {
+        dismiss(authenticated: false)
+    }
+
+    /// Core dismissal.
+    ///
+    /// - `authenticated == true`  → the user passed Touch ID / password / Watch: mark the
+    ///   app authenticated and bring it forward.
+    /// - `authenticated == false` → no auth happened (60s timeout or panic key): NEVER grant
+    ///   access. Keep the app un-authenticated and hide its windows so removing the overlay
+    ///   can't expose protected content. The next activation re-locks it.
+    private func dismiss(authenticated: Bool) {
         stopTimeoutTimer()
 
         // Cancel any in-progress Touch ID evaluation
         AuthenticationService.shared.cancelAuthentication()
 
-        // Mark the app as authenticated so it won't re-lock immediately
-        if let app = currentApp {
-            AppMonitorService.shared.markAuthenticated(app.bundleIdentifier)
+        let bundleID = currentApp?.bundleIdentifier
+
+        if authenticated, let bundleID {
+            AppMonitorService.shared.markAuthenticated(bundleID)
         }
 
         overlayWindows.forEach { $0.close() }
         overlayWindows.removeAll()
 
-        // Activate the protected app now that overlays are gone.
-        // Small delay ensures overlay panels and Touch ID dialog are fully dismissed
-        // before attempting to bring the app forward.
-        if let bundleID = currentApp?.bundleIdentifier {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
-                self?.activateProtectedApp(bundleIdentifier: bundleID)
+        if let bundleID {
+            if authenticated {
+                // Bring the app forward now that overlays are gone. Small delay ensures
+                // panels and the Touch ID dialog are fully dismissed first.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+                    self?.activateProtectedApp(bundleIdentifier: bundleID)
+                }
+            } else {
+                // Fail closed: conceal the app's windows and keep it locked.
+                AppMonitorService.shared.clearAuthentication(for: bundleID)
+                hideRunningApp(bundleIdentifier: bundleID)
             }
         }
 
         currentApp = nil
-        NSLog("[MacShield] Overlay dismissed")
-    }
-
-    /// Dismiss all overlays (used by panic key).
-    func dismissAll() {
-        hide()
+        NSLog("[MacShield] Overlay %@", authenticated ? "unlocked" : "dismissed (locked down)")
     }
 
     /// Whether an overlay is currently displayed.
@@ -133,9 +152,10 @@ final class OverlayWindowService {
                     appName: app.name,
                     bundleIdentifier: app.bundleIdentifier,
                     isPrimary: false,
+                    allowBiometric: app.allowBiometric,
                     onDismiss: { [weak self] in
                         let name = self?.currentApp?.name ?? "app"
-                        self?.hide()
+                        self?.unlock()
                         self?.onUnlocked?(name)
                     }
                 )
@@ -159,9 +179,10 @@ final class OverlayWindowService {
                 appName: app.name,
                 bundleIdentifier: app.bundleIdentifier,
                 isPrimary: isPrimary,
+                allowBiometric: app.allowBiometric,
                 onDismiss: { [weak self] in
                     let name = self?.currentApp?.name ?? "app"
-                    self?.hide()
+                    self?.unlock()
                     self?.onUnlocked?(name)
                 }
             )
@@ -186,6 +207,16 @@ final class OverlayWindowService {
         NSLog("[MacShield] Activated app: %@", bundleIdentifier)
     }
 
+    /// Conceal a running app's windows (used on fail-closed dismiss) so removing the
+    /// overlay never exposes protected content. Equivalent to Cmd+H on the app.
+    private func hideRunningApp(bundleIdentifier: String) {
+        guard let app = NSWorkspace.shared.runningApplications.first(where: {
+            $0.bundleIdentifier == bundleIdentifier
+        }) else { return }
+        app.hide()
+        NSLog("[MacShield] Concealed app on locked-down dismiss: %@", bundleIdentifier)
+    }
+
     // MARK: - Timeout
 
     private func startTimeoutTimer() {
@@ -194,8 +225,8 @@ final class OverlayWindowService {
             : SafetyManager.overlayTimeout
 
         timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-            NSLog("[MacShield Safety] Overlay timeout reached (%.0fs) — auto-dismissing", timeout)
-            self?.hide()
+            NSLog("[MacShield Safety] Overlay timeout reached (%.0fs) — locking down (no access granted)", timeout)
+            self?.dismiss(authenticated: false)
         }
     }
 
