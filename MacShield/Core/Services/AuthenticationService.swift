@@ -57,52 +57,28 @@ final class AuthenticationService {
         isAuthenticating = false
     }
 
-    /// Verify the backup password.
-    func authenticateWithPassword(_ password: String) -> AuthResult {
-        guard KeychainManager.shared.hasPassword() else {
-            return .failure(.noPasswordSet)
+    /// Verify a typed password for a specific protected app.
+    ///
+    /// Routing:
+    /// - If the app has its own **privacy password**, that is the ONLY password accepted
+    ///   (the global backup password intentionally does not open it — the escape hatch is
+    ///   Settings, which is gated by system Touch ID / login password).
+    /// - Otherwise the **global backup password** is used (original behaviour).
+    func authenticateWithPassword(_ password: String, for bundleIdentifier: String?) -> AuthResult {
+        let keychain = KeychainManager.shared
+
+        if let bundleIdentifier, keychain.hasPassword(forApp: bundleIdentifier) {
+            return keychain.verifyPassword(password, forApp: bundleIdentifier)
+                ? .success : .failure(.wrongPassword)
         }
 
-        if KeychainManager.shared.verifyPassword(password) {
-            return .success
-        } else {
-            return .failure(.wrongPassword)
-        }
+        guard keychain.hasPassword() else { return .failure(.noPasswordSet) }
+        return keychain.verifyPassword(password) ? .success : .failure(.wrongPassword)
     }
 
-    /// Authenticate with Touch ID, falling back to macOS login password.
-    /// Used for settings access gating — shows the native system dialog, not the full-screen overlay.
-    func authenticateWithSystemFallback(reason: String, completion: @escaping (AuthResult) -> Void) {
-        guard !isAuthenticating else {
-            completion(.cancelled)
-            return
-        }
-
-        let context = LAContext()
-        var error: NSError?
-
-        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
-            completion(.failure(mapLAError(error)))
-            return
-        }
-
-        isAuthenticating = true
-        activeContext = context
-
-        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
-            DispatchQueue.main.async {
-                self.isAuthenticating = false
-                self.activeContext = nil
-
-                if success {
-                    completion(.success)
-                } else if let error = error as? LAError, error.code == .userCancel {
-                    completion(.cancelled)
-                } else {
-                    completion(.failure(self.mapLAError(error as NSError?)))
-                }
-            }
-        }
+    /// Verify a typed password against the global backup password.
+    func authenticateWithPassword(_ password: String) -> AuthResult {
+        authenticateWithPassword(password, for: nil)
     }
 
     /// Check if Touch ID is available on this Mac.
