@@ -15,6 +15,15 @@ struct GeneralSettingsView: View {
 
                 Toggle("Lock apps when Mac sleeps", isOn: $settings.lockOnSleep)
                     .toggleStyle(.goldSwitch)
+
+#if !APP_STORE
+                Toggle("Keep MacShield running (relaunch if force-quit)", isOn: $settings.keepRunning)
+                    .toggleStyle(.goldSwitch)
+
+                Text("If MacShield is force-quit from Activity Monitor or killed, it relaunches automatically and re-locks your apps. A normal Quit from the menu still works. This raises the bar against someone disabling protection — but it can't block a forced kill outright, and an administrator can still stop it.")
+                    .font(MacShieldTypography.caption)
+                    .foregroundColor(MacShieldColors.textSecondary)
+#endif
             }
 
             Section {
@@ -99,6 +108,7 @@ struct GeneralSettingsView: View {
         .formStyle(.grouped)
         .padding()
         .onChange(of: settings.launchAtLogin) { _ in save() }
+        .onChange(of: settings.keepRunning) { _ in save() }
         .onChange(of: settings.lockOnSleep) { _ in save() }
         .onChange(of: settings.lockOnIdle) { _ in save() }
     }
@@ -118,6 +128,11 @@ struct GeneralSettingsView: View {
 
         // Register or unregister launch at login
         updateLaunchAtLogin(enabled: settings.launchAtLogin)
+
+#if !APP_STORE
+        // Tamper resistance: install or remove the auto-relaunch agent.
+        SafetyManager.syncKeepAlive(enabled: settings.keepRunning)
+#endif
     }
 
     private func updateLaunchAtLogin(enabled: Bool) {
