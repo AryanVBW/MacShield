@@ -6,11 +6,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let menuBarController = MenuBarController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Single-instance guard: if another MacShield is already running (e.g. the login
+        // item AND the keep-alive agent both launched one), this younger instance exits
+        // cleanly before any setup. exit(0) ⇒ KeepAlive won't treat it as a crash.
+        if SafetyManager.shouldExitAsDuplicate() {
+            NSLog("[MacShield] Another instance is already running — exiting duplicate")
+            exit(0)
+        }
+
         menuBarController.setup()
 
 #if !APP_STORE
         // Initialize Sparkle auto-updater
         UpdateService.shared.start()
+
+        // Tamper resistance: keep the auto-relaunch agent in sync with the user's setting.
+        SafetyManager.syncKeepAlive(enabled: Defaults.shared.appSettings.keepRunning)
 #endif
 
         // Request notification permission (for Watch unlock notifications)
@@ -33,8 +44,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppMonitorService.shared.onProtectedAppDetected = { [weak self] app in
             // Auto-unlock if Watch is in range AND unlocked (on wrist).
             // If Watch is nearby but locked/off wrist, fall through to Touch ID.
+            // Password-only (private) apps never auto-unlock via Watch.
             let watch = WatchProximityService.shared
-            let watchCanUnlock = Defaults.shared.appSettings.useWatchUnlock
+            let watchCanUnlock = app.allowBiometric
+                && Defaults.shared.appSettings.useWatchUnlock
                 && watch.isWatchInRange
                 && (watch.isWatchUnlocked ?? true)
             if watchCanUnlock {
@@ -102,8 +115,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // Only auto-unlock if Watch is on wrist (unlocked)
             guard WatchProximityService.shared.isWatchUnlocked ?? true else { return }
             let lockedBundleID = OverlayWindowService.shared.currentBundleIdentifier
+            // Never let the Watch auto-open a password-only (private) app.
+            if let lockedBundleID,
+               let app = ProtectedAppsManager.shared.apps.first(where: { $0.bundleIdentifier == lockedBundleID }),
+               !app.allowBiometric {
+                return
+            }
             let lockedAppName = OverlayWindowService.shared.currentAppName
-            OverlayWindowService.shared.hide()
+            OverlayWindowService.shared.unlock()
             WatchUnlockToast.shared.show(for: lockedBundleID)
             Self.sendWatchUnlockNotification(appName: lockedAppName ?? "app")
             self?.menuBarController.iconState = .active
