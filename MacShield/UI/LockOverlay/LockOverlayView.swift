@@ -14,6 +14,9 @@ struct LockOverlayView: View {
     let appName: String
     let bundleIdentifier: String
     let isPrimary: Bool
+    /// Whether Touch ID / Apple Watch may unlock this app. When false the overlay
+    /// goes straight to password entry and never offers biometrics.
+    let allowBiometric: Bool
     let onDismiss: () -> Void
 
     @State private var isVisible = false
@@ -55,6 +58,7 @@ struct LockOverlayView: View {
             // ── Foreground content ────────────────────────────────────────
             if showPasswordInput {
                 PasswordInputView(
+                    bundleIdentifier: bundleIdentifier,
                     onSuccess: { onDismiss() },
                     onCancel: {
                         showPasswordInput = false
@@ -75,9 +79,24 @@ struct LockOverlayView: View {
             withAnimation(appear) {
                 isVisible = true
             }
-            if isPrimary {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                    attemptTouchID()
+            if allowBiometric {
+                // Happy path: auto-trigger Touch ID on the primary display.
+                if isPrimary {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                        attemptTouchID()
+                    }
+                }
+            } else {
+                // Password-only (private) app: no biometrics. Show the password
+                // field straight away on the primary display.
+                authState = .waitingForUser
+                if isPrimary {
+                    OverlayWindowService.shared.enableKeyboardInput()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        withAnimation(MacShieldAnimations.adapted(MacShieldAnimations.standard)) {
+                            showPasswordInput = true
+                        }
+                    }
                 }
             }
             // Start lock icon breathing pulse
@@ -137,14 +156,17 @@ struct LockOverlayView: View {
                             }
                         }
 
-                        PrimaryButton("Try Again", icon: "touchid") {
-                            attemptTouchID()
-                        }
+                        if allowBiometric {
+                            PrimaryButton("Try Again", icon: "touchid") {
+                                attemptTouchID()
+                            }
 
-                        SecondaryButton("Use Password Instead") {
-                            OverlayWindowService.shared.enableKeyboardInput()
-                            withAnimation(MacShieldAnimations.adapted(MacShieldAnimations.standard)) {
-                                showPasswordInput = true
+                            SecondaryButton("Use Password Instead") {
+                                showPasswordEntry()
+                            }
+                        } else {
+                            PrimaryButton("Enter Password", icon: "key.fill") {
+                                showPasswordEntry()
                             }
                         }
                     }
@@ -194,7 +216,17 @@ struct LockOverlayView: View {
 
     // MARK: - Touch ID
 
+    /// Switch the overlay into password-entry mode (shared by the "Use Password
+    /// Instead" action and the password-only flow).
+    private func showPasswordEntry() {
+        OverlayWindowService.shared.enableKeyboardInput()
+        withAnimation(MacShieldAnimations.adapted(MacShieldAnimations.standard)) {
+            showPasswordInput = true
+        }
+    }
+
     private func attemptTouchID() {
+        guard allowBiometric else { return }
         authState = .authenticating
         errorMessage = nil
         if !reduceMotion { startLockPulse() }

@@ -13,6 +13,9 @@ struct PasswordInputView: View {
     @State private var shakeOffset: CGFloat = 0
     @State private var fieldFocused = false
 
+    /// The app being unlocked. Determines which password to check: the app's own
+    /// privacy password if it has one, otherwise the global backup password.
+    let bundleIdentifier: String?
     let onSuccess: () -> Void
     let onCancel: () -> Void
 
@@ -127,7 +130,7 @@ struct PasswordInputView: View {
     // MARK: - Logic
 
     private func verifyPassword() {
-        let result = AuthenticationService.shared.authenticateWithPassword(password)
+        let result = AuthenticationService.shared.authenticateWithPassword(password, for: bundleIdentifier)
 
         switch result {
         case .success:
