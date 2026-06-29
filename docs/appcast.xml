@@ -14,7 +14,7 @@
             <enclosure
                 url="https://github.com/AryanVBW/MacShield/releases/download/v1.1.0/MacShield.dmg"
                 type="application/octet-stream"
-                sparkle:edSignature=""
+                sparkle:edSignature="d0KnSiOsXVH2U2BAwtnA535AqNCvi8NtzZxBrHSx99aBQ754Lq6ukFRW+7brxn+hGFYSkWoEeqdtPGG9eXimCg=="
                 length="2192458"
             />
         </item>
