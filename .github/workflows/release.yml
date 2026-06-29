@@ -54,12 +54,12 @@ jobs:
       - name: Export app from archive
         run: |
           mkdir -p build/export
-          cp -R build/MacShield.xcarchive/Products/Applications/MacShield.app build/export/
+          cp -R build/MacShield.xcarchive/Products/Applications/*.app build/export/
 
       - name: Create DMG
         run: |
           mkdir -p build/dmg-stage
-          cp -R build/export/MacShield.app build/dmg-stage/
+          cp -R build/export/*.app build/dmg-stage/
           ln -s /Applications build/dmg-stage/Applications
           hdiutil create -volname "MacShield" \
             -srcfolder build/dmg-stage \
