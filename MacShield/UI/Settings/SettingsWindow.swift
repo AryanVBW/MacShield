@@ -30,13 +30,22 @@ final class SettingsWindowController {
         let hostingController = NSHostingController(rootView: settingsView)
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 440),
+            contentRect: NSRect(x: 0, y: 0, width: 560, height: 480),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
         window.title = "MacShield Settings"
         window.contentViewController = hostingController
+
+        // macOS 15+/Tahoe regression: a SwiftUI NSHostingController set as the window's
+        // contentViewController can be left at zero size and render as a blank/black
+        // window unless its initial layout is resolved before the window is shown.
+        // Forcing the constraint + layout pass here fixes the blank page.
+        // See https://stackoverflow.com/a/79337455
+        window.updateConstraintsIfNeeded()
+        window.contentView?.layoutSubtreeIfNeeded()
+
         window.isReleasedWhenClosed = false
         centerWindow(window, on: targetScreen)
         window.makeKeyAndOrderFront(nil)
